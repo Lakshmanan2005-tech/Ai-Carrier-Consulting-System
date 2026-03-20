@@ -1,4 +1,5 @@
 import os
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
 import sys
 import json
 import sqlite3
