@@ -18,7 +18,6 @@ load_dotenv()
 
 app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY', 'your_secret_key')
-GEMINI_API_KEY = ('AIzaSyBo4QsioCwFXzOnuHkT7w5ZSovm465dWCM')
 try:
     genai.configure(api_key=GEMINI_API_KEY)
 except Exception:
