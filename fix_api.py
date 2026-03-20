@@ -6,7 +6,7 @@ with open('app.py', 'r', encoding='utf-8') as f:
 # Fix the broken global variable load
 text = re.sub(
     r"GEMINI_API_KEY = os\.getenv\('AIzaSy[^']+'\)\nif GEMINI_API_KEY and GEMINI_API_KEY != 'AIzaSy[^']+':\n    try:\n        genai\.configure\(api_key=GEMINI_API_KEY\)",
-    "GEMINI_API_KEY = 'AIzaSyBo4QsioCwFXzOnuHkT7w5ZSovm465dWCM'\ntry:\n    genai.configure(api_key=GEMINI_API_KEY)",
+   genai.configure(api_key=GEMINI_API_KEY)",
     text,
     flags=re.MULTILINE
 )
