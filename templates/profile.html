@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="profile-card grid-card-modern" style="max-width: 600px; margin: 2rem auto; border-top: 4px solid var(--primary-color);">
+    <h2 style="text-align: center; margin-bottom: 2rem; color: var(--text-primary); font-family: 'Poppins', sans-serif;">Profile Update</h2>
+    
+    {% if error %}
+    <div style="color: #ef4444; background: rgba(239, 68, 68, 0.1); padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; text-align: center; border: 1px solid rgba(239, 68, 68, 0.3);">
+        <i class="fa-solid fa-circle-exclamation" style="margin-right: 0.5rem;"></i> {{ error }}
+    </div>
+    {% endif %}
+    {% if success %}
+    <div style="color: #10b981; background: rgba(16, 185, 129, 0.1); padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; text-align: center; border: 1px solid rgba(16, 185, 129, 0.3);">
+        <i class="fa-solid fa-circle-check" style="margin-right: 0.5rem;"></i> {{ success }}
+    </div>
+    {% endif %}
+
+    <form method="POST" action="{{ url_for('profile') }}">
+        <div style="margin-bottom: 1.5rem;">
+            <label style="display: block; margin-bottom: 0.5rem; color: var(--text-secondary); font-weight: 500;">Name</label>
+            <input type="text" name="name" value="{{ user.name }}" required style="width: 100%; padding: 0.8rem 1rem; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-color); color: var(--text-primary); transition: all 0.3s;" onfocus="this.style.borderColor='var(--primary-color)'" onblur="this.style.borderColor='var(--border-color)'">
+        </div>
+        
+        <div style="margin-bottom: 1.5rem;">
+            <label style="display: block; margin-bottom: 0.5rem; color: var(--text-secondary); font-weight: 500;">Email Address</label>
+            <input type="email" name="email" value="{{ user.email }}" required style="width: 100%; padding: 0.8rem 1rem; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-color); color: var(--text-primary); transition: all 0.3s;" onfocus="this.style.borderColor='var(--primary-color)'" onblur="this.style.borderColor='var(--border-color)'">
+        </div>
+
+        <hr style="border: 0; border-top: 1px solid rgba(108, 99, 255, 0.15); margin: 2rem 0;">
+        
+        <div style="margin-bottom: 1.5rem;">
+            <label style="display: block; margin-bottom: 0.5rem; color: var(--text-secondary); font-weight: 500;">New Password (Optional)</label>
+            <input type="password" name="new_password" placeholder="Leave blank to keep current password" style="width: 100%; padding: 0.8rem 1rem; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-color); color: var(--text-primary); transition: all 0.3s;" onfocus="this.style.borderColor='var(--primary-color)'" onblur="this.style.borderColor='var(--border-color)'">
+        </div>
+        
+        <div style="margin-bottom: 2rem;">
+            <label style="display: block; margin-bottom: 0.5rem; color: var(--text-primary); font-weight: 600;">Current Password <span style="color: #ef4444;">*</span></label>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.8rem;">Required to authenticate profile changes.</p>
+            <input type="password" name="current_password" required placeholder="Enter current password" style="width: 100%; padding: 0.8rem 1rem; border: 1px solid rgba(239, 68, 68, 0.4); border-radius: 8px; background: var(--bg-color); color: var(--text-primary);">
+        </div>
+        
+        <button type="submit" class="btn-gradient" style="width: 100%; padding: 1rem; border-radius: 12px; font-weight: 600; font-size: 1.05rem;">
+            <i class="fa-solid fa-floppy-disk" style="margin-right: 0.5rem;"></i> Save Changes
+        </button>
+    </form>
+</div>
+{% endblock %}

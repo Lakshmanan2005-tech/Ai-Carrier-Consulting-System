@@ -1,0 +1,27 @@
+    /* FORCE DARK MODE TEXT FIX */
+    body.dark-theme,
+    body.dark-theme * {
+      color: #ffffff !important;
+    }
+
+    /* Cards / boxes */
+    body.dark-theme .card,
+    body.dark-theme .box,
+    body.dark-theme .skill-box,
+    body.dark-theme .container {
+      background-color: #1e293b !important;
+      color: #ffffff !important;
+    }
+
+    /* Buttons */
+    body.dark-theme button {
+      color: #ffffff !important;
+    }
+
+    /* Inputs */
+    body.dark-theme input,
+    body.dark-theme textarea {
+      background-color: #0f172a !important;
+      color: #ffffff !important;
+      border: 1px solid #334155 !important;
+    }

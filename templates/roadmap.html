@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="roadmap-container">
+    {% if not data %}
+        <div class="glass-card" style="text-align: center; padding: 4rem;">
+            <h2>Roadmap not found</h2>
+            <p style="color: var(--text-secondary); margin-top: 1rem;">We couldn't find a structured roadmap for "<strong>{{ skill_query }}</strong>".</p>
+            <p style="margin-top: 1rem;">Try searching for generic IT domains like <em>Java, Python, Web Development, Mobile App Development, AI, Data Science, etc.</em></p>
+            <a href="{{ url_for('index') }}" class="btn-primary" style="margin-top: 2rem;">Go Back Home</a>
+        </div>
+    {% else %}
+        <div class="roadmap-header-centered" style="text-align: center; margin-bottom: 2.5rem; max-width: 800px; margin-left: auto; margin-right: auto;">
+            <h1 class="roadmap-title" style="font-size: 2.5rem; margin-bottom: 0.8rem; line-height: 1.3; font-weight: 800;">{{ data.title }}</h1>
+            <p style="color: var(--text-secondary); font-size: 1.15rem; line-height: 1.6;">
+                {% if data.is_ai_generated %}
+                    Here is an AI-generated learning path for mastering {{ data.title }}.
+                {% else %}
+                    Follow this structured path to master {{ data.title }}.
+                {% endif %}
+            </p>
+            <div style="margin-top: 1.5rem;">
+                <a href="{{ url_for('interview_practice', skill=skill_query) }}" class="btn-gradient" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.8rem 1.8rem; border-radius: 8px;">
+                    <i class="fa-solid fa-microphone"></i> Start Interview Practice
+                </a>
+            </div>
+        </div>
+
+        <div class="grid-layout-system roadmap-cards-grid">
+            {% for section in data.sections %}
+                <div class="grid-card-modern">
+                    <div class="card-icon-wrapper">
+                        {% if 'Beginner' in section.title or 'Foundation' in section.title %}
+                            <i class="fa-solid fa-seedling"></i>
+                        {% elif 'Intermediate' in section.title or 'Core' in section.title %}
+                            <i class="fa-solid fa-layer-group"></i>
+                        {% elif 'Advanced' in section.title %}
+                            <i class="fa-solid fa-rocket"></i>
+                        {% elif 'Tools' in section.title or 'Frameworks' in section.title %}
+                            <i class="fa-solid fa-screwdriver-wrench"></i>
+                        {% elif 'Projects' in section.title or 'Backend' in section.title or 'Security' in section.title %}
+                            <i class="fa-solid fa-laptop-code"></i>
+                        {% elif 'Career' in section.title or 'Job' in section.title or 'Database' in section.title %}
+                            <i class="fa-solid fa-briefcase"></i>
+                        {% else %}
+                            <i class="fa-solid fa-star"></i>
+                        {% endif %}
+                    </div>
+                    <h4 class="grid-card-title">{{ section.title }}</h4>
+                    <p class="grid-card-content">{{ section.content | safe }}</p>
+                </div>
+            {% endfor %}
+        </div>
+
+        {% if data.interview_questions %}
+        <div class="interview-section" style="margin-top: 2.5rem;">
+            <h3 style="margin-bottom: 1.2rem; text-align: center; font-size: 1.5rem;">Important Interview Questions</h3>
+            <div class="glass-card" style="max-width: 800px; margin: 0 auto; padding: 1.5rem;">
+                <ul style="padding-left: 1.5rem; color: var(--text-secondary);">
+                    {% for question in data.interview_questions %}
+                        <li style="margin-bottom: 0.8rem; font-size: 1.05rem;">{{ question }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if data.interview_qs and data.interview_qs|length > 0 %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/roadmap.css') }}">
+        <div class="interview-section" style="margin: 3rem auto 0 auto; max-width: 800px;">
+            <h3 style="margin-bottom: 1.2rem; text-align: center; font-size: 1.5rem; color: var(--text-primary);">Top Interview Questions</h3>
+            <div class="grid-card-modern" style="padding: 1.8rem 2rem; border-top: 4px solid var(--primary-color);">
+                <div style="display: flex; flex-direction: column;">
+                    {% for q in data.interview_qs[:5] %}
+                    <div class="interview-q-item">
+                        <i class="fa-solid fa-circle-question"></i>
+                        <div class="interview-q-text">{{ q | safe }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <div style="margin-top: 2rem; text-align: center; display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;">
+                    <a href="{{ url_for('interview_practice', skill=skill_query) }}" class="btn-gradient" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.8rem 1.8rem; border-radius: 8px;">
+                        <i class="fa-solid fa-microphone"></i> Practice Interview Mode
+                    </a>
+                    <a href="https://www.geeksforgeeks.org/interview-preparation/" target="_blank" class="btn-secondary" style="display: inline-flex; align-items: center; gap: 0.5rem; transition: transform 0.2s, box-shadow 0.2s; padding: 0.8rem 1.8rem; border-radius: 8px;">
+                        More Questions <i class="fa-solid fa-arrow-right-long"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if data.resources and data.resources|length > 0 %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/roadmap.css') }}">
+        <div class="resources-section" style="margin: 3rem auto 0 auto; max-width: 800px;">
+            <h3 style="margin-bottom: 1.2rem; text-align: center; font-size: 1.5rem;">Learning Resources</h3>
+            <div class="grid-card-modern" style="padding: 1.5rem 2rem;">
+                <div style="display: flex; flex-direction: column; gap: 1rem;">
+                    {% for resource in data.resources[:3] %}
+                    <a href="{{ resource.url }}" target="_blank" class="resource-row">
+                        <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(108, 99, 255, 0.08); color: var(--primary-color); display: flex; align-items: center; justify-content: center; font-size: 1.3rem; margin-right: 1.5rem; flex-shrink: 0;">
+                            <i class="fa-solid fa-link"></i>
+                        </div>
+                        <div style="flex: 1; text-align: left;">
+                            <h4 style="color: var(--text-primary); margin-bottom: 0.3rem; font-size: 1.15rem;">{{ resource.name }}</h4>
+                            <p style="color: var(--text-secondary); font-size: 0.95rem; margin: 0; line-height: 1.5;">{{ resource.desc | default('Learn more about ' ~ data.title) }}</p>
+                        </div>
+                        <i class="fa-solid fa-arrow-up-right-from-square" style="color: var(--text-muted); font-size: 1.1rem; margin-left: 1rem;"></i>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        
+        {% if data.jobs and data.jobs|length > 0 %}
+        <div class="jobs-section" style="margin-top: 3.5rem; margin-bottom: 3rem;">
+            <h3 style="margin-bottom: 0.8rem; text-align: center; font-size: 1.6rem; color: var(--text-primary);">Ready for your next career move?</h3>
+            <p style="text-align: center; color: var(--text-secondary); margin-bottom: 2rem; font-size: 1.05rem;">Explore trending roles related to {{ data.title }}.</p>
+            
+            <div class="jobs-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.2rem; max-width: 1000px; margin: 0 auto;">
+                {% for job in data.jobs[:3] %}
+                <div class="grid-card-modern" style="padding: 1.8rem 1.5rem; display: flex; flex-direction: column; align-items: center; text-align: center; border: 1px solid rgba(108, 99, 255, 0.15);">
+                    <div style="width: 45px; height: 45px; border-radius: 12px; background: rgba(108, 99, 255, 0.08); color: var(--primary-color); display: flex; align-items: center; justify-content: center; font-size: 1.4rem; margin-bottom: 1rem;">
+                        <i class="fa-solid fa-briefcase"></i>
+                    </div>
+                    <h4 style="margin-bottom: 0.6rem; font-size: 1.2rem; color: var(--text-primary);">{{ job.role }}</h4>
+                    <p style="color: var(--text-secondary); font-size: 0.95rem; line-height: 1.5; margin-bottom: 1.8rem; flex: 1;">{{ job.desc }}</p>
+                    <a href="https://www.naukri.com/{{ job.role | replace(' ', '-') | replace('/', '-') | lower }}-jobs" target="_blank" class="btn-gradient" style="width: 100%; padding: 0.9rem; border-radius: 10px; font-size: 1.05rem; box-shadow: 0 4px 15px rgba(108, 99, 255, 0.25);">Apply Now</a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    {% endif %}
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    document.querySelectorAll('.grid-card-content').forEach(el => {
+        let content = el.innerHTML;
+        // Check if content has AI/Hardcoded bullet points
+        if (content.includes('•') || content.includes('&#8226;')) {
+            let items = content.replace(/&#8226;/g, '•')
+                               .split(/<br\s*\/?>|\n/)
+                               .map(item => item.replace(/•/g, '').trim())
+                               .filter(i => i.length > 0);
+            
+            if (items.length > 0) {
+                let ul = document.createElement('ul');
+                ul.className = 'custom-list';
+                items.forEach(item => {
+                    let li = document.createElement('li');
+                    
+                    let formattedItem = item;
+                    // Bolding contexts based on common roadmap schemas
+                    if (item.includes(':')) {
+                        let parts = item.split(':');
+                        formattedItem = `<span class="highlight-text">${parts[0]}:</span>${parts.slice(1).join(':')}`;
+                    } else if (item.includes('-')) {
+                        let parts = item.split('-');
+                        formattedItem = `<span class="highlight-text">${parts[0]}-</span>${parts.slice(1).join('-')}`;
+                    } else {
+                        // Highlight first two words for structured aesthetic
+                        let words = item.split(' ');
+                        if (words.length > 2) {
+                            formattedItem = `<span class="highlight-text">${words[0]} ${words[1]}</span> ${words.slice(2).join(' ')}`;
+                        }
+                    }
+                    
+                    li.innerHTML = `<i class="fa-solid fa-check-circle list-icon"></i><span class="list-text">${formattedItem}</span>`;
+                    ul.appendChild(li);
+                });
+                el.innerHTML = '';
+                el.appendChild(ul);
+            }
+        }
+    });
+
+    // Handle Guest User LocalStorage Caching 
+    const titleElement = document.querySelector('.roadmap-title');
+    if (titleElement) {
+        const skillName = titleElement.innerText.trim();
+        if (skillName && skillName !== "Roadmap not found" && !skillName.includes("(AI Error)")) {
+            let history = JSON.parse(localStorage.getItem('guest_roadmap_history') || '[]');
+            // Filter out existing instances of this skill pushing it fresh to top
+            history = history.filter(h => h !== skillName);
+            history.unshift(skillName);
+            if (history.length > 5) history.pop();
+            localStorage.setItem('guest_roadmap_history', JSON.stringify(history));
+        }
+    }
+});
+</script>
+{% endblock %}

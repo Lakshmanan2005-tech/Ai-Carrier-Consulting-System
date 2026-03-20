@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Career Consulting</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=15.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+</head>
+
+<body class="{% if request.endpoint == 'login' %}login-page-bg{% endif %}">
+    <script>
+        const dbTheme = "{{ session.get('theme', '') }}";
+        const localTheme = localStorage.getItem('theme');
+        if (dbTheme === 'dark' || (!dbTheme && localTheme === 'dark')) {
+            document.body.classList.add('dark-theme');
+        }
+    </script>
+    {% if request.endpoint != 'login' %}
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar collapsed" id="sidebar">
+            <div class="sidebar-logo">
+                <i class="fa-solid fa-layer-group"></i> <span class="logo-text">AI Career</span>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="{{ url_for('dashboard') }}"
+                    class="nav-item {% if request.endpoint == 'dashboard' %}active{% endif %}">
+                    <i class="fa-solid fa-house"></i> <span class="nav-text">Home</span>
+                </a>
+                <a href="{{ url_for('history') }}"
+                    class="nav-item {% if request.endpoint == 'history' %}active{% endif %}"
+                    style="white-space: normal; line-height: 1.2;">
+                    <i class="fa-solid fa-clock-rotate-left"></i> <span class="nav-text">Last Viewed Roadmaps</span>
+                </a>
+                <a href="{{ url_for('interview_home') }}"
+                    class="nav-item {% if request.endpoint == 'interview_home' %}active{% endif %}">
+                    <i class="fa-solid fa-microphone"></i> <span class="nav-text">Interview Practice</span>
+                </a>
+                <a href="{{ url_for('ats_test') }}"
+                    class="nav-item {% if request.endpoint == 'ats_test' %}active{% endif %}">
+                    <i class="fa-solid fa-file-lines"></i> <span class="nav-text">ATS Resume Test</span>
+                </a>
+                <a href="{{ url_for('career_test') }}"
+                    class="nav-item {% if request.endpoint == 'career_test' %}active{% endif %}">
+                    <i class="fa-solid fa-brain"></i> <span class="nav-text">Career Test</span>
+                </a>
+            </nav>
+
+            {% if session.get('user_id') or session.get('guest') %}
+            <div class="sidebar-footer">
+                <a href="{{ url_for('logout') }}" class="nav-item logout-item">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i> <span class="nav-text">Logout</span>
+                </a>
+            </div>
+            {% endif %}
+        </aside>
+
+        <!-- Main Content Area -->
+        <div class="main-wrapper collapsed" id="mainWrapper">
+            <header class="app-header">
+                <div class="header-left">
+                    <button class="burger-toggle" id="burgerToggle">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+                </div>
+                
+                <!-- Glowing Navbar Branding -->
+                <div class="navbar-branding">AI Career Consulting System</div>
+                
+                <div class="header-right">
+                    {% if session.get('user_id') or session.get('guest') %}
+                    {% set display_name = session.get('name', 'Guest') %}
+                    <div class="profile-menu-container" id="profileMenuToggle">
+                        <div class="user-profile-header">
+                            <div class="avatar-header">{{ display_name[0]|upper }}</div>
+                            <span class="user-name-header">{{ display_name }}</span>
+                            <i class="fa-solid fa-chevron-down"
+                                style="color: var(--text-muted); font-size: 0.8rem;"></i>
+                        </div>
+                        <div class="profile-dropdown" id="profileDropdown">
+                            {% if not session.get('guest') %}
+                            <a href="{{ url_for('profile') }}"><i class="fa-solid fa-user-pen"></i> Profile Update</a>
+                            {% endif %}
+                            <a href="{{ url_for('history') }}"><i class="fa-solid fa-clock-rotate-left"></i> History</a>
+                            <div class="dropdown-divider"></div>
+                            <div
+                                style="padding: 0.5rem 1.4rem; color: var(--text-muted); font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">
+                                Settings</div>
+                            <a href="#" onclick="toggleTheme('light'); return false;"><i class="fa-solid fa-sun"></i>
+                                Light Mode</a>
+                            <a href="#" onclick="toggleTheme('dark'); return false;"><i class="fa-solid fa-moon"></i>
+                                Dark Mode</a>
+                            <div class="dropdown-divider"></div>
+                            <a href="{{ url_for('logout') }}" class="text-danger"><i
+                                    class="fa-solid fa-arrow-right-from-bracket"></i> Logout</a>
+                        </div>
+                    </div>
+                    {% else %}
+                    <a href="{{ url_for('login') }}" class="btn-primary">Login</a>
+                    {% endif %}
+                </div>
+            </header>
+            {% endif %}
+
+            <main class="content-area {% if request.endpoint == 'login' %}login-content{% endif %}">
+                {% block content %}{% endblock %}
+            </main>
+
+            {% if request.endpoint != 'login' %}
+        </div>
+    </div>
+    {% endif %}
+
+    {% if request.endpoint != 'login' %}
+    <!-- Floating AI Chatbot -->
+    <div class="floating-chatbot">
+        <button class="chatbot-toggle" id="chatbotToggle" title="Career Assistant">
+            <i class="fa-solid fa-robot"></i>
+        </button>
+        <div class="chatbot-window" id="chatbotWindow">
+            <div class="chat-header">
+                <strong>AI Career Assistant</strong>
+                <button class="close-chat" id="closeChat">&times;</button>
+            </div>
+            <div class="chat-body" id="chatBody">
+                <div class="chat-bubble ai">Hello! I am your AI Career Assistant. Ask me anything about skills,
+                    roadmaps, or career paths.</div>
+            </div>
+            <div class="chat-footer">
+                <input type="text" class="chat-input" id="chatInput"
+                    placeholder="Ask about careers, skills, or roadmaps...">
+                <button class="chat-send" id="chatSend">
+                    <i class="fa-solid fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Mobile Navigation Overlay -->
+    <div class="mobile-overlay" id="mobileOverlay"></div>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}?v=1.1"></script>
+    <script>
+        function toggleTheme(themeType) {
+            if (themeType === 'dark') {
+                document.body.classList.add('dark-theme');
+            } else {
+                document.body.classList.remove('dark-theme');
+            }
+            localStorage.setItem('theme', themeType);
+
+            // Notify Backend Session
+            fetch('/update_theme', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ theme: themeType })
+            });
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,42 @@
+            .interview-q-item {
+                display: flex;
+                align-items: flex-start;
+                margin-bottom: 1.2rem;
+                padding-bottom: 1.2rem;
+                border-bottom: 1px solid rgba(108, 99, 255, 0.1);
+            }
+            .interview-q-item:last-child {
+                border-bottom: none;
+                margin-bottom: 0;
+                padding-bottom: 0;
+            }
+            .interview-q-item i {
+                color: var(--primary-color);
+                font-size: 1.2rem;
+                margin-right: 1.2rem;
+                margin-top: 0.2rem;
+            }
+            .interview-q-text {
+                color: var(--text-secondary);
+                font-size: 1.05rem;
+                line-height: 1.6;
+            }
+            .interview-q-text b {
+                color: var(--primary-color);
+                font-weight: 600;
+            }
+            .resource-row {
+                display: flex; 
+                align-items: center; 
+                padding: 1.2rem 1.5rem; 
+                background: #ffffff; 
+                border-radius: 12px; 
+                text-decoration: none; 
+                transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease;
+                border: 1px solid rgba(108, 99, 255, 0.05);
+            }
+            .resource-row:hover {
+                transform: translateY(-4px);
+                box-shadow: 0 12px 25px rgba(108, 99, 255, 0.12);
+                border-color: rgba(108, 99, 255, 0.2);
+            }

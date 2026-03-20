@@ -1,0 +1,110 @@
+    .forgot-pwd-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(10, 10, 20, 0.4);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        z-index: 9999;
+        display: none;
+        justify-content: center;
+        align-items: center;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .forgot-pwd-modal.show {
+        display: flex;
+    }
+
+    .forgot-pwd-modal.active {
+        opacity: 1;
+    }
+
+    .fp-card {
+        background: #ffffff !important;
+        padding: 2.5rem;
+        border-radius: 32px;
+        width: 90%;
+        max-width: 440px;
+        position: relative;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.06) !important;
+        border: 1px solid rgba(255, 255, 255, 0.8) !important;
+        transform: scale(0.95) translateY(20px);
+        transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        color: #6b7280 !important;
+        text-shadow: none !important;
+    }
+
+    .fp-card h3 {
+        color: #111827 !important;
+        text-shadow: none !important;
+        font-size: 1.5rem;
+        font-weight: 700;
+    }
+
+    .fp-card p {
+        color: #6b7280 !important;
+        text-shadow: none !important;
+    }
+
+    .fp-card .form-control {
+        background: #f3f4f6 !important;
+        border: 1px solid transparent !important;
+        border-radius: 12px !important;
+        color: #111827 !important;
+        box-shadow: none !important;
+        padding: 1.2rem 1rem !important;
+        font-size: 1rem !important;
+        transition: all 0.3s ease !important;
+        margin-bottom: 0.8rem;
+    }
+
+    .fp-card .form-control:focus {
+        background: #ffffff !important;
+        border-color: #d1d5db !important;
+        box-shadow: 0 0 0 4px rgba(229, 231, 235, 0.5) !important;
+        outline: none !important;
+    }
+
+    .fp-card .form-control::placeholder {
+        color: #9ca3af !important;
+        font-weight: 500 !important;
+    }
+
+    .forgot-pwd-modal.active .fp-card {
+        transform: scale(1) translateY(0);
+    }
+
+    .close-modal {
+        position: absolute;
+        top: 18px;
+        right: 22px;
+        background: none;
+        border: none;
+        font-size: 1.8rem;
+        color: #9ca3af;
+        cursor: pointer;
+        transition: color 0.2s ease;
+        text-shadow: none;
+    }
+
+    .close-modal:hover {
+        color: #111827;
+    }
+
+    /* Enforce dark layout inheritance safely inside modal if configured */
+    body.dark-theme.login-page-bg .fp-card {
+        background: #1f2937 !important;
+        border-color: #374151 !important;
+    }
+
+    body.dark-theme.login-page-bg .fp-card h3 {
+        color: #f9fafb !important;
+    }
+
+    body.dark-theme.login-page-bg .fp-card p {
+        color: #d1d5db !important;
+    }

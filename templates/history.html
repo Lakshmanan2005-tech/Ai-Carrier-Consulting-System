@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="history-container" style="max-width: 900px; margin: 0 auto; padding-top: 1rem;">
+    <h2 style="font-size: 2.2rem; margin-bottom: 2.5rem; color: var(--text-primary); text-align: center; font-family: 'Poppins', sans-serif; font-weight: 700;">Last Viewed Roadmaps</h2>
+    
+    <div id="history-content" class="grid-layout-system" style="grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem;">
+        {% if not is_guest %}
+            {% if history and history|length > 0 %}
+                {% for item in history[:5] %}
+                <a href="{{ url_for('roadmap', skill=item) }}" class="grid-card-modern history-card" style="text-decoration: none; align-items: center; padding: 2.5rem 1.5rem; text-align: center; display: flex; flex-direction: column;">
+                    <div class="card-icon-wrapper" style="width: 55px; height: 55px; border-radius: 14px; font-size: 1.5rem; margin-bottom: 1.2rem; background: rgba(108, 99, 255, 0.08); color: var(--primary-color); box-shadow: none; display: flex; justify-content: center; align-items: center; transition: all 0.3s ease;">
+                        <i class="fa-solid fa-clock-rotate-left"></i>
+                    </div>
+                    <h4 style="font-size: 1.25rem; color: var(--text-primary); margin-bottom: 0.8rem; font-weight: 700;">{{ item }}</h4>
+                    <span style="color: var(--primary-color); font-size: 0.95rem; font-weight: 600; margin-top: auto;">Open Roadmap <i class="fa-solid fa-arrow-right" style="font-size: 0.85rem; margin-left: 0.4rem;"></i></span>
+                </a>
+                {% endfor %}
+            {% else %}
+                <div style="grid-column: 1 / -1; text-align: center; padding: 4rem; background: white; border-radius: 20px; border: 1px dashed rgba(108, 99, 255, 0.4);">
+                    <i class="fa-solid fa-folder-open" style="font-size: 3rem; color: var(--text-muted); margin-bottom: 1rem;"></i>
+                    <p style="color: var(--text-secondary); font-size: 1.15rem; font-weight: 500;">No recently viewed roadmaps</p>
+                </div>
+            {% endif %}
+        {% endif %}
+    </div>
+
+    {% if is_guest %}
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const container = document.getElementById('history-content');
+            let history = JSON.parse(localStorage.getItem('guest_roadmap_history') || '[]');
+            
+            if (history.length > 0) {
+                container.innerHTML = history.slice(0, 5).map(item => `
+                    <a href="/roadmap?skill=${encodeURIComponent(item)}" class="grid-card-modern history-card" style="text-decoration: none; align-items: center; padding: 2.5rem 1.5rem; text-align: center; display: flex; flex-direction: column;">
+                        <div class="card-icon-wrapper" style="width: 55px; height: 55px; border-radius: 14px; font-size: 1.5rem; margin-bottom: 1.2rem; background: rgba(108, 99, 255, 0.08); color: var(--primary-color); box-shadow: none; display: flex; justify-content: center; align-items: center; transition: all 0.3s ease;">
+                            <i class="fa-solid fa-clock-rotate-left"></i>
+                        </div>
+                        <h4 style="font-size: 1.25rem; color: var(--text-primary); margin-bottom: 0.8rem; font-weight: 700;">${item}</h4>
+                        <span style="color: var(--primary-color); font-size: 0.95rem; font-weight: 600; margin-top: auto;">Open Roadmap <i class="fa-solid fa-arrow-right" style="font-size: 0.85rem; margin-left: 0.4rem;"></i></span>
+                    </a>
+                `).join('');
+            } else {
+                container.innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 4rem; background: white; border-radius: 20px; border: 1px dashed rgba(108, 99, 255, 0.4);">
+                        <i class="fa-solid fa-folder-open" style="font-size: 3rem; color: var(--text-muted); margin-bottom: 1rem;"></i>
+                        <p style="color: var(--text-secondary); font-size: 1.15rem; font-weight: 500;">No recently viewed roadmaps</p>
+                    </div>
+                `;
+            }
+        });
+    </script>
+    {% endif %}
+</div>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/history.css') }}">
+{% endblock %}

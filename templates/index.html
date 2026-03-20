@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="dashboard-container">
+    <div class="hero-centered-layout">
+        <div class="dashboard-hero-card">
+            <h1 class="hero-title-new">Explore Your IT Career Path</h1>
+            <p class="hero-subtitle-new">Generate structured roadmaps, discover resources, and prepare for your next big interview.</p>
+            
+            <div class="search-wrapper">
+                <form action="{{ url_for('roadmap') }}" method="GET" class="search-form">
+                    <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                    <input type="text" name="skill" id="skillSearch" class="search-input" placeholder="Enter a skill (e.g., Java, AI, Web Development)" autocomplete="off" required>
+                    <button type="submit" class="btn-gradient">Generate Roadmap</button>
+                </form>
+                <div class="suggestions-box" id="suggestionsBox"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section-container" style="margin-top: 2rem; padding-bottom: 2rem;">
+        <div class="section-header">
+            <h2>Trending Skills <i class="fa-solid fa-fire" style="color: #ef4444; margin-left: 8px;"></i></h2>
+        </div>
+        <div class="trending-grid">
+            <a href="{{ url_for('roadmap', skill='Artificial Intelligence') }}" class="modern-card trending-card-item">
+                <div class="trending-rank">1</div>
+                <div class="trending-info">
+                    <h5>Artificial Intelligence</h5>
+                </div>
+                <i class="fa-solid fa-robot trending-icon-small"></i>
+            </a>
+            <a href="{{ url_for('roadmap', skill='Data Science') }}" class="modern-card trending-card-item">
+                <div class="trending-rank">2</div>
+                <div class="trending-info">
+                    <h5>Data Science</h5>
+                </div>
+                <i class="fa-solid fa-chart-line trending-icon-small"></i>
+            </a>
+            <a href="{{ url_for('roadmap', skill='Cloud Computing') }}" class="modern-card trending-card-item">
+                <div class="trending-rank">3</div>
+                <div class="trending-info">
+                    <h5>Cloud Computing</h5>
+                </div>
+                <i class="fa-solid fa-cloud trending-icon-small"></i>
+            </a>
+            <a href="{{ url_for('roadmap', skill='Cyber Security') }}" class="modern-card trending-card-item">
+                <div class="trending-rank">4</div>
+                <div class="trending-info">
+                    <h5>Cyber Security</h5>
+                </div>
+                <i class="fa-solid fa-shield-halved trending-icon-small"></i>
+            </a>
+        </div>
+    </div>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+
+    <div class="section-container" style="margin-top: 2rem; padding-bottom: 4rem;">
+        <div class="section-header">
+            <h2>In-Demand Skills in Job Market <i class="fa-solid fa-briefcase" style="color: var(--primary-color); margin-left: 8px;"></i></h2>
+        </div>
+        <div class="in-demand-grid">
+            <a href="{{ url_for('roadmap', skill='Full Stack Development') }}" class="modern-card trending-card-item">
+                <div class="trending-rank">1</div>
+                <div class="trending-info">
+                    <h5>Full Stack Development</h5>
+                </div>
+                <i class="fa-solid fa-laptop-code trending-icon-small"></i>
+            </a>
+            <a href="{{ url_for('roadmap', skill='DevOps') }}" class="modern-card trending-card-item">
+                <div class="trending-rank">2</div>
+                <div class="trending-info">
+                    <h5>DevOps</h5>
+                </div>
+                <i class="fa-solid fa-server trending-icon-small"></i>
+            </a>
+            <a href="{{ url_for('roadmap', skill='Cloud Computing') }}" class="modern-card trending-card-item">
+                <div class="trending-rank">3</div>
+                <div class="trending-info">
+                    <h5>Cloud Computing</h5>
+                </div>
+                <i class="fa-solid fa-cloud trending-icon-small"></i>
+            </a>
+            <a href="{{ url_for('roadmap', skill='AI Machine Learning') }}" class="modern-card trending-card-item">
+                <div class="trending-rank">4</div>
+                <div class="trending-info">
+                    <h5>AI / Machine Learning</h5>
+                </div>
+                <i class="fa-solid fa-brain trending-icon-small"></i>
+            </a>
+            <a href="{{ url_for('roadmap', skill='Data Engineering') }}" class="modern-card trending-card-item">
+                <div class="trending-rank">5</div>
+                <div class="trending-info">
+                    <h5>Data Engineering</h5>
+                </div>
+                <i class="fa-solid fa-database trending-icon-small"></i>
+            </a>
+            <a href="{{ url_for('roadmap', skill='Cyber Security') }}" class="modern-card trending-card-item">
+                <div class="trending-rank">6</div>
+                <div class="trending-info">
+                    <h5>Cyber Security</h5>
+                </div>
+                <i class="fa-solid fa-shield-halved trending-icon-small"></i>
+            </a>
+        </div>
+    </div>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+
+    <!-- Skill Demand Bar Chart Section -->
+    <div class="section-container" style="margin-top: 2rem; padding-bottom: 6rem;">
+        <div class="section-header">
+            <h2>Market Demand Analysis <i class="fa-solid fa-chart-bar" style="color: var(--primary-color); margin-left: 8px;"></i></h2>
+        </div>
+        
+        <div style="max-width: 850px; margin: 0 auto;">
+            
+            <!-- Skill 1 -->
+            <div class="demand-item-box" onclick="this.classList.toggle('glow-active')">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.8rem;">
+                    <span style="font-weight: 600; color: var(--text-primary); font-size: 1.1rem;">AI / Machine Learning</span>
+                    <span style="font-weight: 700; color: #6C63FF; font-size: 1.15rem;">95%</span>
+                </div>
+                <div style="width: 100%; height: 12px; background: rgba(108, 99, 255, 0.1); border-radius: 10px; overflow: hidden;">
+                    <div style="width: 95%; height: 100%; background: linear-gradient(90deg, #4A90E2 0%, #6C63FF 100%); border-radius: 10px; transition: width 1.5s ease-out;"></div>
+                </div>
+            </div>
+
+            <!-- Skill 2 -->
+            <div class="demand-item-box" onclick="this.classList.toggle('glow-active')">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.8rem;">
+                    <span style="font-weight: 600; color: var(--text-primary); font-size: 1.1rem;">Cloud Computing</span>
+                    <span style="font-weight: 700; color: #6C63FF; font-size: 1.15rem;">88%</span>
+                </div>
+                <div style="width: 100%; height: 12px; background: rgba(108, 99, 255, 0.1); border-radius: 10px; overflow: hidden;">
+                    <div style="width: 88%; height: 100%; background: linear-gradient(90deg, #4A90E2 0%, #6C63FF 100%); border-radius: 10px; transition: width 1.5s ease-out;"></div>
+                </div>
+            </div>
+
+            <!-- Skill 3 -->
+            <div class="demand-item-box" onclick="this.classList.toggle('glow-active')">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.8rem;">
+                    <span style="font-weight: 600; color: var(--text-primary); font-size: 1.1rem;">Web Development</span>
+                    <span style="font-weight: 700; color: #6C63FF; font-size: 1.15rem;">85%</span>
+                </div>
+                <div style="width: 100%; height: 12px; background: rgba(108, 99, 255, 0.1); border-radius: 10px; overflow: hidden;">
+                    <div style="width: 85%; height: 100%; background: linear-gradient(90deg, #4A90E2 0%, #6C63FF 100%); border-radius: 10px; transition: width 1.5s ease-out;"></div>
+                </div>
+            </div>
+
+            <!-- Skill 4 -->
+            <div class="demand-item-box" onclick="this.classList.toggle('glow-active')">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.8rem;">
+                    <span style="font-weight: 600; color: var(--text-primary); font-size: 1.1rem;">Data Engineering</span>
+                    <span style="font-weight: 700; color: #6C63FF; font-size: 1.15rem;">82%</span>
+                </div>
+                <div style="width: 100%; height: 12px; background: rgba(108, 99, 255, 0.1); border-radius: 10px; overflow: hidden;">
+                    <div style="width: 82%; height: 100%; background: linear-gradient(90deg, #4A90E2 0%, #6C63FF 100%); border-radius: 10px; transition: width 1.5s ease-out;"></div>
+                </div>
+            </div>
+
+            <!-- Skill 5 -->
+            <div class="demand-item-box" onclick="this.classList.toggle('glow-active')">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.8rem;">
+                    <span style="font-weight: 600; color: var(--text-primary); font-size: 1.1rem;">Cyber Security</span>
+                    <span style="font-weight: 700; color: #6C63FF; font-size: 1.15rem;">80%</span>
+                </div>
+                <div style="width: 100%; height: 12px; background: rgba(108, 99, 255, 0.1); border-radius: 10px; overflow: hidden;">
+                    <div style="width: 80%; height: 100%; background: linear-gradient(90deg, #4A90E2 0%, #6C63FF 100%); border-radius: 10px; transition: width 1.5s ease-out;"></div>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</div>
+{% endblock %}

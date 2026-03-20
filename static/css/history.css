@@ -1,0 +1,6 @@
+.history-card:hover .card-icon-wrapper {
+    background: var(--primary-color) !important;
+    color: white !important;
+    transform: scale(1.15) translateY(-2px);
+    box-shadow: 0 8px 20px rgba(108, 99, 255, 0.4) !important;
+}

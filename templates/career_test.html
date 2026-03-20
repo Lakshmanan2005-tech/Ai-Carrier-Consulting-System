@@ -1,0 +1,223 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/career_test.css') }}">
+
+<div class="dashboard-container">
+    <div class="hero-centered-layout">
+        <div class="dashboard-hero-card" id="introArea">
+            <h1 class="hero-title-new">Career Personality Test</h1>
+            <p class="hero-subtitle-new">Take our quick assessment to discover career paths that perfectly match your personality and skills.</p>
+            
+            <div class="test-card-bg" style="max-width: 600px; margin: 2rem auto; background: var(--card-bg, #ffffff); padding: 3rem 2rem; border-radius: 16px; border: 1px solid var(--border-color); text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
+                <i class="fa-solid fa-brain" style="font-size: 3.5rem; color: var(--primary-color); margin-bottom: 1.5rem;"></i>
+                <h3 style="color: var(--text-primary); margin-bottom: 1rem; font-size: 1.4rem;">Ready to find your ideal tech role?</h3>
+                <p style="color: var(--text-secondary); margin-bottom: 2rem;">Answer 5 quick behavioral questions. Our system will analyze your preferences and recommend the best technology roles for you.</p>
+                <div style="display: flex; justify-content: center; align-items: center; width: 100%;">
+                    <button class="btn-gradient" style="padding: 1rem 3rem; font-size: 1.1rem; border-radius: 30px; margin: 0 auto;" onclick="startQuiz(this)">Start Test <i class="fa-solid fa-arrow-right" style="margin-left: 8px;"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <div id="quizArea" style="max-width: 600px; margin: 2rem auto; display: none;">
+            <div class="test-card-bg" style="background: var(--card-bg, #ffffff); padding: 3rem 2rem; border-radius: 16px; border: 1px solid var(--border-color); box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
+                
+                <div style="margin-bottom: 2rem;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; color: var(--text-secondary); font-size: 0.9rem;">
+                        <span id="questionProgress">Question 1 of 5</span>
+                    </div>
+                    <div style="width: 100%; background: #e5e7eb; height: 8px; border-radius: 4px;">
+                        <div id="progressBar" style="width: 20%; background: var(--primary-color); height: 100%; border-radius: 4px; transition: width 0.3s ease;"></div>
+                    </div>
+                </div>
+
+                <!-- Q1 -->
+                <div class="question-container active" id="q1">
+                    <h3 style="color: var(--text-primary); margin-bottom: 1.5rem; font-size: 1.3rem;">1. Do you enjoy coding?</h3>
+                    <button class="quiz-option" onclick="selectOption(1, 'coding', 2, this)">Yes</button>
+                    <button class="quiz-option" onclick="selectOption(1, 'coding', 1, this)">Somewhat</button>
+                    <button class="quiz-option" onclick="selectOption(1, 'none', 0, this)">No</button>
+                </div>
+
+                <!-- Q2 -->
+                <div class="question-container" id="q2">
+                    <h3 style="color: var(--text-primary); margin-bottom: 1.5rem; font-size: 1.3rem;">2. Do you like working with data?</h3>
+                    <button class="quiz-option" onclick="selectOption(2, 'data', 2, this)">Yes</button>
+                    <button class="quiz-option" onclick="selectOption(2, 'data', 1, this)">Somewhat</button>
+                    <button class="quiz-option" onclick="selectOption(2, 'none', 0, this)">No</button>
+                </div>
+
+                <!-- Q3 -->
+                <div class="question-container" id="q3">
+                    <h3 style="color: var(--text-primary); margin-bottom: 1.5rem; font-size: 1.3rem;">3. Do you like designing UI?</h3>
+                    <button class="quiz-option" onclick="selectOption(3, 'design', 2, this)">Yes</button>
+                    <button class="quiz-option" onclick="selectOption(3, 'none', 0, this)">No</button>
+                </div>
+
+                <!-- Q4 -->
+                <div class="question-container" id="q4">
+                    <h3 style="color: var(--text-primary); margin-bottom: 1.5rem; font-size: 1.3rem;">4. Do you enjoy solving security problems?</h3>
+                    <button class="quiz-option" onclick="selectOption(4, 'security', 2, this)">Yes</button>
+                    <button class="quiz-option" onclick="selectOption(4, 'none', 0, this)">No</button>
+                </div>
+
+                <!-- Q5 -->
+                <div class="question-container" id="q5">
+                    <h3 style="color: var(--text-primary); margin-bottom: 1.5rem; font-size: 1.3rem;">5. Do you prefer logic over creativity?</h3>
+                    <button class="quiz-option" onclick="selectOption(5, 'coding', 2, this)">Logic</button>
+                    <button class="quiz-option" onclick="selectOption(5, 'design', 2, this)">Creativity</button>
+                </div>
+
+                <div style="text-align: right; margin-top: 1.5rem;">
+                    <button id="nextBtn" class="btn-primary" style="padding: 0.8rem 2rem; border-radius: 12px; display: none;" onclick="nextQuestion()">Next Question <i class="fa-solid fa-arrow-right"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <div id="resultArea" style="max-width: 600px; margin: 2rem auto; display: none; animation: fadeIn 0.8s ease-in-out;">
+            <div class="test-gradient-bg" style="background: linear-gradient(135deg, rgba(108, 99, 255, 0.1) 0%, rgba(74, 144, 226, 0.1) 100%); padding: 3rem 2rem; border-radius: 16px; border: 1px solid rgba(108, 99, 255, 0.3); text-align: center; box-shadow: 0 10px 30px rgba(108,99,255,0.15);">
+                <i id="resultIcon" class="fa-solid fa-trophy" style="font-size: 4rem; color: var(--primary-color); margin-bottom: 1rem;"></i>
+                <h4 style="color: var(--text-secondary); text-transform: uppercase; font-size: 0.9rem; letter-spacing: 2px; margin-bottom: 0.5rem;">Your Ideal Career Match</h4>
+                <h2 id="resultTitle" style="color: var(--text-primary); margin-bottom: 1rem; font-size: 2.2rem; font-weight: 700;">Software Developer</h2>
+                
+                <p id="resultDesc" style="color: var(--text-secondary); margin-bottom: 2rem; font-size: 1.1rem; line-height: 1.6;">You love logical problem solving and building systems from scratch.</p>
+                
+                <div class="test-card-bg" style="text-align: left; background: var(--card-bg, #ffffff); padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border-color);">
+                    <h5 style="margin-bottom: 1rem; color: var(--text-primary); font-size: 1.1rem;">Recommended Skills:</h5>
+                    <div id="resultSkills" style="display: flex; flex-wrap: wrap; gap: 0.8rem;">
+                        <span style="background: rgba(108, 99, 255, 0.1); color: var(--primary-color); padding: 0.4rem 1rem; border-radius: 20px; font-weight: 600;">Python</span>
+                    </div>
+                </div>
+
+                <button class="btn-gradient" style="margin-top: 2.5rem; padding: 0.8rem 2.5rem; border-radius: 30px;" onclick="location.reload()">Take Test Again</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+let currentQuestion = 1;
+let scores = {
+    coding: 0,
+    data: 0,
+    design: 0,
+    security: 0
+};
+let selectedValue = null;
+
+function startQuiz(btn) {
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin" style="margin-right: 8px;"></i> Loading...';
+    btn.disabled = true;
+    
+    setTimeout(() => {
+        document.getElementById('introArea').style.display = 'none';
+        document.getElementById('quizArea').style.display = 'block';
+    }, 600);
+}
+
+function selectOption(qNum, category, points, btnElement) {
+    // Clear previous selection visually
+    const options = document.getElementById('q' + qNum).getElementsByClassName('quiz-option');
+    for (let opt of options) {
+        opt.classList.remove('selected');
+    }
+    
+    // Highlight choice
+    btnElement.classList.add('selected');
+    
+    // Store current state
+    selectedValue = { category, points };
+    
+    // Show Next button securely
+    const nextBtn = document.getElementById('nextBtn');
+    nextBtn.style.display = 'inline-block';
+    if(qNum === 5) {
+        nextBtn.innerHTML = 'See Results <i class="fa-solid fa-check"></i>';
+    }
+}
+
+function nextQuestion() {
+    if(!selectedValue) return;
+    
+    // Process exact score value
+    if(selectedValue.category !== 'none') {
+        scores[selectedValue.category] += selectedValue.points;
+    }
+    
+    selectedValue = null;
+    
+    // Hide current question completely
+    document.getElementById('q' + currentQuestion).classList.remove('active');
+    document.getElementById('nextBtn').style.display = 'none';
+    
+    if (currentQuestion < 5) {
+        // Build next question payload
+        currentQuestion++;
+        document.getElementById('q' + currentQuestion).classList.add('active');
+        document.getElementById('questionProgress').innerText = `Question ${currentQuestion} of 5`;
+        document.getElementById('progressBar').style.width = (currentQuestion * 20) + '%';
+    } else {
+        // Finished evaluation branch
+        showResults();
+    }
+}
+
+function showResults() {
+    document.getElementById('quizArea').style.display = 'none';
+    
+    // Logic: Calculate exactly which bucket has highest scores
+    let highestCategory = 'coding';
+    let max = -1;
+    for(let cat in scores) {
+        if(scores[cat] > max) {
+            max = scores[cat];
+            highestCategory = cat;
+        }
+    }
+    
+    /* Result Mapping Schema */
+    const mappings = {
+        'coding': {
+            title: 'Software Developer',
+            desc: 'You have a strong affinity for logic, building systems, and solving complex algorithmic puzzles. You enjoy bringing ideas to life through code!',
+            skills: ['Python', 'Java', 'JavaScript', 'Algorithms', 'Databases'],
+            icon: 'fa-laptop-code'
+        },
+        'data': {
+            title: 'Data Scientist',
+            desc: 'You are naturally analytical and logically curious. You brilliantly enjoy discovering patterns in numbers and predicting trends using statistics.',
+            skills: ['Python', 'SQL', 'Machine Learning', 'Data Visualization', 'Math'],
+            icon: 'fa-chart-line'
+        },
+        'design': {
+            title: 'UI/UX Designer',
+            desc: 'You possess a highly creative mindset, aesthetic touch, and deeply care about user experiences. Designing beautiful and intuitive interfaces is your true calling.',
+            skills: ['Figma', 'Wireframing', 'User Research', 'Prototyping', 'CSS'],
+            icon: 'fa-pen-nib'
+        },
+        'security': {
+            title: 'Cyber Security Analyst',
+            desc: 'You are a natural problem solver who loves digging out vulnerabilities. Protecting systems and outsmarting hackers excites you logically.',
+            skills: ['Ethical Hacking', 'Networking', 'Cryptography', 'Linux', 'Risk Analysis'],
+            icon: 'fa-shield-halved'
+        }
+    };
+    
+    const result = mappings[highestCategory];
+    
+    document.getElementById('resultTitle').innerText = result.title;
+    document.getElementById('resultDesc').innerText = result.desc;
+    document.getElementById('resultIcon').className = `fa-solid ${result.icon}`;
+    
+    const skillsContainer = document.getElementById('resultSkills');
+    skillsContainer.innerHTML = '';
+    result.skills.forEach(skill => {
+        skillsContainer.innerHTML += `<a href="/roadmap?skill=${encodeURIComponent(skill)}" style="text-decoration: none; cursor: pointer;"><span style="background: rgba(108, 99, 255, 0.1); color: var(--primary-color); padding: 0.4rem 1rem; border-radius: 20px; font-weight: 600; font-size: 0.9rem; cursor: pointer;">${skill}</span></a>`;
+    });
+    
+    document.getElementById('resultArea').style.display = 'block';
+}
+</script>
+{% endblock %}

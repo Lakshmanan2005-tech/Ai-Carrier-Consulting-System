@@ -1,0 +1,7 @@
+flask
+flask-session
+google-generativeai
+python-dotenv
+werkzeug
+PyPDF2
+python-docx

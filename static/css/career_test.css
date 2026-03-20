@@ -1,0 +1,130 @@
+.quiz-option {
+    display: block;
+    width: 100%;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    background: var(--card-bg, #ffffff);
+    border: 1px solid var(--border-color, #e5e7eb);
+    border-radius: 12px;
+    text-align: left;
+    font-size: 1.1rem;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.quiz-option:hover {
+    background: rgba(108, 99, 255, 0.05);
+    border-color: rgba(108, 99, 255, 0.4);
+}
+.quiz-option.selected {
+    background: rgba(108, 99, 255, 0.1);
+    border-color: var(--primary-color);
+    font-weight: 600;
+}
+.question-container {
+    display: none;
+    animation: fadeIn 0.5s ease-in-out;
+}
+.question-container.active {
+    display: block;
+}
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Dark Mode Overrides for UI Elements */
+body.dark-theme .quiz-option {
+    background: #1e1e1e !important;
+    border-color: #333 !important;
+    color: #ffffff !important;
+}
+body.dark-theme .quiz-option:hover {
+    background: rgba(108, 99, 255, 0.15) !important;
+    border-color: var(--primary-color) !important;
+}
+body.dark-theme .quiz-option.selected {
+    background: rgba(108, 99, 255, 0.3) !important;
+    border-color: var(--primary-color) !important;
+}
+body.dark-theme .test-card-bg {
+    background: #1e1e1e !important;
+    border-color: #333 !important;
+}
+body.dark-theme .test-gradient-bg {
+    background: linear-gradient(135deg, rgba(108, 99, 255, 0.2) 0%, rgba(74, 144, 226, 0.2) 100%) !important;
+    border-color: rgba(108, 99, 255, 0.4) !important;
+}
+body.dark-theme .features-grid-item {
+    background: rgba(255, 255, 255, 0.05) !important;
+}
+
+/* Force Mobile Alignment for Career Personality Test */
+@media (max-width: 768px) {
+    html, body {
+        overflow-x: hidden !important;
+    }
+    
+    .dashboard-container,
+    .hero-centered-layout {
+        padding: 0 !important;
+        margin: 0 !important;
+        width: 100% !important;
+    }
+
+    #introArea,
+    #quizArea,
+    #resultArea {
+        width: 100% !important;
+        max-width: 100vw !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        box-sizing: border-box !important;
+    }
+
+    .test-card-bg,
+    .test-gradient-bg {
+        padding: 1.5rem 1rem !important;
+        margin: 1rem auto !important;
+        width: 95% !important;
+        max-width: 95% !important;
+        border-radius: 12px !important;
+        box-sizing: border-box !important;
+        display: block !important;
+        overflow: hidden !important;
+    }
+
+    .quiz-option {
+        width: 100% !important;
+        padding: 1rem !important;
+        margin-bottom: 0.8rem !important;
+        font-size: 1rem !important;
+        text-align: center !important;
+        display: block !important;
+        box-sizing: border-box !important;
+    }
+
+    .hero-title-new {
+        font-size: 1.8rem !important;
+        word-wrap: break-word !important;
+        text-align: center !important;
+    }
+
+    .hero-subtitle-new {
+        font-size: 1rem !important;
+        text-align: center !important;
+        padding: 0 10px !important;
+    }
+
+    .question-container h3, 
+    #resultTitle {
+        font-size: 1.3rem !important;
+        text-align: center !important;
+        word-wrap: break-word !important;
+    }
+    
+    #resultDesc {
+        font-size: 1rem !important;
+        text-align: center !important;
+    }
+}

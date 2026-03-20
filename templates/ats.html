@@ -1,0 +1,167 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="dashboard-container">
+    <div class="hero-centered-layout">
+        <div class="dashboard-hero-card">
+            <h1 class="hero-title-new">ATS Resume Checker</h1>
+            <p class="hero-subtitle-new">Upload your resume to check its ATS compatibility and get actionable improvements.</p>
+            
+            <div onclick="document.getElementById('resumeUpload').click()" style="max-width: 600px; margin: 2rem auto; background: rgba(108, 99, 255, 0.05); border: 2px dashed rgba(108, 99, 255, 0.3); border-radius: 16px; padding: 3rem 2rem; text-align: center; transition: all 0.3s ease; cursor: pointer;" onmouseover="this.style.borderColor='rgba(108, 99, 255, 0.8)'" onmouseout="this.style.borderColor='rgba(108, 99, 255, 0.3)'">
+                <i class="fa-solid fa-cloud-arrow-up" style="font-size: 3.5rem; color: var(--primary-color); margin-bottom: 1.5rem;"></i>
+                <h3 style="color: var(--text-primary); margin-bottom: 1rem; font-size: 1.3rem;">Drag & Drop or Click to upload resume</h3>
+                <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">Supported formats: PDF, DOCX (Max 5MB)</p>
+                <input type="file" id="resumeUpload" style="display: none;" accept=".pdf,.doc,.docx" onchange="updateFileName(this)">
+                <div style="display: flex; justify-content: center; width: 100%; gap: 1rem;">
+                    <button type="button" onclick="event.stopPropagation(); document.getElementById('resumeUpload').click()" class="btn-gradient" style="padding: 0.8rem 2rem;">Browse Files</button>
+                    <button type="button" id="removeFileBtn" onclick="event.stopPropagation(); removeFile()" class="btn-primary" style="padding: 0.8rem 2rem; display: none; background: #ef4444; border-color: #ef4444;">Remove</button>
+                </div>
+                <p id="fileNameDisplay" style="margin-top: 1rem; color: var(--primary-color); font-weight: 500; display: none;"></p>
+            </div>
+            
+            <div style="max-width: 600px; margin: 0 auto;">
+                <textarea id="jobDescription" class="search-input" placeholder="Paste the target Job Description here (optional but recommended for better accuracy)" style="width: 100%; height: 120px; border-radius: 16px; padding: 1rem; resize: none; margin-bottom: 1.5rem;"></textarea>
+                
+                <p id="atsErrorMessage" style="color: #ef4444; margin-bottom: 1rem; font-weight: 500; display: none; text-align: center;"><i class="fa-solid fa-circle-exclamation"></i> Please upload a resume before testing.</p>
+                <div id="atsSuccessMessage" style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 2rem; margin-bottom: 2rem; display: none; text-align: center;">
+                    <div id="atsScoreRing" style="width: 120px; height: 120px; border-radius: 50%; border: 8px solid #10b981; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem auto; box-shadow: 0 0 20px rgba(16, 185, 129, 0.2); transition: all 0.5s ease;">
+                        <span id="atsScoreText" style="font-size: 2.5rem; font-weight: 700; color: #10b981;"><span id="atsScoreValue">85</span><span style="font-size: 1.2rem;">%</span></span>
+                    </div>
+                    <h4 id="atsMatchStatus" style="color: var(--text-primary); font-size: 1.4rem; margin-bottom: 0.8rem;">Great Match!</h4>
+                    <p id="atsSummaryMsg" style="color: var(--text-secondary); margin-bottom: 1.5rem;">Your resume passes most ATS requirements based on the job description.</p>
+                    
+                    <div style="text-align: left; background: var(--bg-sidebar); padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border-color, #e5e7eb);">
+                        <h5 style="margin-bottom: 1rem; color: var(--text-primary); font-size: 1.1rem;">AI Analysis Feedback:</h5>
+                        <ul id="atsFeedbackList" style="color: var(--text-secondary); padding-left: 0; list-style: none; margin-bottom: 0;">
+                        </ul>
+                    </div>
+                </div>
+                
+                <button id="testScoreBtn" class="btn-primary" style="width: 100%; padding: 1rem; font-size: 1.1rem; border-radius: 12px;" onclick="testScore()">Test Resume Score</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+async function testScore() {
+    const fileInput = document.getElementById('resumeUpload');
+    const jobDescInput = document.getElementById('jobDescription');
+    const errorMsg = document.getElementById('atsErrorMessage');
+    const successMsg = document.getElementById('atsSuccessMessage');
+    
+    // Reset messages
+    errorMsg.style.display = 'none';
+    successMsg.style.display = 'none';
+    
+    if (!fileInput.files || fileInput.files.length === 0) {
+        errorMsg.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i> Please upload a resume before testing.';
+        errorMsg.style.display = 'block';
+        return;
+    }
+    
+    const btn = document.getElementById('testScoreBtn');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin" style="margin-right: 8px;"></i> Analyzing Resume...';
+    btn.disabled = true;
+    
+    const formData = new FormData();
+    formData.append('resume', fileInput.files[0]);
+    if (jobDescInput && jobDescInput.value) {
+        formData.append('job_description', jobDescInput.value);
+    }
+    
+    try {
+        const response = await fetch('/api/ats_analyze', {
+            method: 'POST',
+            body: formData
+        });
+        
+        const data = await response.json();
+        
+        if (!response.ok) {
+            errorMsg.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i> ' + (data.error || 'Server Analysis Error');
+            errorMsg.style.display = 'block';
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+            return;
+        }
+        
+        // Populate Data
+        document.getElementById('atsScoreValue').innerText = data.score;
+        document.getElementById('atsMatchStatus').innerText = data.match_status;
+        document.getElementById('atsSummaryMsg').innerText = data.summary;
+        
+        const feedbackList = document.getElementById('atsFeedbackList');
+        feedbackList.innerHTML = '';
+        if (data.feedback && data.feedback.length > 0) {
+            data.feedback.forEach(item => {
+                const li = document.createElement('li');
+                li.style.marginBottom = '0.8rem';
+                if (item.icon === 'check') {
+                    li.innerHTML = '<i class="fa-solid fa-check-circle" style="color: #10b981; margin-right: 8px;"></i> ' + item.text;
+                } else {
+                    li.innerHTML = '<i class="fa-solid fa-circle-xmark" style="color: #ef4444; margin-right: 8px;"></i> <strong>' + item.text + '</strong>';
+                }
+                feedbackList.appendChild(li);
+            });
+        }
+        
+        // Colors By Score
+        const ring = document.getElementById('atsScoreRing');
+        const scoreTxt = document.getElementById('atsScoreText');
+        if (data.score >= 80) {
+            ring.style.borderColor = '#10b981';
+            ring.style.boxShadow = '0 0 20px rgba(16, 185, 129, 0.2)';
+            scoreTxt.style.color = '#10b981';
+            successMsg.style.background = 'rgba(16, 185, 129, 0.05)';
+        } else if (data.score >= 50) {
+            ring.style.borderColor = '#f59e0b';
+            ring.style.boxShadow = '0 0 20px rgba(245, 158, 11, 0.2)';
+            scoreTxt.style.color = '#f59e0b';
+            successMsg.style.background = 'rgba(245, 158, 11, 0.05)';
+        } else {
+            ring.style.borderColor = '#ef4444';
+            ring.style.boxShadow = '0 0 20px rgba(239, 68, 68, 0.2)';
+            scoreTxt.style.color = '#ef4444';
+            successMsg.style.background = 'rgba(239, 68, 68, 0.05)';
+        }
+        
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+        successMsg.style.display = 'block';
+        
+    } catch (err) {
+        errorMsg.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i> Network Error connecting to Gemini API';
+        errorMsg.style.display = 'block';
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    }
+}
+
+function updateFileName(input) {
+    const display = document.getElementById('fileNameDisplay');
+    const errorMsg = document.getElementById('atsErrorMessage');
+    const removeBtn = document.getElementById('removeFileBtn');
+    
+    if (input.files && input.files.length > 0) {
+        display.innerHTML = '<i class="fa-solid fa-file" style="margin-right: 5px;"></i> ' + input.files[0].name;
+        display.style.display = 'block';
+        if (removeBtn) removeBtn.style.display = 'block';
+        errorMsg.style.display = 'none'; // Hide error if a file is cleanly selected
+    } else {
+        display.style.display = 'none';
+        if (removeBtn) removeBtn.style.display = 'none';
+        display.innerHTML = '';
+    }
+}
+
+function removeFile() {
+    const fileInput = document.getElementById('resumeUpload');
+    if (fileInput) {
+        fileInput.value = ''; // clears the file
+        updateFileName(fileInput);
+    }
+}
+</script>
+{% endblock %}
