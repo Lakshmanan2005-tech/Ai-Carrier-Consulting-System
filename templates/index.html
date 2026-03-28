@@ -23,28 +23,28 @@
             <h2>Trending Skills <i class="fa-solid fa-fire" style="color: #ef4444; margin-left: 8px;"></i></h2>
         </div>
         <div class="trending-grid">
-            <a href="{{ url_for('roadmap', skill='Artificial Intelligence') }}" class="modern-card trending-card-item">
+            <a href="{{ url_for('roadmap', skill='Artificial Intelligence') }}" class="modern-card trending-card-item tc-ai">
                 <div class="trending-rank">1</div>
                 <div class="trending-info">
                     <h5>Artificial Intelligence</h5>
                 </div>
                 <i class="fa-solid fa-robot trending-icon-small"></i>
             </a>
-            <a href="{{ url_for('roadmap', skill='Data Science') }}" class="modern-card trending-card-item">
+            <a href="{{ url_for('roadmap', skill='Data Science') }}" class="modern-card trending-card-item tc-ds">
                 <div class="trending-rank">2</div>
                 <div class="trending-info">
                     <h5>Data Science</h5>
                 </div>
                 <i class="fa-solid fa-chart-line trending-icon-small"></i>
             </a>
-            <a href="{{ url_for('roadmap', skill='Cloud Computing') }}" class="modern-card trending-card-item">
+            <a href="{{ url_for('roadmap', skill='Cloud Computing') }}" class="modern-card trending-card-item tc-cloud">
                 <div class="trending-rank">3</div>
                 <div class="trending-info">
                     <h5>Cloud Computing</h5>
                 </div>
                 <i class="fa-solid fa-cloud trending-icon-small"></i>
             </a>
-            <a href="{{ url_for('roadmap', skill='Cyber Security') }}" class="modern-card trending-card-item">
+            <a href="{{ url_for('roadmap', skill='Cyber Security') }}" class="modern-card trending-card-item tc-cyber">
                 <div class="trending-rank">4</div>
                 <div class="trending-info">
                     <h5>Cyber Security</h5>
@@ -61,42 +61,42 @@
             <h2>In-Demand Skills in Job Market <i class="fa-solid fa-briefcase" style="color: var(--primary-color); margin-left: 8px;"></i></h2>
         </div>
         <div class="in-demand-grid">
-            <a href="{{ url_for('roadmap', skill='Full Stack Development') }}" class="modern-card trending-card-item">
+            <a href="{{ url_for('roadmap', skill='Full Stack Development') }}" class="modern-card trending-card-item id-fs">
                 <div class="trending-rank">1</div>
                 <div class="trending-info">
                     <h5>Full Stack Development</h5>
                 </div>
                 <i class="fa-solid fa-laptop-code trending-icon-small"></i>
             </a>
-            <a href="{{ url_for('roadmap', skill='DevOps') }}" class="modern-card trending-card-item">
+            <a href="{{ url_for('roadmap', skill='DevOps') }}" class="modern-card trending-card-item id-ops">
                 <div class="trending-rank">2</div>
                 <div class="trending-info">
                     <h5>DevOps</h5>
                 </div>
                 <i class="fa-solid fa-server trending-icon-small"></i>
             </a>
-            <a href="{{ url_for('roadmap', skill='Cloud Computing') }}" class="modern-card trending-card-item">
+            <a href="{{ url_for('roadmap', skill='Cloud Computing') }}" class="modern-card trending-card-item id-cloud">
                 <div class="trending-rank">3</div>
                 <div class="trending-info">
                     <h5>Cloud Computing</h5>
                 </div>
                 <i class="fa-solid fa-cloud trending-icon-small"></i>
             </a>
-            <a href="{{ url_for('roadmap', skill='AI Machine Learning') }}" class="modern-card trending-card-item">
+            <a href="{{ url_for('roadmap', skill='AI Machine Learning') }}" class="modern-card trending-card-item id-ai">
                 <div class="trending-rank">4</div>
                 <div class="trending-info">
                     <h5>AI / Machine Learning</h5>
                 </div>
                 <i class="fa-solid fa-brain trending-icon-small"></i>
             </a>
-            <a href="{{ url_for('roadmap', skill='Data Engineering') }}" class="modern-card trending-card-item">
+            <a href="{{ url_for('roadmap', skill='Data Engineering') }}" class="modern-card trending-card-item id-data">
                 <div class="trending-rank">5</div>
                 <div class="trending-info">
                     <h5>Data Engineering</h5>
                 </div>
                 <i class="fa-solid fa-database trending-icon-small"></i>
             </a>
-            <a href="{{ url_for('roadmap', skill='Cyber Security') }}" class="modern-card trending-card-item">
+            <a href="{{ url_for('roadmap', skill='Cyber Security') }}" class="modern-card trending-card-item id-cyber">
                 <div class="trending-rank">6</div>
                 <div class="trending-info">
                     <h5>Cyber Security</h5>
@@ -109,7 +109,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
 
     <!-- Skill Demand Bar Chart Section -->
-    <div class="section-container" style="margin-top: 2rem; padding-bottom: 6rem;">
+    <div class="section-container" style="margin-top: 2rem; padding-bottom: 1rem;">
         <div class="section-header">
             <h2>Market Demand Analysis <i class="fa-solid fa-chart-bar" style="color: var(--primary-color); margin-left: 8px;"></i></h2>
         </div>
@@ -117,61 +117,232 @@
         <div style="max-width: 850px; margin: 0 auto;">
             
             <!-- Skill 1 -->
-            <div class="demand-item-box" onclick="this.classList.toggle('glow-active')">
+            <div class="demand-item-box di-ai" onclick="this.classList.toggle('glow-active')">
                 <div style="display: flex; justify-content: space-between; margin-bottom: 0.8rem;">
                     <span style="font-weight: 600; color: var(--text-primary); font-size: 1.1rem;">AI / Machine Learning</span>
-                    <span style="font-weight: 700; color: #6C63FF; font-size: 1.15rem;">95%</span>
+                    <span class="di-value" style="font-weight: 700; font-size: 1.15rem;">95%</span>
                 </div>
-                <div style="width: 100%; height: 12px; background: rgba(108, 99, 255, 0.1); border-radius: 10px; overflow: hidden;">
-                    <div style="width: 95%; height: 100%; background: linear-gradient(90deg, #4A90E2 0%, #6C63FF 100%); border-radius: 10px; transition: width 1.5s ease-out;"></div>
+                <div style="width: 100%; height: 12px; background: rgba(0, 0, 0, 0.05); border-radius: 10px; overflow: hidden;">
+                    <div class="di-bar" style="width: 95%; height: 100%; border-radius: 10px; transition: width 1.5s ease-out;"></div>
                 </div>
             </div>
 
             <!-- Skill 2 -->
-            <div class="demand-item-box" onclick="this.classList.toggle('glow-active')">
+            <div class="demand-item-box di-cloud" onclick="this.classList.toggle('glow-active')">
                 <div style="display: flex; justify-content: space-between; margin-bottom: 0.8rem;">
                     <span style="font-weight: 600; color: var(--text-primary); font-size: 1.1rem;">Cloud Computing</span>
-                    <span style="font-weight: 700; color: #6C63FF; font-size: 1.15rem;">88%</span>
+                    <span class="di-value" style="font-weight: 700; font-size: 1.15rem;">88%</span>
                 </div>
-                <div style="width: 100%; height: 12px; background: rgba(108, 99, 255, 0.1); border-radius: 10px; overflow: hidden;">
-                    <div style="width: 88%; height: 100%; background: linear-gradient(90deg, #4A90E2 0%, #6C63FF 100%); border-radius: 10px; transition: width 1.5s ease-out;"></div>
+                <div style="width: 100%; height: 12px; background: rgba(0, 0, 0, 0.05); border-radius: 10px; overflow: hidden;">
+                    <div class="di-bar" style="width: 88%; height: 100%; border-radius: 10px; transition: width 1.5s ease-out;"></div>
                 </div>
             </div>
 
             <!-- Skill 3 -->
-            <div class="demand-item-box" onclick="this.classList.toggle('glow-active')">
+            <div class="demand-item-box di-web" onclick="this.classList.toggle('glow-active')">
                 <div style="display: flex; justify-content: space-between; margin-bottom: 0.8rem;">
                     <span style="font-weight: 600; color: var(--text-primary); font-size: 1.1rem;">Web Development</span>
-                    <span style="font-weight: 700; color: #6C63FF; font-size: 1.15rem;">85%</span>
+                    <span class="di-value" style="font-weight: 700; font-size: 1.15rem;">85%</span>
                 </div>
-                <div style="width: 100%; height: 12px; background: rgba(108, 99, 255, 0.1); border-radius: 10px; overflow: hidden;">
-                    <div style="width: 85%; height: 100%; background: linear-gradient(90deg, #4A90E2 0%, #6C63FF 100%); border-radius: 10px; transition: width 1.5s ease-out;"></div>
+                <div style="width: 100%; height: 12px; background: rgba(0, 0, 0, 0.05); border-radius: 10px; overflow: hidden;">
+                    <div class="di-bar" style="width: 85%; height: 100%; border-radius: 10px; transition: width 1.5s ease-out;"></div>
                 </div>
             </div>
 
             <!-- Skill 4 -->
-            <div class="demand-item-box" onclick="this.classList.toggle('glow-active')">
+            <div class="demand-item-box di-data" onclick="this.classList.toggle('glow-active')">
                 <div style="display: flex; justify-content: space-between; margin-bottom: 0.8rem;">
                     <span style="font-weight: 600; color: var(--text-primary); font-size: 1.1rem;">Data Engineering</span>
-                    <span style="font-weight: 700; color: #6C63FF; font-size: 1.15rem;">82%</span>
+                    <span class="di-value" style="font-weight: 700; font-size: 1.15rem;">82%</span>
                 </div>
-                <div style="width: 100%; height: 12px; background: rgba(108, 99, 255, 0.1); border-radius: 10px; overflow: hidden;">
-                    <div style="width: 82%; height: 100%; background: linear-gradient(90deg, #4A90E2 0%, #6C63FF 100%); border-radius: 10px; transition: width 1.5s ease-out;"></div>
+                <div style="width: 100%; height: 12px; background: rgba(0, 0, 0, 0.05); border-radius: 10px; overflow: hidden;">
+                    <div class="di-bar" style="width: 82%; height: 100%; border-radius: 10px; transition: width 1.5s ease-out;"></div>
                 </div>
             </div>
 
             <!-- Skill 5 -->
-            <div class="demand-item-box" onclick="this.classList.toggle('glow-active')">
+            <div class="demand-item-box di-cyber" onclick="this.classList.toggle('glow-active')">
                 <div style="display: flex; justify-content: space-between; margin-bottom: 0.8rem;">
                     <span style="font-weight: 600; color: var(--text-primary); font-size: 1.1rem;">Cyber Security</span>
-                    <span style="font-weight: 700; color: #6C63FF; font-size: 1.15rem;">80%</span>
+                    <span class="di-value" style="font-weight: 700; font-size: 1.15rem;">80%</span>
                 </div>
-                <div style="width: 100%; height: 12px; background: rgba(108, 99, 255, 0.1); border-radius: 10px; overflow: hidden;">
-                    <div style="width: 80%; height: 100%; background: linear-gradient(90deg, #4A90E2 0%, #6C63FF 100%); border-radius: 10px; transition: width 1.5s ease-out;"></div>
+                <div style="width: 100%; height: 12px; background: rgba(0, 0, 0, 0.05); border-radius: 10px; overflow: hidden;">
+                    <div class="di-bar" style="width: 80%; height: 100%; border-radius: 10px; transition: width 1.5s ease-out;"></div>
                 </div>
             </div>
             
         </div>
     </div>
+
+    <!-- MNC Hiring Section (reusable partial) -->
+    {% include '_mnc_hiring.html' %}
 </div>
+
+<style>
+/* === Unique Trending Card Colors & Card Glow === */
+
+/* Base transition for smooth card glow */
+.trending-card-item {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Card 1: AI — Indigo-Purple */
+.tc-ai { border-top-color: #6366f1 !important; }
+.tc-ai:hover { 
+    box-shadow: 0 10px 30px rgba(99, 102, 241, 0.15), 0 0 20px rgba(99, 102, 241, 0.3) !important; 
+    border-color: #6366f1 !important; 
+}
+.tc-ai .trending-info h5 {
+    color: #6366f1 !important; /* Indigo */
+}
+.tc-ai .trending-rank { background: linear-gradient(135deg, #6366f1, #a855f7) !important; }
+.tc-ai .trending-icon-small { color: #818cf8 !important; }
+
+/* Card 2: Data Science — Cyan-Teal */
+.tc-ds { border-top-color: #06b6d4 !important; }
+.tc-ds:hover { 
+    box-shadow: 0 10px 30px rgba(6, 182, 212, 0.15), 0 0 20px rgba(6, 182, 212, 0.3) !important; 
+    border-color: #06b6d4 !important; 
+}
+.tc-ds .trending-info h5 {
+    color: #0d9488 !important; /* Teal */
+}
+.tc-ds .trending-rank { background: linear-gradient(135deg, #06b6d4, #0284c7) !important; }
+.tc-ds .trending-icon-small { color: #22d3ee !important; }
+
+/* Card 3: Cloud — Sky-Blue */
+.tc-cloud { border-top-color: #38bdf8 !important; }
+.tc-cloud:hover { 
+    box-shadow: 0 10px 30px rgba(56, 189, 248, 0.15), 0 0 20px rgba(56, 189, 248, 0.3) !important; 
+    border-color: #38bdf8 !important; 
+}
+.tc-cloud .trending-info h5 {
+    color: #0284c7 !important; /* Ocean Blue */
+}
+.tc-cloud .trending-rank { background: linear-gradient(135deg, #38bdf8, #2563eb) !important; }
+.tc-cloud .trending-icon-small { color: #7dd3fc !important; }
+
+/* Card 4: Cyber Security — Rose-Orange */
+.tc-cyber { border-top-color: #f43f5e !important; }
+.tc-cyber:hover { 
+    box-shadow: 0 10px 30px rgba(244, 63, 94, 0.15), 0 0 20px rgba(244, 63, 94, 0.3) !important; 
+    border-color: #f43f5e !important; 
+}
+.tc-cyber .trending-info h5 {
+    color: #e11d48 !important; /* Crimson Red */
+}
+.tc-cyber .trending-rank { background: linear-gradient(135deg, #f43f5e, #f97316) !important; }
+.tc-cyber .trending-icon-small { color: #fb7185 !important; }
+
+/* In-Demand 1: Full Stack — Magenta */
+.id-fs { border-top-color: #db2777 !important; }
+.id-fs:hover { 
+    box-shadow: 0 10px 30px rgba(219, 39, 119, 0.15), 0 0 20px rgba(219, 39, 119, 0.3) !important; 
+    border-color: #db2777 !important; 
+}
+.id-fs .trending-info h5 { color: #be185d !important; /* Deep Magenta */ }
+.id-fs .trending-rank { background: linear-gradient(135deg, #db2777, #9d174d) !important; }
+.id-fs .trending-icon-small { color: #f472b6 !important; }
+
+/* In-Demand 2: DevOps — Orange/Amber */
+.id-ops { border-top-color: #ea580c !important; }
+.id-ops:hover { 
+    box-shadow: 0 10px 30px rgba(234, 88, 12, 0.15), 0 0 20px rgba(234, 88, 12, 0.3) !important; 
+    border-color: #ea580c !important; 
+}
+.id-ops .trending-info h5 { color: #c2410c !important; /* Solid Orange */ }
+.id-ops .trending-rank { background: linear-gradient(135deg, #ea580c, #c2410c) !important; }
+.id-ops .trending-icon-small { color: #fb923c !important; }
+
+/* In-Demand 3: Cloud Computing — Emerald Green */
+.id-cloud { border-top-color: #22c55e !important; }
+.id-cloud:hover { 
+    box-shadow: 0 10px 30px rgba(34, 197, 94, 0.15), 0 0 20px rgba(34, 197, 94, 0.3) !important; 
+    border-color: #22c55e !important; 
+}
+.id-cloud .trending-info h5 { color: #15803d !important; /* Forest Green */ }
+.id-cloud .trending-rank { background: linear-gradient(135deg, #22c55e, #166534) !important; }
+.id-cloud .trending-icon-small { color: #4ade80 !important; }
+
+/* In-Demand 4: AI / Machine Learning — Purple */
+.id-ai { border-top-color: #a855f7 !important; }
+.id-ai:hover { 
+    box-shadow: 0 10px 30px rgba(168, 85, 247, 0.15), 0 0 20px rgba(168, 85, 247, 0.3) !important; 
+    border-color: #a855f7 !important; 
+}
+.id-ai .trending-info h5 { color: #7e22ce !important; /* Deep Purple */ }
+.id-ai .trending-rank { background: linear-gradient(135deg, #a855f7, #6b21a8) !important; }
+.id-ai .trending-icon-small { color: #c084fc !important; }
+
+/* In-Demand 5: Data Engineering — Golden Yellow */
+.id-data { border-top-color: #eab308 !important; }
+.id-data:hover { 
+    box-shadow: 0 10px 30px rgba(234, 179, 8, 0.15), 0 0 20px rgba(234, 179, 8, 0.3) !important; 
+    border-color: #eab308 !important; 
+}
+.id-data .trending-info h5 { color: #a16207 !important; /* Bronze/Gold */ }
+.id-data .trending-rank { background: linear-gradient(135deg, #eab308, #854d0e) !important; }
+.id-data .trending-icon-small { color: #fde047 !important; }
+
+/* In-Demand 6: Cyber Security — Slate Gray/Blue */
+.id-cyber { border-top-color: #64748b !important; }
+.id-cyber:hover { 
+    box-shadow: 0 10px 30px rgba(100, 116, 139, 0.15), 0 0 20px rgba(100, 116, 139, 0.3) !important; 
+    border-color: #64748b !important; 
+}
+.id-cyber .trending-info h5 { color: #334155 !important; /* Slate Gray */ }
+.id-cyber .trending-rank { background: linear-gradient(135deg, #64748b, #334155) !important; }
+.id-cyber .trending-icon-small { color: #94a3b8 !important; }
+
+/* === Unique Demand Card Colors & Card Glow === */
+
+/* Demand 1: AI / ML — Indigo */
+.di-ai { border-top-color: #6366f1 !important; }
+.di-ai:hover { 
+    box-shadow: 0 10px 30px rgba(99, 102, 241, 0.15), 0 0 20px rgba(99, 102, 241, 0.3) !important; 
+    border-color: #6366f1 !important; 
+}
+.di-ai .di-value { color: #6366f1 !important; }
+.di-ai .di-bar { background: linear-gradient(90deg, #818cf8, #4f46e5) !important; }
+
+/* Demand 2: Cloud Computing — Ocean Blue */
+.di-cloud { border-top-color: #0ea5e9 !important; }
+.di-cloud:hover { 
+    box-shadow: 0 10px 30px rgba(14, 165, 233, 0.15), 0 0 20px rgba(14, 165, 233, 0.3) !important; 
+    border-color: #0ea5e9 !important; 
+}
+.di-cloud .di-value { color: #0ea5e9 !important; }
+.di-cloud .di-bar { background: linear-gradient(90deg, #38bdf8, #0284c7) !important; }
+
+/* Demand 3: Web Development — Emerald Green */
+.di-web { border-top-color: #10b981 !important; }
+.di-web:hover { 
+    box-shadow: 0 10px 30px rgba(16, 185, 129, 0.15), 0 0 20px rgba(16, 185, 129, 0.3) !important; 
+    border-color: #10b981 !important; 
+}
+.di-web .di-value { color: #10b981 !important; }
+.di-web .di-bar { background: linear-gradient(90deg, #34d399, #059669) !important; }
+
+/* Demand 4: Data Engineering — Amber Orange */
+.di-data { border-top-color: #f59e0b !important; }
+.di-data:hover { 
+    box-shadow: 0 10px 30px rgba(245, 158, 11, 0.15), 0 0 20px rgba(245, 158, 11, 0.3) !important; 
+    border-color: #f59e0b !important; 
+}
+.di-data .di-value { color: #f59e0b !important; }
+.di-data .di-bar { background: linear-gradient(90deg, #fbbf24, #d97706) !important; }
+
+/* Demand 5: Cyber Security — Rose Red */
+.di-cyber { border-top-color: #f43f5e !important; }
+.di-cyber:hover { 
+    box-shadow: 0 10px 30px rgba(244, 63, 94, 0.15), 0 0 20px rgba(244, 63, 94, 0.3) !important; 
+    border-color: #f43f5e !important; 
+}
+.di-cyber .di-value { color: #f43f5e !important; }
+.di-cyber .di-bar { background: linear-gradient(90deg, #fb7185, #e11d48) !important; }
+
+body.dark-theme .demand-item-box {
+    background: #1e293b !important;
+}
+</style>
 {% endblock %}

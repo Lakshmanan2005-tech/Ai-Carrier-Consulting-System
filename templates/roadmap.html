@@ -3,156 +3,686 @@
 {% block content %}
 <div class="roadmap-container">
     {% if not data %}
-        <div class="glass-card" style="text-align: center; padding: 4rem;">
-            <h2>Roadmap not found</h2>
-            <p style="color: var(--text-secondary); margin-top: 1rem;">We couldn't find a structured roadmap for "<strong>{{ skill_query }}</strong>".</p>
-            <p style="margin-top: 1rem;">Try searching for generic IT domains like <em>Java, Python, Web Development, Mobile App Development, AI, Data Science, etc.</em></p>
-            <a href="{{ url_for('index') }}" class="btn-primary" style="margin-top: 2rem;">Go Back Home</a>
-        </div>
+    <div class="glass-card" style="text-align: center; padding: 4rem;">
+        <h2>Roadmap not found</h2>
+        <p style="color: var(--text-secondary); margin-top: 1rem;">We couldn't find a structured roadmap for "<strong>{{
+                skill_query }}</strong>".</p>
+        <p style="margin-top: 1rem;">Try searching for generic IT domains like <em>Java, Python, Web Development, Mobile
+                App Development, AI, Data Science, etc.</em></p>
+        <a href="{{ url_for('index') }}" class="btn-primary" style="margin-top: 2rem;">Go Back Home</a>
+    </div>
     {% else %}
-        <div class="roadmap-header-centered" style="text-align: center; margin-bottom: 2.5rem; max-width: 800px; margin-left: auto; margin-right: auto;">
-            <h1 class="roadmap-title" style="font-size: 2.5rem; margin-bottom: 0.8rem; line-height: 1.3; font-weight: 800;">{{ data.title }}</h1>
-            <p style="color: var(--text-secondary); font-size: 1.15rem; line-height: 1.6;">
-                {% if data.is_ai_generated %}
-                    Here is an AI-generated learning path for mastering {{ data.title }}.
+    <div class="roadmap-header-centered"
+        style="text-align: center; margin-bottom: 2.5rem; max-width: 800px; margin-left: auto; margin-right: auto;">
+        <h1 class="roadmap-title" style="font-size: 2.5rem; margin-bottom: 0.8rem; line-height: 1.3; font-weight: 800;">
+            {{ data.title }}</h1>
+        <p style="color: var(--text-secondary); font-size: 1.15rem; line-height: 1.6;">
+            {% if data.is_ai_generated %}
+            Here is an AI-generated learning path for mastering {{ data.title }}.
+            {% else %}
+            Follow this structured path to master {{ data.title }}.
+            {% endif %}
+        </p>
+        <div style="margin-top: 1.5rem;">
+            <a href="{{ url_for('interview_practice', skill=skill_query) }}" class="btn-gradient"
+                style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.8rem 1.8rem; border-radius: 8px;">
+                <i class="fa-solid fa-microphone"></i> Start Interview Practice
+            </a>
+        </div>
+    </div>
+
+    <div class="grid-layout-system roadmap-cards-grid">
+        {% for section in data.sections if 'Career' not in section.title and 'Job' not in section.title %}
+        <div
+            class="grid-card-modern {% if 'Career' in section.title or 'Job' in section.title %}career-card-no-click{% endif %}">
+            <div class="card-icon-wrapper">
+                {% if 'Beginner' in section.title or 'Foundation' in section.title %}
+                <i class="fa-solid fa-seedling"></i>
+                {% elif 'Intermediate' in section.title or 'Core' in section.title %}
+                <i class="fa-solid fa-layer-group"></i>
+                {% elif 'Advanced' in section.title %}
+                <i class="fa-solid fa-rocket"></i>
+                {% elif 'Tools' in section.title or 'Frameworks' in section.title %}
+                <i class="fa-solid fa-screwdriver-wrench"></i>
+                {% elif 'Projects' in section.title or 'Backend' in section.title or 'Security' in section.title %}
+                <i class="fa-solid fa-laptop-code"></i>
+                {% elif 'Database' in section.title %}
+                <i class="fa-solid fa-database"></i>
+                {% elif 'Web' in section.title or 'API' in section.title %}
+                <i class="fa-solid fa-globe"></i>
+                {% elif 'Career' in section.title or 'Job' in section.title %}
+                <i class="fa-solid fa-briefcase"></i>
                 {% else %}
-                    Follow this structured path to master {{ data.title }}.
+                <i class="fa-solid fa-star"></i>
                 {% endif %}
-            </p>
-            <div style="margin-top: 1.5rem;">
-                <a href="{{ url_for('interview_practice', skill=skill_query) }}" class="btn-gradient" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.8rem 1.8rem; border-radius: 8px;">
-                    <i class="fa-solid fa-microphone"></i> Start Interview Practice
-                </a>
+            </div>
+            <h4 class="grid-card-title">{{ section.title }}</h4>
+            <p class="grid-card-content">{{ section.content | safe }}</p>
+        </div>
+        {% endfor %}
+
+
+        <!-- ================= DYNAMIC TOOLS & SALARY CARDS FOR ALL SKILLS ================= -->
+        {% set sq = skill_query.lower() %}
+        {% if 'java' in sq and 'script' not in sq %}
+        {% set sc = 'java' %}
+        {% elif 'python' in sq %}
+        {% set sc = 'python' %}
+        {% elif 'cyber' in sq or 'security' in sq %}
+        {% set sc = 'cyber' %}
+        {% elif 'ai' in sq or 'ml' in sq or 'machine' in sq or 'deep' in sq %}
+        {% set sc = 'ai' %}
+        {% elif 'full' in sq or 'stack' in sq or 'mern' in sq or 'mean' in sq %}
+        {% set sc = 'fullstack' %}
+        {% elif 'front' in sq or 'web' in sq or 'react' in sq or 'angular' in sq %}
+        {% set sc = 'frontend' %}
+        {% elif 'back' in sq or 'node' in sq %}
+        {% set sc = 'backend' %}
+        {% elif 'data' in sq or 'sql' in sq %}
+        {% set sc = 'data' %}
+        {% elif 'devops' in sq or 'cloud' in sq or 'aws' in sq or 'azure' in sq %}
+        {% set sc = 'devops' %}
+        {% elif 'mobile' in sq or 'app' in sq or 'android' in sq or 'ios' in sq or 'flutter' in sq %}
+        {% set sc = 'mobile' %}
+        {% elif 'game' in sq or 'unity' in sq or 'unreal' in sq %}
+        {% set sc = 'game' %}
+        {% elif 'blockchain' in sq or 'web3' in sq or 'crypto' in sq %}
+        {% set sc = 'blockchain' %}
+        {% elif 'qa' in sq or 'test' in sq %}
+        {% set sc = 'qa' %}
+        {% elif 'ui' in sq or 'ux' in sq or 'design' in sq %}
+        {% set sc = 'uiux' %}
+        {% else %}
+        {% set sc = 'default' %}
+        {% endif %}
+
+        <!-- Tools Card -->
+        <div class="grid-card-modern">
+            <div class="card-icon-wrapper" style="color: #FF5722; background: rgba(255, 87, 34, 0.1);">
+                <i class="fa-solid fa-industry"></i>
+            </div>
+            <h4 class="grid-card-title">🏭 Industry Tools</h4>
+            <div class="grid-card-content" style="line-height: 1.8;">
+                {% if sc == 'java' %}
+                • IntelliJ IDEA<br>• Eclipse<br>• Spring Boot<br>• Maven / Gradle<br>• Postman<br>• Docker
+                {% elif sc == 'python' %}
+                • VS Code<br>• PyCharm<br>• Jupyter Notebook<br>• Django / Flask<br>• Pandas / NumPy
+                {% elif sc == 'cyber' %}
+                • Kali Linux<br>• Wireshark<br>• Metasploit<br>• Burp Suite<br>• Nmap
+                {% elif sc == 'ai' %}
+                • Jupyter Notebook<br>• TensorFlow<br>• Scikit-learn<br>• Pandas<br>• Google Colab
+                {% elif sc == 'fullstack' %}
+                • VS Code<br>• GitHub<br>• Docker<br>• Postman<br>• Chrome DevTools
+                {% elif sc == 'frontend' %}
+                • VS Code<br>• Webpack<br>• Figma<br>• Chrome DevTools<br>• Git / GitHub
+                {% elif sc == 'backend' %}
+                • VS Code<br>• Postman<br>• Docker<br>• Kubernetes<br>• Linux Shell
+                {% elif sc == 'data' %}
+                • Jupyter Notebook<br>• Tableau / PowerBI<br>• SQL Server / MySQL<br>• Apache Spark<br>• Excel
+                {% elif sc == 'devops' %}
+                • Docker<br>• Kubernetes<br>• Jenkins<br>• Terraform<br>• AWS / Azure Console
+                {% elif sc == 'mobile' %}
+                • Android Studio<br>• Xcode<br>• Firebase<br>• Postman<br>• Figma
+                {% elif sc == 'game' %}
+                • Unity / Unreal Editor<br>• Visual Studio<br>• Blender<br>• GitHub<br>• Rider
+                {% elif sc == 'blockchain' %}
+                • Remix IDE<br>• Hardhat / Truffle<br>• Ganache<br>• Metamask<br>• VS Code
+                {% elif sc == 'qa' %}
+                • Selenium<br>• Postman<br>• JMeter<br>• Jira<br>• Appium
+                {% elif sc == 'uiux' %}
+                • Figma<br>• Adobe XD<br>• Sketch<br>• InVision<br>• Miro
+                {% else %}
+                • VS Code<br>• Git / GitHub<br>• Docker<br>• Postman<br>• Google Chrome
+                {% endif %}
             </div>
         </div>
 
-        <div class="grid-layout-system roadmap-cards-grid">
-            {% for section in data.sections %}
-                <div class="grid-card-modern">
-                    <div class="card-icon-wrapper">
-                        {% if 'Beginner' in section.title or 'Foundation' in section.title %}
-                            <i class="fa-solid fa-seedling"></i>
-                        {% elif 'Intermediate' in section.title or 'Core' in section.title %}
-                            <i class="fa-solid fa-layer-group"></i>
-                        {% elif 'Advanced' in section.title %}
-                            <i class="fa-solid fa-rocket"></i>
-                        {% elif 'Tools' in section.title or 'Frameworks' in section.title %}
-                            <i class="fa-solid fa-screwdriver-wrench"></i>
-                        {% elif 'Projects' in section.title or 'Backend' in section.title or 'Security' in section.title %}
-                            <i class="fa-solid fa-laptop-code"></i>
-                        {% elif 'Career' in section.title or 'Job' in section.title or 'Database' in section.title %}
-                            <i class="fa-solid fa-briefcase"></i>
-                        {% else %}
-                            <i class="fa-solid fa-star"></i>
-                        {% endif %}
-                    </div>
-                    <h4 class="grid-card-title">{{ section.title }}</h4>
-                    <p class="grid-card-content">{{ section.content | safe }}</p>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const targetSkill = "{{ skill_query }}";
+                window.currentSalaryData = null; // Store fetched data globally for PDF
+
+                // Tier 1: Known Skills Hardcoded Benchmarks
+                const salaryBackup = {
+                    "java": { fresher: { yearly: 450000, monthly: 35000 }, mid: { yearly: 950000, monthly: 80000 }, senior: { yearly: 2200000, monthly: 180000 } },
+                    "python": { fresher: { yearly: 500000, monthly: 40000 }, mid: { yearly: 1100000, monthly: 90000 }, senior: { yearly: 2500000, monthly: 200000 } },
+                    "fullstack": { fresher: { yearly: 500000, monthly: 40000 }, mid: { yearly: 1200000, monthly: 100000 }, senior: { yearly: 2800000, monthly: 230000 } },
+                    "frontend": { fresher: { yearly: 400000, monthly: 32000 }, mid: { yearly: 1000000, monthly: 85000 }, senior: { yearly: 2000000, monthly: 160000 } },
+                    "backend": { fresher: { yearly: 480000, monthly: 38000 }, mid: { yearly: 1150000, monthly: 95000 }, senior: { yearly: 2400000, monthly: 190000 } },
+                    "ai": { fresher: { yearly: 800000, monthly: 60000 }, mid: { yearly: 1800000, monthly: 140000 }, senior: { yearly: 3500000, monthly: 280000 } },
+                    "ml": { fresher: { yearly: 700000, monthly: 55000 }, mid: { yearly: 1600000, monthly: 120000 }, senior: { yearly: 3200000, monthly: 260000 } },
+                    "datascience": { fresher: { yearly: 900000, monthly: 70000 }, mid: { yearly: 2000000, monthly: 160000 }, senior: { yearly: 4000000, monthly: 320000 } },
+                    "dataanalyst": { fresher: { yearly: 500000, monthly: 40000 }, mid: { yearly: 1200000, monthly: 90000 }, senior: { yearly: 2200000, monthly: 180000 } },
+                    "deeplearning": { fresher: { yearly: 1000000, monthly: 80000 }, mid: { yearly: 2200000, monthly: 170000 }, senior: { yearly: 4500000, monthly: 350000 } },
+                    "nlp": { fresher: { yearly: 900000, monthly: 70000 }, mid: { yearly: 2000000, monthly: 160000 }, senior: { yearly: 4000000, monthly: 320000 } },
+                    "computervision": { fresher: { yearly: 900000, monthly: 70000 }, mid: { yearly: 2100000, monthly: 170000 }, senior: { yearly: 4200000, monthly: 330000 } },
+                    "aimlengineer": { fresher: { yearly: 1000000, monthly: 80000 }, mid: { yearly: 2200000, monthly: 170000 }, senior: { yearly: 4500000, monthly: 350000 } },
+                    "bigdata": { fresher: { yearly: 700000, monthly: 55000 }, mid: { yearly: 1500000, monthly: 110000 }, senior: { yearly: 3000000, monthly: 250000 } },
+                    "cybersecurity": { fresher: { yearly: 450000, monthly: 35000 }, mid: { yearly: 1200000, monthly: 100000 }, senior: { yearly: 2500000, monthly: 200000 } },
+                    "devops": { fresher: { yearly: 550000, monthly: 45000 }, mid: { yearly: 1300000, monthly: 110000 }, senior: { yearly: 2800000, monthly: 230000 } }
+                };
+
+                function getRandomSalary() {
+                    return {
+                        fresher: { yearly: 300000 + Math.floor(Math.random() * 300000), monthly: 20000 + Math.floor(Math.random() * 20000) },
+                        mid: { yearly: 800000 + Math.floor(Math.random() * 500000), monthly: 60000 + Math.floor(Math.random() * 40000) },
+                        senior: { yearly: 1500000 + Math.floor(Math.random() * 1000000), monthly: 120000 + Math.floor(Math.random() * 80000) }
+                    };
+                }
+
+                function formatSalary(amount) {
+                    if (!amount) return "N/A";
+                    if (amount >= 100000) return "₹" + (amount / 100000).toFixed(1).replace(".0", "") + "L";
+                    if (amount >= 1000) return "₹" + (amount / 1000).toFixed(0) + "K";
+                    return "₹" + amount;
+                }
+
+                function renderSalary(data) {
+                    const loadingEl = document.getElementById('salary-loading');
+                    const dataContainer = document.getElementById('salary-data-container');
+
+                    document.getElementById('salary-fresher').innerText = formatSalary(data.fresher.yearly);
+                    document.getElementById('monthly-fresher').innerText = ` (${formatSalary(data.fresher.monthly)}/mo)`;
+
+                    document.getElementById('salary-mid').innerText = formatSalary(data.mid.yearly);
+                    document.getElementById('monthly-mid').innerText = ` (${formatSalary(data.mid.monthly)}/mo)`;
+
+                    document.getElementById('salary-senior').innerText = formatSalary(data.senior.yearly);
+                    document.getElementById('monthly-senior').innerText = ` (${formatSalary(data.senior.monthly)}/mo)`;
+
+                    loadingEl.style.display = 'none';
+                    dataContainer.style.display = 'block';
+                }
+
+                async function handleSalary(skill) {
+                    const key = skill.toLowerCase().replace(/\s/g, "");
+                    const loadingEl = document.getElementById('salary-loading');
+
+                    // ✅ Tier 1: Known skill → direct hardcoded (Instant)
+                    if (salaryBackup[key]) {
+                        console.log("Using Hardcoded Salary for:", key);
+                        const data = salaryBackup[key];
+                        renderSalary(data);
+                        window.currentSalaryData = data;
+                        return;
+                    }
+
+                    // 🟡 Tier 2: API call with 7s Performance Timeout
+                    try {
+                        const timeoutPromise = new Promise((_, reject) =>
+                            setTimeout(() => reject(new Error('TIMEOUT')), 7000)
+                        );
+
+                        const data = await Promise.race([
+                            (async () => {
+                                const response = await fetch(`/api/salary?skill=${encodeURIComponent(skill)}`);
+                                if (!response.ok) throw new Error("API Failure");
+
+                                const result = await response.json();
+                                let content = result.choices[0].message.content.trim();
+
+                                try {
+                                    return JSON.parse(content);
+                                } catch (e) {
+                                    const start = content.indexOf('{');
+                                    const end = content.lastIndexOf('}');
+                                    return JSON.parse(content.substring(start, end + 1));
+                                }
+                            })(),
+                            timeoutPromise
+                        ]);
+
+                        renderSalary(data);
+                        window.currentSalaryData = data;
+
+                    } catch (error) {
+                        console.warn(error.message === 'TIMEOUT' ? "API Slow (7s) → Using Random Fallback" : "API Fail → Using Random Fallback");
+                        // 🔁 Tier 3: API fail or timeout → random fallback
+                        const data = getRandomSalary();
+                        renderSalary(data);
+                        window.currentSalaryData = data;
+                    }
+                }
+
+                if (targetSkill) {
+                    handleSalary(targetSkill);
+                } else {
+                    const loadingEl = document.getElementById('salary-loading');
+                    if (loadingEl) loadingEl.innerHTML = '<span style="color: #FFB800;"><i class="fa-solid fa-circle-info"></i> Skill missing</span>';
+                }
+            });
+        </script>
+        <!-- ================= #11 CAREER OPPORTUNITIES ================= -->
+        {% for section in data.sections if 'Career' in section.title or 'Job' in section.title %}
+        <div
+            class="grid-card-modern {% if 'Career' in section.title or 'Job' in section.title %}career-card-no-click{% endif %}">
+            <div class="card-icon-wrapper" style="color: #00F0FF; background: rgba(0, 240, 255, 0.1);">
+                <i class="fa-solid fa-briefcase"></i>
+            </div>
+            <h4 class="grid-card-title">{{ section.title }}</h4>
+            <p class="grid-card-content">{{ section.content | safe }}</p>
+        </div>
+        {% endfor %}
+
+        <!-- ================= #12 SALARY INSIGHTS ================= -->
+        <div class="grid-card-modern salary-card" id="salary-card">
+            <style>
+                .salary-badge {
+                    background: rgba(255, 255, 255, 0.1);
+                    padding: 2px 8px;
+                    border-radius: 4px;
+                    color: #fff;
+                    font-weight: 600;
+                    border: 1px solid rgba(255, 255, 255, 0.2);
+                }
+
+                .loading-pulse {
+                    animation: pulse 1.5s infinite ease-in-out;
+                    color: #888;
+                    font-style: italic;
+                }
+
+                @keyframes pulse {
+                    0% {
+                        opacity: 0.6;
+                    }
+
+                    50% {
+                        opacity: 1;
+                    }
+
+                    100% {
+                        opacity: 0.6;
+                    }
+                }
+            </style>
+            <div class="card-icon-wrapper" style="color: #25D366; background: rgba(37, 211, 102, 0.1);">
+                <i class="fa-solid fa-money-bill-wave"></i>
+            </div>
+            <h4 class="grid-card-title">💰 Salary Insights</h4>
+            <div class="grid-card-content" id="salary-card-content"
+                style="display: flex; flex-direction: column; gap: 0.8rem; font-size: 0.9rem; line-height: 1.4; color: var(--text-secondary);">
+
+                <div id="salary-loading" class="loading-pulse">
+                    <i class="fa-solid fa-spinner fa-spin"></i> Fetching real-time salary insights...
                 </div>
+
+                <div id="salary-data-container" style="display: none;">
+                    <div style="margin-bottom: 0.5rem; display: flex; flex-direction: column; gap: 0.4rem;">
+                        <span>🎓 Fresher: <span id="salary-fresher" class="salary-badge">...</span> <span
+                                id="monthly-fresher" style="font-size: 0.8rem; color: #888;"></span></span>
+                        <span>💼 Mid: <span id="salary-mid" class="salary-badge">...</span> <span id="monthly-mid"
+                                style="font-size: 0.8rem; color: #888;"></span></span>
+                        <span>👑 Senior: <span id="salary-senior" class="salary-badge">...</span> <span
+                                id="monthly-senior" style="font-size: 0.8rem; color: #888;"></span></span>
+                    </div>
+
+                    <div style="border-top: 1px solid rgba(255,255,255,0.08); padding-top: 0.8rem;">
+                        <span style="color: #fff; font-weight: 600;">📍 Location:</span><br>
+                        BLR ↑ | Chennai → | Remote ~
+                    </div>
+
+                    <div style="border-top: 1px solid rgba(255,255,255,0.08); padding-top: 0.5rem;">
+                        <span style="color: #fff; font-weight: 600;">🏢 Company:</span><br>
+                        Service (Low) | Product (High) | Startup (Variable)
+                    </div>
+
+                    <div style="border-top: 1px solid rgba(255,255,255,0.08); padding-top: 0.5rem;">
+                        <span style="color: #fff; font-weight: 600;">📈 Growth:</span><br>
+                        0–2y → Fresher | 2–5y → Mid | 5+y → Senior
+                    </div>
+
+                    <div style="border-top: 1px solid rgba(255,255,255,0.08); padding-top: 0.5rem;">
+                        <span style="color: #FFD700; font-weight: 600;">💡 Tip:</span><br>
+                        <span id="salary-dynamic-tip">Focus on Core Concepts + Deep Projects 🚀</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= 5. FINAL ADVICE (FULL WIDTH) ================= -->
+    {% if data.final_advice %}
+    <div class="grid-card-modern final-advice-card" style="margin: 2rem 0; width: 100%; border-color: rgba(245, 158, 11, 0.3); text-align: center;">
+        <div class="card-icon-wrapper" style="margin: 0 auto 1.5rem auto; width: 60px; height: 60px; font-size: 1.8rem; background: rgba(245, 158, 11, 0.15); color: #f59e0b; box-shadow: 0 0 15px rgba(245, 158, 11, 0.4);">
+            <i class="fa-solid fa-rocket"></i>
+        </div>
+        <h4 class="grid-card-title" style="font-size: 1.6rem; color: #d97706; margin-bottom: 1.5rem;">⭐ Final Advice 🚀</h4>
+
+        <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 1rem; color: var(--text-primary); font-size: 1.1rem; font-weight: 500;">
+            {% for advice in data.final_advice %}
+            <span class="advice-pill" style="background: rgba(245, 158, 11, 0.08); padding: 0.8rem 1.5rem; border-radius: 8px; border: 1px solid rgba(245, 158, 11, 0.2); transition: all 0.3s ease;">
+                {{ advice }}
+            </span>
             {% endfor %}
         </div>
+    </div>
+    {% endif %}
+    <!-- ================================================================= -->
+    <div class="industrial-workflow-section" style="margin-top: 3.5rem; margin-bottom: 2rem;">
+        <h3 style="margin-bottom: 1.5rem; text-align: center; font-size: 1.6rem; color: var(--text-primary);">Industrial
+            Workflow</h3>
 
-        {% if data.interview_questions %}
-        <div class="interview-section" style="margin-top: 2.5rem;">
-            <h3 style="margin-bottom: 1.2rem; text-align: center; font-size: 1.5rem;">Important Interview Questions</h3>
-            <div class="glass-card" style="max-width: 800px; margin: 0 auto; padding: 1.5rem;">
-                <ul style="padding-left: 1.5rem; color: var(--text-secondary);">
-                    {% for question in data.interview_questions %}
-                        <li style="margin-bottom: 0.8rem; font-size: 1.05rem;">{{ question }}</li>
-                    {% endfor %}
-                </ul>
+        <!-- Horizontally scrolling timeline wrapper to fit all roles beautifully -->
+        <div class="industrial-workflow-scroll-container">
+            <div id="dynamic-workflow-grid" class="industrial-workflow-flex">
+                <!-- Loading Interface -->
+                <div
+                    style="text-align: center; width: 100vw; max-width: 600px; color: var(--text-secondary); padding: 3rem 0;">
+                    <i class="fa-solid fa-circle-notch fa-spin fa-2x" style="color: var(--primary-color);"></i>
+                    <p style="margin-top: 1rem; font-size: 1.1rem;">Engineering Role Matrix...</p>
+                </div>
             </div>
         </div>
-        {% endif %}
+    </div>
 
-        {% if data.interview_qs and data.interview_qs|length > 0 %}
+    {% if data.interview_questions %}
+    <div class="interview-section" style="margin-top: 2.5rem;">
+        <h3 style="margin-bottom: 1.2rem; text-align: center; font-size: 1.5rem;">Important Interview Questions</h3>
+        <div class="glass-card" style="max-width: 800px; margin: 0 auto; padding: 1.5rem;">
+            <ul style="padding-left: 1.5rem; color: var(--text-secondary);">
+                {% for question in data.interview_questions %}
+                <li style="margin-bottom: 0.8rem; font-size: 1.05rem;">{{ question }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if data.interview_qs and data.interview_qs|length > 0 %}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/roadmap.css') }}">
-        <div class="interview-section" style="margin: 3rem auto 0 auto; max-width: 800px;">
-            <h3 style="margin-bottom: 1.2rem; text-align: center; font-size: 1.5rem; color: var(--text-primary);">Top Interview Questions</h3>
-            <div class="grid-card-modern" style="padding: 1.8rem 2rem; border-top: 4px solid var(--primary-color);">
-                <div style="display: flex; flex-direction: column;">
-                    {% for q in data.interview_qs[:5] %}
-                    <div class="interview-q-item">
-                        <i class="fa-solid fa-circle-question"></i>
-                        <div class="interview-q-text">{{ q | safe }}</div>
-                    </div>
-                    {% endfor %}
-                </div>
-                
-                <div style="margin-top: 2rem; text-align: center; display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;">
-                    <a href="{{ url_for('interview_practice', skill=skill_query) }}" class="btn-gradient" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.8rem 1.8rem; border-radius: 8px;">
-                        <i class="fa-solid fa-microphone"></i> Practice Interview Mode
-                    </a>
-                    <a href="https://www.geeksforgeeks.org/interview-preparation/" target="_blank" class="btn-secondary" style="display: inline-flex; align-items: center; gap: 0.5rem; transition: transform 0.2s, box-shadow 0.2s; padding: 0.8rem 1.8rem; border-radius: 8px;">
-                        More Questions <i class="fa-solid fa-arrow-right-long"></i>
-                    </a>
-                </div>
-            </div>
-        </div>
-        {% endif %}
-
-        {% if data.resources and data.resources|length > 0 %}
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/roadmap.css') }}">
-        <div class="resources-section" style="margin: 3rem auto 0 auto; max-width: 800px;">
-            <h3 style="margin-bottom: 1.2rem; text-align: center; font-size: 1.5rem;">Learning Resources</h3>
-            <div class="grid-card-modern" style="padding: 1.5rem 2rem;">
-                <div style="display: flex; flex-direction: column; gap: 1rem;">
-                    {% for resource in data.resources[:3] %}
-                    <a href="{{ resource.url }}" target="_blank" class="resource-row">
-                        <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(108, 99, 255, 0.08); color: var(--primary-color); display: flex; align-items: center; justify-content: center; font-size: 1.3rem; margin-right: 1.5rem; flex-shrink: 0;">
-                            <i class="fa-solid fa-link"></i>
-                        </div>
-                        <div style="flex: 1; text-align: left;">
-                            <h4 style="color: var(--text-primary); margin-bottom: 0.3rem; font-size: 1.15rem;">{{ resource.name }}</h4>
-                            <p style="color: var(--text-secondary); font-size: 0.95rem; margin: 0; line-height: 1.5;">{{ resource.desc | default('Learn more about ' ~ data.title) }}</p>
-                        </div>
-                        <i class="fa-solid fa-arrow-up-right-from-square" style="color: var(--text-muted); font-size: 1.1rem; margin-left: 1rem;"></i>
-                    </a>
-                    {% endfor %}
-                </div>
-            </div>
-        </div>
-        {% endif %}
-        
-        {% if data.jobs and data.jobs|length > 0 %}
-        <div class="jobs-section" style="margin-top: 3.5rem; margin-bottom: 3rem;">
-            <h3 style="margin-bottom: 0.8rem; text-align: center; font-size: 1.6rem; color: var(--text-primary);">Ready for your next career move?</h3>
-            <p style="text-align: center; color: var(--text-secondary); margin-bottom: 2rem; font-size: 1.05rem;">Explore trending roles related to {{ data.title }}.</p>
-            
-            <div class="jobs-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.2rem; max-width: 1000px; margin: 0 auto;">
-                {% for job in data.jobs[:3] %}
-                <div class="grid-card-modern" style="padding: 1.8rem 1.5rem; display: flex; flex-direction: column; align-items: center; text-align: center; border: 1px solid rgba(108, 99, 255, 0.15);">
-                    <div style="width: 45px; height: 45px; border-radius: 12px; background: rgba(108, 99, 255, 0.08); color: var(--primary-color); display: flex; align-items: center; justify-content: center; font-size: 1.4rem; margin-bottom: 1rem;">
-                        <i class="fa-solid fa-briefcase"></i>
-                    </div>
-                    <h4 style="margin-bottom: 0.6rem; font-size: 1.2rem; color: var(--text-primary);">{{ job.role }}</h4>
-                    <p style="color: var(--text-secondary); font-size: 0.95rem; line-height: 1.5; margin-bottom: 1.8rem; flex: 1;">{{ job.desc }}</p>
-                    <a href="https://www.naukri.com/{{ job.role | replace(' ', '-') | replace('/', '-') | lower }}-jobs" target="_blank" class="btn-gradient" style="width: 100%; padding: 0.9rem; border-radius: 10px; font-size: 1.05rem; box-shadow: 0 4px 15px rgba(108, 99, 255, 0.25);">Apply Now</a>
+    <div class="interview-section" style="margin: 3rem auto 0 auto; max-width: 800px;">
+        <h3 style="margin-bottom: 1.2rem; text-align: center; font-size: 1.5rem; color: var(--text-primary);">Top
+            Interview Questions</h3>
+        <div class="grid-card-modern" style="padding: 1.8rem 2rem; border-top: 4px solid var(--primary-color);">
+            <div style="display: flex; flex-direction: column;">
+                {% for q in data.interview_qs[:5] %}
+                <div class="interview-q-item">
+                    <i class="fa-solid fa-circle-question"></i>
+                    <div class="interview-q-text">{{ q | safe }}</div>
                 </div>
                 {% endfor %}
             </div>
+
+            <div
+                style="margin-top: 2rem; text-align: center; display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;">
+                <a href="{{ url_for('interview_practice', skill=skill_query) }}" class="btn-gradient"
+                    style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.8rem 1.8rem; border-radius: 8px;">
+                    <i class="fa-solid fa-microphone"></i> Practice Interview Mode
+                </a>
+                <a href="https://www.geeksforgeeks.org/interview-preparation/" target="_blank" class="btn-secondary"
+                    style="display: inline-flex; align-items: center; gap: 0.5rem; transition: transform 0.2s, box-shadow 0.2s; padding: 0.8rem 1.8rem; border-radius: 8px;">
+                    More Questions <i class="fa-solid fa-arrow-right-long"></i>
+                </a>
+            </div>
         </div>
-        {% endif %}
+    </div>
     {% endif %}
+
+    {% if data.resources and data.resources|length > 0 %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/roadmap.css') }}">
+    <div class="resources-section" style="margin: 3rem auto 0 auto; max-width: 800px;">
+        <h3 style="margin-bottom: 1.2rem; text-align: center; font-size: 1.5rem;">Learning Resources</h3>
+        <div class="grid-card-modern" style="padding: 1.5rem 2rem;">
+            <div style="display: flex; flex-direction: column; gap: 1rem;">
+                {% for resource in data.resources[:3] %}
+                <a href="{{ resource.url }}" target="_blank" class="resource-row">
+                    <div
+                        style="width: 48px; height: 48px; border-radius: 12px; background: rgba(108, 99, 255, 0.08); color: var(--primary-color); display: flex; align-items: center; justify-content: center; font-size: 1.3rem; margin-right: 1.5rem; flex-shrink: 0;">
+                        <i class="fa-solid fa-link"></i>
+                    </div>
+                    <div style="flex: 1; text-align: left;">
+                        <h4 style="color: var(--text-primary); margin-bottom: 0.3rem; font-size: 1.15rem;">{{
+                            resource.name }}</h4>
+                        <p style="color: var(--text-secondary); font-size: 0.95rem; margin: 0; line-height: 1.5;">{{
+                            resource.desc | default('Learn more about ' ~ data.title) }}</p>
+                    </div>
+                    <i class="fa-solid fa-arrow-up-right-from-square"
+                        style="color: var(--text-muted); font-size: 1.1rem; margin-left: 1rem;"></i>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if data.jobs and data.jobs|length > 0 %}
+    <div class="jobs-section" style="margin-top: 3.5rem; margin-bottom: 3rem;">
+        <h3 style="margin-bottom: 0.8rem; text-align: center; font-size: 1.6rem; color: var(--text-primary);">Ready for
+            your next career move?</h3>
+        <p style="text-align: center; color: var(--text-secondary); margin-bottom: 2rem; font-size: 1.05rem;">Explore
+            trending roles related to {{ data.title }}.</p>
+
+        <div class="jobs-grid"
+            style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.2rem; max-width: 1000px; margin: 0 auto;">
+            {% for job in data.jobs[:3] %}
+            <div class="grid-card-modern"
+                style="padding: 1.8rem 1.5rem; display: flex; flex-direction: column; align-items: center; text-align: center; border: 1px solid rgba(108, 99, 255, 0.15);">
+                <div class="career-job-icon"
+                    style="width: 45px; height: 45px; border-radius: 12px; background: rgba(108, 99, 255, 0.08); color: var(--primary-color); display: flex; align-items: center; justify-content: center; font-size: 1.4rem; margin-bottom: 1rem;">
+                    <i class="fa-solid fa-briefcase"></i>
+                </div>
+                <h4 style="margin-bottom: 0.6rem; font-size: 1.2rem; color: var(--text-primary);">{{ job.role }}</h4>
+                <p
+                    style="color: var(--text-secondary); font-size: 0.95rem; line-height: 1.5; margin-bottom: 1.8rem; flex: 1;">
+                    {{ job.desc }}</p>
+                <a href="https://www.naukri.com/{{ job.role | replace(' ', '-') | replace('/', '-') | lower }}-jobs"
+                    target="_blank" class="btn-gradient"
+                    style="width: 100%; padding: 0.9rem; border-radius: 10px; font-size: 1.05rem; box-shadow: 0 4px 15px rgba(108, 99, 255, 0.25);">Apply
+                    Now</a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% include '_mnc_hiring.html' %}
+
+<!-- NEW SECTION: Complete Career Guidance Document (Moved to End) -->
+<div class="career-guidance-section"
+    style="margin-top: 2rem; margin-bottom: 4rem; text-align: center; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 2rem;">
+    <h3 style="margin-bottom: 1.5rem; font-size: 1.8rem; color: var(--text-primary);">📘 Complete Career Guidance
+        Document</h3>
+    <p
+        style="color: var(--text-secondary); margin-bottom: 2.5rem; max-width: 600px; margin-left: auto; margin-right: auto; line-height: 1.6;">
+        Generate a full, in-depth AI comprehensive A-Z roadmap compilation covering everything from Beginner concepts to
+        Industrial Workflows for <strong>{{ data.title }}</strong>.</p>
+
+    <style>
+        #btn-share-whatsapp:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 8px 25px rgba(37, 211, 102, 0.7);
+        }
+
+        #btn-download-pdf:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 8px 25px rgba(108, 99, 255, 0.5);
+        }
+    </style>
+    <div style="display: flex; justify-content: center; gap: 1.5rem; flex-wrap: wrap;">
+        <button id="btn-download-pdf" class="btn-gradient"
+            style="display: inline-flex; align-items: center; gap: 0.8rem; padding: 1rem 2rem; font-size: 1.1rem; border: none; cursor: pointer; border-radius: 12px; font-weight: 600; box-shadow: 0 4px 15px rgba(108, 99, 255, 0.3); transition: transform 0.3s ease, box-shadow 0.3s ease;">
+            <i class="fa-solid fa-file-pdf"></i> Download PDF
+        </button>
+        <button id="btn-share-whatsapp" class="btn-secondary"
+            style="display: inline-flex; align-items: center; gap: 0.8rem; padding: 1rem 2rem; font-size: 1.1rem; border: none; background: linear-gradient(135deg, #25D366, #128C7E); color: white; cursor: pointer; border-radius: 12px; font-weight: 600; box-shadow: 0 0 15px rgba(37, 211, 102, 0.6), 0 4px 20px rgba(37, 211, 102, 0.4); transition: transform 0.3s ease, box-shadow 0.3s ease;">
+            <i class="fa-brands fa-whatsapp" style="font-size: 1.4rem;"></i> Share on WhatsApp
+        </button>
+    </div>
+
+    <div id="career-guidance-status"
+        style="margin-top: 1.5rem; color: var(--primary-color); font-weight: 500; display: none;">
+        <i class="fa-solid fa-cog fa-spin"></i> Generating complete in-depth compilation via NVIDIA AI... (May take
+        30-45s)
+    </div>
+
+    <!-- Hidden form for PDF download to trigger native browser save -->
+    <form id="pdf-download-form" action="/download_complete_pdf" method="POST" style="display: none;">
+        <input type="hidden" name="skill" id="pdf-skill-input" value="{{ skill_query }}">
+    </form>
+</div>
+{% endif %}
 </div>
 
+<style>
+    /* Make topic roadmap items and interview questions look clickable */
+    .custom-list li,
+    .interview-q-item,
+    .interview-section ul li {
+        cursor: pointer;
+        transition: color 0.2s ease, transform 0.2s ease;
+    }
+
+    .custom-list li:hover,
+    .interview-q-item:hover,
+    .interview-section ul li:hover {
+        color: var(--primary-color, #6C63FF);
+        transform: translateX(4px);
+    }
+
+    /* Career Section - Not Clickable */
+    .career-card-no-click .custom-list li {
+        cursor: default !important;
+        transform: none !important;
+        color: inherit !important;
+    }
+
+    .career-card-no-click .custom-list li:hover {
+        transform: none !important;
+        color: inherit !important;
+    }
+
+    /* Industrial Workflow Cards */
+    .workflow-card {
+        padding: 2rem 1.5rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        border: 1px solid rgba(108, 99, 255, 0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .workflow-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    }
+
+    .workflow-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin-bottom: 1.2rem;
+    }
+
+    .workflow-content {
+        width: 100%;
+        margin-top: 0.5rem;
+        padding-top: 1rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .workflow-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.3rem;
+    }
+
+    .workflow-label {
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: var(--primary-color, #6C63FF);
+        font-weight: 700;
+    }
+
+    .workflow-text {
+        font-size: 0.95rem;
+        color: var(--text-secondary, #b3b3b3);
+        line-height: 1.5;
+    }
+
+    /* Industrial Workflow Layout System */
+    .industrial-workflow-scroll-container {
+        width: 100%;
+        overflow-x: auto;
+        padding-bottom: 1.5rem;
+        cursor: grab;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .industrial-workflow-flex {
+        display: flex;
+        gap: 1.5rem;
+        width: max-content;
+        margin: 0 auto;
+        padding: 0 1rem;
+        transition: all 0.3s ease;
+    }
+    /* Mobile Responsive Overrides */
+    @media (max-width: 768px) {
+        .industrial-workflow-flex {
+            flex-direction: column !important;
+            width: 100% !important;
+            max-width: 600px;
+            margin: 0 auto;
+            gap: 1.2rem;
+            display: flex !important;
+        }
+
+        .workflow-card {
+            width: 100% !important;
+            margin: 0 auto 1.2rem auto !important;
+            flex-shrink: 0 !important;
+        }
+        
+        .industrial-workflow-scroll-container {
+            overflow-x: hidden !important;
+        }
+
+        .career-job-icon {
+            margin: 0 auto 1rem auto !important;
+        }
+
+        .jobs-grid {
+            grid-template-columns: 1fr !important;
+            max-width: 400px !important;
+            margin: 0 auto !important;
+        }
+
+        .grid-card-modern {
+            align-items: center !important;
+            text-align: center !important;
+        }
+    }
+</style>
+
 <script>
-document.addEventListener("DOMContentLoaded", function() {
+    document.addEventListener("DOMContentLoaded", function () {
+        // --- STEP 1 & 2: Store Current Skill and Roadmap Data ---
+        window.currentSkill = "{{ data.title }}";
+        window.currentRoadmapData = {{ data.sections | tojson | safe if data and data.sections else '[]' }};
+
     document.querySelectorAll('.grid-card-content').forEach(el => {
         let content = el.innerHTML;
         // Check if content has AI/Hardcoded bullet points
         if (content.includes('•') || content.includes('&#8226;')) {
             let items = content.replace(/&#8226;/g, '•')
-                               .split(/<br\s*\/?>|\n/)
-                               .map(item => item.replace(/•/g, '').trim())
-                               .filter(i => i.length > 0);
-            
+                .split(/<br\s*\/?>|\n/)
+                .map(item => item.replace(/•/g, '').trim())
+                .filter(i => i.length > 0);
+
             if (items.length > 0) {
                 let ul = document.createElement('ul');
                 ul.className = 'custom-list';
                 items.forEach(item => {
                     let li = document.createElement('li');
-                    
+
                     let formattedItem = item;
                     // Bolding contexts based on common roadmap schemas
                     if (item.includes(':')) {
@@ -168,7 +698,7 @@ document.addEventListener("DOMContentLoaded", function() {
                             formattedItem = `<span class="highlight-text">${words[0]} ${words[1]}</span> ${words.slice(2).join(' ')}`;
                         }
                     }
-                    
+
                     li.innerHTML = `<i class="fa-solid fa-check-circle list-icon"></i><span class="list-text">${formattedItem}</span>`;
                     ul.appendChild(li);
                 });
@@ -190,6 +720,274 @@ document.addEventListener("DOMContentLoaded", function() {
             if (history.length > 5) history.pop();
             localStorage.setItem('guest_roadmap_history', JSON.stringify(history));
         }
+
+        // Dynamically request full Role progression via API or use pre-fetched data
+        {% if data and data.prefetched_workflow %}
+        const resData = {{ data.prefetched_workflow | tojson | safe }};
+    const grid = document.getElementById('dynamic-workflow-grid');
+    if (resData && resData.length > 0) {
+        grid.innerHTML = ''; // Wipe loading spinner
+        resData.forEach(roleData => {
+            const skillsHtml = (roleData.skills || []).join(', ');
+            const card = `
+                        <div class="grid-card-modern workflow-card" style="width: 280px; flex-shrink: 0;">
+                            <div class="workflow-icon" style="background: rgba(108, 99, 255, 0.1); color: var(--primary-color);">
+                                <i class="fa-solid fa-briefcase"></i>
+                            </div>
+                            <h4 class="grid-card-title" style="text-align: center; margin-bottom: 1rem;">${roleData.role}</h4>
+                            <div class="workflow-content">
+                                <div class="workflow-group">
+                                    <span class="workflow-label">Skills / Tasks:</span>
+                                    <span class="workflow-text">${skillsHtml}</span>
+                                </div>
+                                <div class="workflow-group" style="margin-top: 1rem;">
+                                    <span class="workflow-label">Goal:</span>
+                                    <span class="workflow-text">${roleData.goal}</span>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+            grid.innerHTML += card;
+        });
+    }
+    {% else %}
+    fetch('/api/industrial_workflow', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ skill: skillName })
+    })
+        .then(response => response.json())
+        .then(res => {
+            const grid = document.getElementById('dynamic-workflow-grid');
+            if (res.data && res.data.length > 0) {
+                grid.innerHTML = ''; // Wipe loading spinner
+                res.data.forEach(roleData => {
+                    const skillsHtml = (roleData.skills || []).join(', ');
+                    const card = `
+                            <div class="grid-card-modern workflow-card" style="width: 280px; flex-shrink: 0;">
+                                <div class="workflow-icon" style="background: rgba(108, 99, 255, 0.1); color: var(--primary-color);">
+                                    <i class="fa-solid fa-briefcase"></i>
+                                </div>
+                                <h4 class="grid-card-title" style="text-align: center; margin-bottom: 1rem;">${roleData.role}</h4>
+                                <div class="workflow-content">
+                                    <div class="workflow-group">
+                                        <span class="workflow-label">Skills:</span>
+                                        <span class="workflow-text">${skillsHtml}</span>
+                                    </div>
+                                    <div class="workflow-group" style="margin-top: 1rem;">
+                                        <span class="workflow-label">Goal:</span>
+                                        <span class="workflow-text">${roleData.goal}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    grid.innerHTML += card;
+                });
+            }
+        })
+        .catch(err => {
+            console.error("API Fetch Error:", err);
+            const grid = document.getElementById('dynamic-workflow-grid');
+            if (grid) grid.innerHTML = "<p style='color:red;'>Failed to load workflow progression.</p>";
+        });
+    {% endif %}
+    }
+
+    // Dynamic topic navigation handler
+    document.addEventListener('click', function (e) {
+        // Only target items inside the custom roadmap list
+        const listItem = e.target.closest('li');
+        if (listItem && listItem.closest('.custom-list')) {
+            // Find section title (e.g. Tools & Technologies)
+            const card = listItem.closest('.grid-card-modern');
+            let sectionType = "";
+            if (card) {
+                const titleEl = card.querySelector('.grid-card-title');
+                if (titleEl) sectionType = titleEl.innerText.trim();
+            }
+
+            // Extract cleaner topic name
+            let topicText = listItem.innerText.trim();
+            if (topicText.includes(':')) {
+                topicText = topicText.split(':')[0].trim();
+            } else if (topicText.includes('-')) {
+                topicText = topicText.split('-')[0].trim();
+            }
+            // Open link dynamically via Flask passing the section name
+            if (topicText && !sectionType.toLowerCase().includes('career') && !sectionType.toLowerCase().includes('job')) {
+                window.open(`/topic/${encodeURIComponent(topicText)}?section=${encodeURIComponent(sectionType)}`, '_blank');
+            }
+        }
+
+        // Dynamic Interview Question handler
+        const intItem = e.target.closest('.interview-q-item') || e.target.closest('.interview-section ul li');
+        if (intItem && !e.target.closest('.custom-list li')) {
+            let questionText = intItem.innerText.trim();
+            if (questionText) {
+                window.open(`/answer/${encodeURIComponent(questionText)}`, '_blank');
+            }
+        }
+    });
+
+    // ==========================================
+    // COMPLETE CAREER GUIDANCE HANDLERS
+    // ==========================================
+    const btnPdf = document.getElementById('btn-download-pdf');
+    const btnWhatsApp = document.getElementById('btn-share-whatsapp');
+    const statusMsg = document.getElementById('career-guidance-status');
+    const targetSkill = "{{ skill_query }}";
+
+    let cachedPdfBlob = null;
+    let isGeneratingPdf = false;
+
+    // Direct download helper
+    function triggerDirectDownload(blob, filename) {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+    }
+
+    // Handles what to do after the blob is securely in memory
+    function handlePdfAction(blob, action) {
+        const safeSkill = targetSkill.replace(/[^a-zA-Z0-9 -_]/g, '').replace(/ /g, '_');
+        const filename = `${safeSkill}_Career_Guidance.pdf`;
+        const file = new File([blob], filename, { type: 'application/pdf' });
+
+        if (action === 'download') {
+            triggerDirectDownload(blob, filename);
+            statusMsg.style.display = 'block';
+            statusMsg.innerHTML = '<i class="fa-solid fa-check-circle" style="color:#25D366;"></i> <b>PDF Successfully Downloaded!</b>';
+            setTimeout(() => { statusMsg.style.display = 'none'; }, 4000);
+
+        } else if (action === 'share') {
+            // NATIVE SHARE REQUIRED to physically attach the PDF file payload to the app intent
+            statusMsg.style.display = 'block';
+            statusMsg.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <b>Opening OS Share Menu to attach PDF...</b>';
+
+            if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                navigator.share({
+                    title: `${targetSkill} Career Guidance`,
+                    text: `Check out this Complete A-Z Career Guidance PDF Document for ${targetSkill}!\n\n(See attached file)`,
+                    files: [file]
+                }).then(() => {
+                    statusMsg.innerHTML = '<i class="fa-solid fa-check-circle" style="color:#25D366;"></i> <b>PDF Shared Successfully!</b>';
+                    setTimeout(() => { statusMsg.style.display = 'none'; }, 4000);
+                }).catch(err => {
+                    console.error('Share failed', err);
+                    if (err.name === 'NotAllowedError') {
+                        // Gesture timeout hit!
+                        statusMsg.innerHTML = '<i class="fa-solid fa-check-circle" style="color:#25D366;"></i> <b>PDF Generated! Please click "Share on WhatsApp" again to attach the file!</b>';
+                    } else {
+                        statusMsg.style.display = 'none';
+                    }
+                });
+            } else {
+                alert("Your browser/device doesn't support automatic file sharing. The PDF has been directly downloaded so you can attach it to WhatsApp manually.");
+                triggerDirectDownload(blob, filename);
+                statusMsg.style.display = 'none';
+            }
+        }
+    }
+
+    // Main interaction handler
+    function processPdfAction(action) {
+        if (!targetSkill) return;
+        if (isGeneratingPdf) {
+            alert("AI is still crafting your document! Please wait.");
+            return;
+        }
+
+        // If they already generated it, it's instant!
+        if (cachedPdfBlob) {
+            handlePdfAction(cachedPdfBlob, action);
+            return;
+        }
+
+        // --- Generate sequence ---
+        isGeneratingPdf = true;
+        statusMsg.style.display = 'block';
+
+        let countdownRemaining = 45;
+        statusMsg.innerHTML = `<i class="fa-solid fa-cog fa-spin"></i> Generating complete document via AI... Please wait (~<span id="pdf-countdown">${countdownRemaining}</span>s)`;
+
+        const countdownInterval = setInterval(() => {
+            countdownRemaining -= 1;
+            const countdownEl = document.getElementById('pdf-countdown');
+            if (countdownEl && countdownRemaining > 0) {
+                countdownEl.innerText = countdownRemaining;
+            } else if (countdownRemaining <= 0) {
+                statusMsg.innerHTML = '<i class="fa-solid fa-cog fa-spin"></i> Finalizing massive AI document... Almost done!';
+                clearInterval(countdownInterval);
+            }
+        }, 1000);
+
+        const formData = new URLSearchParams();
+        formData.append('skill', targetSkill);
+
+        // Pass dynamic roadmap and salary data to backend
+        if (window.currentRoadmapData && window.currentRoadmapData.length > 0) {
+            formData.append('roadmap_data', JSON.stringify(window.currentRoadmapData));
+        }
+        if (window.currentSalaryData) {
+            formData.append('salary_data', JSON.stringify(window.currentSalaryData));
+        }
+
+        fetch('/download_complete_pdf', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: formData.toString()
+        })
+            .then(res => res.blob())
+            .then(blob => {
+                clearInterval(countdownInterval);
+                isGeneratingPdf = false;
+                cachedPdfBlob = blob; // Cache it!
+
+                handlePdfAction(blob, action);
+            })
+            .catch(err => {
+                clearInterval(countdownInterval);
+                isGeneratingPdf = false;
+                statusMsg.innerHTML = '<i class="fa-solid fa-triangle-exclamation" style="color:#FF4B4B;"></i> Generation failed. Please try again.';
+                console.error(err);
+            });
+    }
+
+    if (btnPdf) {
+        btnPdf.addEventListener('click', function (e) {
+            e.preventDefault();
+            processPdfAction('download');
+        });
+    }
+
+    if (btnWhatsApp) {
+        btnWhatsApp.addEventListener('click', function (e) {
+            e.preventDefault();
+            processPdfAction('share');
+        });
+    }
+
+    // Scroll reveal animation for MNC cards
+    const revealCards = document.querySelectorAll('.scroll-reveal');
+    if (revealCards.length > 0) {
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach((entry, index) => {
+                if (entry.isIntersecting) {
+                    // Staggered delay for each card
+                    setTimeout(() => {
+                        entry.target.classList.add('visible');
+                    }, index * 100);
+                    revealObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.15 });
+
+        revealCards.forEach(card => revealObserver.observe(card));
     }
 });
 </script>

@@ -10,8 +10,49 @@
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=15.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=26.0">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+    
+    <style>
+        /* Shared Mobile Badge Styles */
+        .mobile-nav-badge {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            /* Nav Bar Badge */
+            .mobile-nav-badge {
+                display: block !important;
+                position: absolute !important;
+                left: 50% !important;
+                transform: translateX(-50%) !important;
+                background: transparent !important;
+                color: #00C853 !important; /* Emerald Green */
+                padding: 4px 12px !important;
+                font-size: 0.85rem !important;
+                font-weight: 800 !important;
+                text-transform: uppercase !important;
+                letter-spacing: 1.5px !important;
+                text-shadow: 0 0 8px rgba(0, 200, 83, 0.5) !important;
+                animation: navTextGlow 2.5s ease-in-out infinite !important;
+                z-index: 100 !important;
+                white-space: nowrap !important;
+            }
+
+            @keyframes navTextGlow {
+                0%, 100% { 
+                    text-shadow: 0 0 8px rgba(0, 200, 83, 0.4);
+                    transform: translateX(-50%) scale(1);
+                    opacity: 0.9;
+                }
+                50% { 
+                    text-shadow: 0 0 18px rgba(0, 200, 83, 0.8), 0 0 30px rgba(0, 200, 83, 0.3);
+                    transform: translateX(-50%) scale(1.04);
+                    opacity: 1;
+                }
+            }
+        }
+    </style>
 </head>
 
 <body class="{% if request.endpoint == 'login' %}login-page-bg{% endif %}">
@@ -74,6 +115,7 @@
                 
                 <!-- Glowing Navbar Branding -->
                 <div class="navbar-branding">AI Career Consulting System</div>
+                <div class="mobile-nav-badge">CAREER GUIDANCE</div>
                 
                 <div class="header-right">
                     {% if session.get('user_id') or session.get('guest') %}
@@ -123,11 +165,11 @@
     <!-- Floating AI Chatbot -->
     <div class="floating-chatbot">
         <button class="chatbot-toggle" id="chatbotToggle" title="Career Assistant">
-            <i class="fa-solid fa-robot"></i>
+            <i class="fa-solid fa-comment-dots"></i>
         </button>
         <div class="chatbot-window" id="chatbotWindow">
             <div class="chat-header">
-                <strong>AI Career Assistant</strong>
+                <strong><i class="fa-solid fa-robot"></i> AI Career Assistant</strong>
                 <button class="close-chat" id="closeChat">&times;</button>
             </div>
             <div class="chat-body" id="chatBody">

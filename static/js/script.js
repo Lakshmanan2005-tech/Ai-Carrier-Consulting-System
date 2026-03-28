@@ -69,12 +69,18 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    function scrollToLatest() {
+        requestAnimationFrame(() => {
+            chatBody.scrollTop = chatBody.scrollHeight;
+        });
+    }
+
     function appendMessage(sender, text) {
         const bubble = document.createElement('div');
         bubble.classList.add('chat-bubble', sender);
         bubble.innerText = text;
         chatBody.appendChild(bubble);
-        chatBody.scrollTop = 0;
+        scrollToLatest();
     }
 
     async function sendMessage() {
@@ -90,7 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
         loadingBubble.innerText = 'Thinking...';
         loadingBubble.id = 'loadingIndicator';
         chatBody.appendChild(loadingBubble);
-        chatBody.scrollTop = 0;
+        scrollToLatest();
 
         try {
             const res = await fetch('/chat', {
