@@ -5,4 +5,8 @@ requests
 reportlab
 PyPDF2
 python-docx
+<<<<<<< HEAD
 google-generativeai
+=======
+google-generativeai
+>>>>>>> 9a61a26adee20493e06e4a3aa3724cc104b81cff
