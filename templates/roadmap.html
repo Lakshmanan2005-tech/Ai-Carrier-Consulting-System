@@ -1452,6 +1452,71 @@
         0%, 100% { opacity: 1; transform: scale(1); }
         50% { opacity: 0.8; transform: scale(0.98); }
     }
+
+    /* ========== MOBILE OPTIMIZATIONS (Roadmap Page) ========== */
+    @media (max-width: 768px) {
+        .rm-page {
+            padding: 2.5rem 1.25rem 6rem; /* Increased side padding slightly */
+            max-width: 92%; /* Added a max-width for better framing on tablets */
+            margin: 0 auto;
+        }
+        .rm-header {
+            margin-bottom: 3.5rem;
+        }
+        .rm-meta-row {
+            flex-direction: column;
+            gap: 1.25rem;
+            align-items: center;
+            margin-top: 1.5rem;
+        }
+        .rm-meta-item {
+            font-size: 0.8rem;
+        }
+        .rm-grid {
+            gap: 1.25rem;
+            margin-bottom: 3rem;
+        }
+        .rm-premium-card {
+            padding: 1.25rem;
+        }
+        .rm-step-item {
+            padding: 0.75rem 2.5rem 0.75rem 0.75rem !important; /* Reduced right padding for mobile */
+            gap: 12px;
+        }
+        .rm-btn-test {
+            width: 100%;
+            justify-content: center;
+            padding: 14px 20px;
+        }
+        .rm-badge-tech {
+            margin-bottom: 1rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .rm-page {
+            padding: 2.5rem 1.5rem 6rem; /* Further increased side padding for small phones */
+            max-width: 88%; /* More aggressive width reduction for narrower appearance */
+        }
+        .rm-title {
+            margin-bottom: 1.25rem;
+            letter-spacing: -0.03em;
+        }
+        .rm-badge-tech {
+            padding: 0.5rem 1rem;
+            font-size: 0.65rem;
+        }
+        .rm-premium-title {
+            font-size: 1.1rem;
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.5rem;
+        }
+        .rm-icon-container {
+            width: 36px;
+            height: 36px;
+            margin-bottom: 0.75rem;
+        }
+    }
 </style>
 
 <!-- PDF Loading Toast (Small Box) -->

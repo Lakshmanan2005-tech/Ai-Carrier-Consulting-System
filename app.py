@@ -1221,8 +1221,8 @@ def get_skill_progress(skill):
         except: return jsonify({"success": True, "passed_sections": []})
     return jsonify({"success": True, "passed_sections": []})
 
-@app.route('/my-learning')
-def my_learning():
+@app.route('/my-learning', endpoint='resume_learning')
+def resume_learning():
     if 'user_id' not in session and not session.get('guest'):
         return redirect(url_for('login'))
     return render_template('my_learning.html')

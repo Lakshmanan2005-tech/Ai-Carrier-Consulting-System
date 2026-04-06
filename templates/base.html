@@ -119,8 +119,8 @@
                     class="nav-item {% if request.endpoint == 'dashboard' %}active{% endif %}">
                     <i class="fa-solid fa-house"></i> <span class="nav-text">Home</span>
                 </a>
-                <a href="{{ url_for('my_learning') }}"
-                    class="nav-item {% if request.endpoint == 'my_learning' %}active{% endif %}">
+                <a href="{{ url_for('resume_learning') }}"
+                    class="nav-item {% if request.endpoint == 'resume_learning' %}active{% endif %}">
                     <i class="fa-solid fa-graduation-cap"></i> <span class="nav-text">Resume Learning</span>
                 </a>
                 <a href="{{ url_for('interview_home') }}"
