@@ -58,7 +58,7 @@ Backend:
 
 Database:
 
-- Firebase / SQLite (based on usage)
+- SQLite (based on usage)
 
 AI Integration:
 
