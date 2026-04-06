@@ -14,6 +14,8 @@
         border-radius: 20px;
         background: rgba(245, 243, 255, 0.5);
         border: 1px solid #ede9fe;
+        overscroll-behavior: contain;
+        -webkit-overflow-scrolling: touch;
     }
 
     .mnc-hiring-section-wrapper::-webkit-scrollbar { width: 5px; }
@@ -104,7 +106,7 @@
         <p style="color: #64748b; font-size: 0.97rem;">Click any company to visit their official careers portal.</p>
     </div>
 
-    <div class="mnc-hiring-section-wrapper">
+    <div class="mnc-hiring-section-wrapper" data-lenis-prevent>
         <div class="mnc-section-container">
             <div class="mnc-hiring-card mnc-card-violet scroll-reveal">
                 <div class="mnc-card-header">
