@@ -53,20 +53,22 @@
         font-family: 'Plus Jakarta Sans', sans-serif;
         font-size: clamp(2.5rem, 6vw, 4.5rem);
         font-weight: 800;
+        color: #1e293b; /* Solid Fallback */
         background: linear-gradient(135deg, #1e293b, #64748b);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
-        line-height: 1;
+        line-height: 1.1; /* Adjusted for better spacing */
         margin-bottom: 1.5rem;
         letter-spacing: -0.04em;
     }
 
     body.dark-mode .rm-title {
-        background: linear-gradient(135deg, #f8fafc, #94a3b8);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
+        color: #f8fafc !important; /* Force visibility with solid color */
+        background: none !important; /* Remove gradient that might be causing clipping failure */
+        -webkit-background-clip: unset !important;
+        background-clip: unset !important;
+        -webkit-text-fill-color: #f8fafc !important;
     }
 
     .rm-meta-row {
@@ -1538,7 +1540,7 @@
     <div class="rm-page" style="text-align:center; padding-top: 5rem;">
         <i class="fa-solid fa-magnifying-glass"
             style="font-size: 3rem; color: #6d28d9; margin-bottom:1.5rem; display:block;"></i>
-        <h2 style="color:#f8fafc; margin-bottom:1rem;">Roadmap not found</h2>
+        <h2 style="color:var(--text-primary); margin-bottom:1rem;">Roadmap not found</h2>
         <p style="color:#64748b; margin-bottom:2rem;">We couldn't find a structured roadmap for "<strong>{{ skill_query
                 }}</strong>".</p>
         <a href="{{ url_for('index') }}" class="rm-btn-start">Go Back Home</a>
