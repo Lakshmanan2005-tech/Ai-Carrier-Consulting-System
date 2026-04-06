@@ -78,7 +78,13 @@ document.addEventListener('DOMContentLoaded', () => {
     function appendMessage(sender, text) {
         const bubble = document.createElement('div');
         bubble.classList.add('chat-bubble', sender);
-        bubble.innerText = text;
+        
+        // --- Special Theme for Unwanted Messages ---
+        if (text.includes('dark-study-badge')) {
+            bubble.classList.add('unwanted-msg-bubble');
+        }
+        
+        bubble.innerHTML = text;
         chatBody.appendChild(bubble);
         scrollToLatest();
     }
@@ -90,11 +96,11 @@ document.addEventListener('DOMContentLoaded', () => {
         appendMessage('user', msg);
         chatInput.value = '';
 
-        // loading indication
+        // loading indication with animated dots
         const loadingBubble = document.createElement('div');
-        loadingBubble.classList.add('chat-bubble', 'ai');
-        loadingBubble.innerText = 'Thinking...';
+        loadingBubble.classList.add('chat-bubble', 'ai', 'typing-indicator');
         loadingBubble.id = 'loadingIndicator';
+        loadingBubble.innerHTML = '<span class="typing-dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></span>';
         chatBody.appendChild(loadingBubble);
         scrollToLatest();
 

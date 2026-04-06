@@ -1,348 +1,1834 @@
 {% extends "base.html" %}
 
 {% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}?v=1.2">
 <div class="dashboard-container">
-    <div class="hero-centered-layout">
-        <div class="dashboard-hero-card">
+    <div class="hero-centered-layout" style="position: relative; overflow: visible;">
+        <div class="dashboard-hero-card explore-section" style="position: relative; z-index: 10;">
+            <style>
+                /* Premium Mobile Optimization for Search & Hero Section */
+                @media (max-width: 480px) {
+                    .explore-section {
+                        width: 94% !important;
+                        max-width: 380px !important;
+                        margin: 115px auto 0 auto !important;
+                        padding: 2.2rem 1.4rem !important;
+                        border-radius: 28px !important;
+                        background: rgba(255, 255, 255, 0.98) !important;
+                        border: 1px solid rgba(99, 102, 241, 0.2) !important;
+                        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08) !important;
+                    }
+
+                    .hero-title-new {
+                        font-size: 1.6rem !important;
+                        line-height: 1.4 !important;
+                        /* Increased to prevent descender clipping */
+                        margin-bottom: 12px !important;
+                        letter-spacing: -0.01em !important;
+                        color: #1e293b !important;
+                        padding-bottom: 0.2em !important;
+                        /* Prevents text from cutting off at the bottom */
+                        overflow: visible !important;
+                        white-space: normal !important;
+                        word-wrap: break-word !important;
+                    }
+
+                    .hero-subtitle-new {
+                        font-size: 0.9rem !important;
+                        line-height: 1.5 !important;
+                        margin-bottom: 24px !important;
+                        color: #64748b !important;
+                    }
+
+                    /* Vertical Stacked Search Experience */
+                    .search-container {
+                        display: flex !important;
+                        flex-direction: column !important;
+                        gap: 14px !important;
+                        width: 100% !important;
+                    }
+
+                    .search-icon {
+                        display: none !important;
+                    }
+
+                    .search-container .search-input {
+                        width: 100% !important;
+                        height: 58px !important;
+                        border-radius: 18px !important;
+                        background-color: #ffffff !important;
+                        padding: 14px 18px !important;
+                        font-size: 16px !important;
+                        border: 1.5px solid #e2e8f0 !important;
+                        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03) !important;
+                        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+                        color: #1e293b !important;
+                        /* Ensure visibility on white background */
+                        text-align: center !important;
+                    }
+
+                    .search-container .search-input:focus {
+                        outline: none !important;
+                        border-color: #6366f1 !important;
+                        box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1), 0 8px 24px rgba(99, 102, 241, 0.12) !important;
+                        transform: translateY(-1px) !important;
+                        color: #1e293b !important;
+                    }
+
+                    .search-container .btn-gradient {
+                        width: 100% !important;
+                        height: 58px !important;
+                        border-radius: 18px !important;
+                        background: linear-gradient(135deg, #4f46e5, #7c3aed) !important;
+                        box-shadow: 0 10px 25px rgba(79, 70, 229, 0.3) !important;
+                        transition: all 0.2s ease !important;
+                    }
+
+                    .search-container .btn-gradient:active {
+                        transform: scale(0.97) !important;
+                        filter: brightness(0.9) !important;
+                    }
+
+                    .search-container .btn-text {
+                        font-size: 16px !important;
+                        font-weight: 700 !important;
+                        color: #ffffff !important;
+                    }
+
+                    /* Floating Suggestion Box Mobile Overhaul */
+                    #suggestionBox {
+                        position: absolute !important;
+                        top: calc(100% + 10px) !important;
+                        left: 0 !important;
+                        right: 0 !important;
+                        width: 100% !important;
+                        background: #ffffff !important;
+                        border-radius: 20px !important;
+                        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.18) !important;
+                        border: 1px solid rgba(0, 0, 0, 0.06) !important;
+                        max-height: 280px !important;
+                        overflow-y: auto !important;
+                    }
+
+                    .suggestion-item {
+                        padding: 16px 20px !important;
+                        font-size: 1rem !important;
+                        border-bottom: 1px solid #f1f5f9 !important;
+                    }
+
+                    .btn-mobile-icon {
+                        display: none !important;
+                    }
+                }
+            </style>
             <h1 class="hero-title-new">Explore Your IT Career Path</h1>
-            <p class="hero-subtitle-new">Generate structured roadmaps, discover resources, and prepare for your next big interview.</p>
-            
-            <div class="search-wrapper">
-                <form action="{{ url_for('roadmap') }}" method="GET" class="search-form">
+            <p class="hero-subtitle-new">Generate structured roadmaps, discover resources, and prepare for your next big
+                interview.</p>
+
+            <div class="search-wrapper"
+                style="position: relative !important; width: 100%; z-index: 9999; overflow: visible !important;">
+                <form action="{{ url_for('roadmap') }}" method="GET" id="roadmapForm"
+                    class="search-form search-container">
                     <i class="fa-solid fa-magnifying-glass search-icon"></i>
-                    <input type="text" name="skill" id="skillSearch" class="search-input" placeholder="Enter a skill (e.g., Java, AI, Web Development)" autocomplete="off" required>
-                    <button type="submit" class="btn-gradient">Generate Roadmap</button>
+                    <input type="text" name="skill" id="careerInput" class="search-input"
+                        placeholder="Enter a skill (e.g., Java, AI, Web Development)" autocomplete="off" required>
+                    <button type="submit" id="generateBtn" class="btn-gradient">
+                        <span class="btn-text">Generate Roadmap</span>
+                    </button>
                 </form>
-                <div class="suggestions-box" id="suggestionsBox"></div>
+                <div id="aiSuggestionBox" class="ai-suggestions" style="display: none;"></div>
+            </div>
+        </div>
+    </div>
+    <!-- Fresher Guide Section -->
+    <div class="section-container reveal-on-scroll freshers-section-mobile"
+        style="margin-top: 0.5rem; background: var(--fg-bg, #f5f7ff); border: 1px solid var(--border-color); border-radius: 48px; padding: 4.5rem 2rem; overflow: hidden; position: relative;">
+        <!-- Mesh Blooms for Freshers Section -->
+        <style>
+            :root {
+                --fg-bg: linear-gradient(135deg, #ecfdf5 0%, #f0fdfa 50%, #eff6ff 100%);
+            }
+
+            body.dark-mode {
+                --fg-bg: linear-gradient(135deg, #064e3b 0%, #083344 50%, #0f172a 100%);
+            }
+
+            @media (max-width: 768px) {
+                .freshers-section-mobile {
+                    padding: 0 0.5rem !important;
+                    border-radius: 20px !important;
+                    width: 100% !important;
+                    margin-left: 0 !important;
+                    margin-right: 0 !important;
+                }
+            }
+        </style>
+        <div
+            style="position: absolute; top: -15%; right: -5%; width: 45%; height: 50%; background: radial-gradient(circle, rgba(16, 185, 129, 0.08), transparent 70%); filter: blur(40px); will-change: filter; transform: translateZ(0); pointer-events: none;">
+        </div>
+        <div
+            style="position: absolute; bottom: -15%; left: -5%; width: 45%; height: 50%; background: radial-gradient(circle, rgba(6, 182, 212, 0.08), transparent 70%); filter: blur(40px); will-change: filter; transform: translateZ(0); pointer-events: none;">
+        </div>
+
+        <!-- CONTINUE LEARNING (CLOUD PROGRESS) -->
+        <section id="continueLearning" class="continue-learning-section"
+            style="display:none; margin: 0 auto 3rem auto; width: 100%; max-width: 900px; padding: 0 1.25rem;">
+            <style>
+                .continue-learning-header {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 12px;
+                    margin-bottom: 2.5rem;
+                }
+
+                @media (max-width: 768px) {
+                    #continueLearning {
+                        margin-top: 2.5rem !important;
+                    }
+                }
+
+                .continue-learning-header h3 {
+                    font-size: 1.2rem;
+                    font-weight: 800;
+                    color: var(--text-primary);
+                    text-transform: uppercase;
+                    letter-spacing: 2px;
+                    text-align: center;
+                }
+
+                .progress-grid {
+                    display: grid;
+                    grid-template-columns: repeat(2, 1fr);
+                    gap: 1.25rem;
+                }
+
+                @media (max-width: 800px) {
+                    .progress-grid {
+                        grid-template-columns: 1fr;
+                    }
+                }
+
+                .prog-card {
+                    background: var(--glass-bg);
+                    border: 1px solid var(--glass-border);
+                    backdrop-filter: blur(12px);
+                    border-radius: 20px;
+                    padding: 1rem 1.15rem;
+                    text-decoration: none;
+                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                    display: flex;
+                    flex-direction: column;
+                    gap: 0.75rem;
+                }
+
+                .prog-card:hover {
+                    transform: translateY(-5px);
+                    border-color: #6366f1;
+                    box-shadow: 0 10px 25px rgba(99, 102, 241, 0.1);
+                }
+
+                .prog-card-top {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                }
+
+                .prog-skill-name {
+                    font-weight: 800;
+                    font-size: 0.95rem;
+                    color: var(--text-primary);
+                }
+
+                .prog-pct-pill {
+                    font-size: 0.75rem;
+                    font-weight: 900;
+                    color: #fff;
+                    background: #6366f1;
+                    padding: 3px 10px;
+                    border-radius: 20px;
+                    box-shadow: 0 4px 10px rgba(99, 102, 241, 0.3);
+                }
+
+                .prog-bar-track {
+                    height: 6px;
+                    background: rgba(0, 0, 0, 0.05);
+                    border-radius: 10px;
+                    overflow: hidden;
+                }
+
+                body.dark-mode .prog-bar-track {
+                    background: rgba(255, 255, 255, 0.05);
+                }
+
+                .prog-bar-fill {
+                    height: 100%;
+                    background: linear-gradient(90deg, #6366f1, #a855f7);
+                    transition: width 1s ease-in-out;
+                }
+
+                .prog-card-action {
+                    font-size: 0.8rem;
+                    font-weight: 700;
+                    color: #6366f1;
+                    display: flex;
+                    align-items: center;
+                    gap: 6px;
+                    margin-top: 0.5rem;
+                }
+
+                .prog-delete-btn {
+                    width: 32px;
+                    height: 32px;
+                    border-radius: 50%;
+                    border: none;
+                    background: rgba(239, 68, 68, 0.1);
+                    color: #ef4444;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+                    z-index: 10;
+                }
+
+                .prog-delete-btn:hover {
+                    background: #ef4444;
+                    color: #fff;
+                    transform: scale(1.1);
+                }
+            </style>
+            <div class="continue-learning-header">
+                <div
+                    style="width: 32px; height: 32px; background: rgba(99, 102, 241, 0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #6366f1;">
+                    <i class="fa-solid fa-bolt-lightning"></i>
+                </div>
+                <h3>Resume Learning</h3>
+            </div>
+            <div class="progress-grid" id="userProgressGrid"></div>
+        </section>
+
+        <div class="fg-layout-wrapper" style="position: relative; z-index: 2;">
+            <div class="section-header"
+                style="text-align: center; margin-bottom: 2.8rem; margin-top: 0; padding: 0; width: 100%;">
+                <h2
+                    style="font-size: 2.2rem; font-weight: 800; color: var(--text-primary); margin-bottom: 0; margin-top: 1.2rem; display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap; width: 100%;">
+                    <span
+                        style="background: linear-gradient(135deg, #6366f1, #a855f7, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">Freshers
+                        – Crack Your First Job</span>
+                    <div style="display: inline-block; animation: float 3s ease-in-out infinite;">
+                        <i class="fa-solid fa-rocket" style="color: var(--text-muted, #94a3b8);"></i>
+                    </div>
+                </h2>
+            </div>
+
+            <style>
+                .fg-master-grid {
+                    display: grid;
+                    grid-template-columns: repeat(3, 1fr);
+                    gap: 2rem;
+                    margin-bottom: 2rem;
+                }
+
+                @media (max-width: 1024px) {
+                    .fg-master-grid {
+                        grid-template-columns: repeat(2, 1fr);
+                    }
+                }
+
+                @media (max-width: 768px) {
+                    .fg-master-grid {
+                        grid-template-columns: 1fr;
+                        gap: 1.5rem;
+                    }
+                }
+
+                .fg-premium-card {
+                    background: var(--card-bg, #ffffff);
+                    border: 1px solid rgba(0, 0, 0, 0.06);
+                    border-radius: 24px;
+                    padding: 2.5rem 2rem;
+                    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+                    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                    position: relative;
+                    overflow: hidden;
+                    display: flex;
+                    flex-direction: column;
+                    height: 100%;
+                    z-index: 1;
+                }
+
+                .fg-premium-card::before {
+                    content: '';
+                    position: absolute;
+                    top: -50%;
+                    left: -50%;
+                    width: 200%;
+                    height: 200%;
+                    background: radial-gradient(circle at center, rgba(var(--cg, 99, 102, 241), 0.1) 0%, transparent 60%);
+                    opacity: 0;
+                    transition: opacity 0.5s ease;
+                    z-index: -1;
+                    pointer-events: none;
+                }
+
+                .fg-premium-card:hover {
+                    transform: translateY(-8px);
+                    box-shadow: 0 20px 40px rgba(var(--cg, 0, 0, 0), 0.2), 0 0 20px rgba(var(--cg, 0, 0, 0), 0.1);
+                    border-color: rgba(var(--cg, 0, 0, 0), 0.3);
+                }
+
+                .fg-premium-card:hover::before {
+                    opacity: 1;
+                }
+
+                .fg-card-glow {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    height: 6px;
+                    z-index: 10;
+                }
+
+                .fg-premium-card:hover .fg-icon-box {
+                    transform: scale(1.1) rotate(5deg);
+                }
+
+                .fg-icon-box {
+                    width: 60px;
+                    height: 60px;
+                    border-radius: 16px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 1.8rem;
+                    margin-bottom: 1.5rem;
+                    transition: transform 0.3s ease;
+                }
+
+                body.dark-mode .fg-premium-card {
+                    background: #1e2235;
+                    border-color: rgba(255, 255, 255, 0.05);
+                }
+
+                .fg-step-list {
+                    list-style: none;
+                    padding: 0;
+                    margin: 0;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 1.2rem;
+                    flex-grow: 1;
+                }
+
+                .fg-step-item {
+                    display: flex;
+                    gap: 14px;
+                }
+
+                .fg-step-icon {
+                    width: 28px;
+                    height: 28px;
+                    border-radius: 8px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 0.8rem;
+                    flex-shrink: 0;
+                    margin-top: 2px;
+                }
+
+                .fg-step-content h5 {
+                    margin: 0 0 4px 0;
+                    font-size: 1.05rem;
+                    font-weight: 700;
+                    color: var(--text-primary);
+                }
+
+                .fg-step-content p {
+                    margin: 0;
+                    font-size: 0.88rem;
+                    color: var(--text-secondary);
+                    line-height: 1.5;
+                }
+
+                .fg-tag-cloud {
+                    display: flex;
+                    flex-wrap: wrap;
+                    gap: 0.8rem;
+                }
+
+                .fg-super-tag {
+                    padding: 8px 14px;
+                    border-radius: 12px;
+                    font-size: 0.85rem;
+                    font-weight: 600;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 4px;
+                    transition: all 0.3s ease;
+                    cursor: default;
+                    width: calc(50% - 0.4rem);
+                }
+
+                .fg-super-tag:hover {
+                    transform: translateY(-3px);
+                }
+
+                .fg-super-tag span {
+                    font-size: 0.75rem;
+                    font-weight: 500;
+                    opacity: 0.8;
+                }
+
+                @media (max-width: 1024px) {
+                    .fg-master-grid {
+                        grid-template-columns: repeat(2, 1fr);
+                    }
+
+                    .fg-premium-card:last-child {
+                        grid-column: 1 / -1;
+                        max-width: 800px;
+                        margin: 0 auto;
+                        width: 100%;
+                    }
+                }
+
+                @media (max-width: 768px) {
+                    .fg-master-grid {
+                        grid-template-columns: 1fr;
+                        gap: 1.5rem;
+                        width: 100%;
+                        max-width: 380px;
+                        box-sizing: border-box;
+                        padding: 0 1rem;
+                        margin: 0 auto 2rem auto;
+                    }
+
+                    .fg-premium-card {
+                        padding: 1.5rem 1.2rem;
+                        align-items: center;
+                        text-align: center;
+                        box-sizing: border-box;
+                        width: 100%;
+                    }
+
+                    .fg-premium-card h3 {
+                        justify-content: center !important;
+                        text-align: center;
+                        display: flex;
+                        flex-direction: column;
+                        gap: 8px;
+                        font-size: 1.25rem;
+                    }
+
+                    .fg-icon-box {
+                        margin: 0 auto 1.2rem auto !important;
+                        width: 50px;
+                        height: 50px;
+                        font-size: 1.4rem;
+                    }
+
+                    .fg-super-tag {
+                        width: 100%;
+                        align-items: center;
+                        text-align: center;
+                        box-sizing: border-box;
+                        padding: 12px;
+                    }
+
+                    .fg-super-tag>div {
+                        justify-content: center !important;
+                        gap: 8px;
+                        flex-wrap: wrap;
+                    }
+
+                    .fg-step-list {
+                        align-items: center;
+                        width: 100%;
+                        gap: 1rem;
+                    }
+
+                    .fg-step-item {
+                        flex-direction: column;
+                        align-items: center;
+                        text-align: center;
+                        gap: 8px;
+                    }
+
+                    .fg-step-icon {
+                        margin: 0 auto;
+                    }
+
+                    .fg-premium-card p,
+                    .fg-premium-card span {
+                        font-size: 0.85rem;
+                        line-height: 1.4;
+                    }
+                }
+            </style>
+
+            <div class="fg-master-grid">
+
+                <!-- Card 1: The Interview Funnel -->
+                <div class="fg-premium-card" style="--cg: 139, 92, 246;">
+                    <div class="fg-card-glow" style="background: linear-gradient(90deg, #8b5cf6, #d946ef);"></div>
+                    <div class="fg-icon-box"
+                        style="background: rgba(139, 92, 246, 0.1); color: #8b5cf6; box-shadow: 0 0 20px rgba(139, 92, 246, 0.2);">
+                        <i class="fa-solid fa-filter"></i>
+                    </div>
+                    <h3 style="font-size: 1.4rem; margin-bottom: 1.5rem; color: var(--text-primary);">Interview Rounds
+                    </h3>
+
+                    <ul class="fg-step-list">
+                        <li class="fg-step-item">
+                            <div class="fg-step-icon" style="background: rgba(139, 92, 246, 0.1); color: #8b5cf6;"><i
+                                    class="fa-solid fa-1"></i></div>
+                            <div class="fg-step-content">
+                                <h5>Aptitude & Logical</h5>
+                                <p>The first test! It checks your basic math, logic, and English skills.</p>
+                            </div>
+                        </li>
+                        <li class="fg-step-item">
+                            <div class="fg-step-icon" style="background: rgba(217, 70, 239, 0.1); color: #d946ef;"><i
+                                    class="fa-solid fa-2"></i></div>
+                            <div class="fg-step-content">
+                                <h5>Core IT Subjects</h5>
+                                <p>Your college basics! Start by studying Databases, Operating Systems, and OOPs.</p>
+                            </div>
+                        </li>
+                        <li class="fg-step-item">
+                            <div class="fg-step-icon" style="background: rgba(236, 72, 153, 0.1); color: #ec4899;"><i
+                                    class="fa-solid fa-3"></i></div>
+                            <div class="fg-step-content">
+                                <h5>Coding Round</h5>
+                                <p>Write actual code to solve problems. Practice basic logic and everyday coding
+                                    challenges.</p>
+                            </div>
+                        </li>
+                        <li class="fg-step-item">
+                            <div class="fg-step-icon" style="background: rgba(244, 63, 110, 0.1); color: #f43f5e;"><i
+                                    class="fa-solid fa-4"></i></div>
+                            <div class="fg-step-content">
+                                <h5>HR Interview</h5>
+                                <p>A friendly chat! They just want to check your speaking skills and see if you are a
+                                    good team player.</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Card 2: Industry Reality -->
+                <div class="fg-premium-card" style="--cg: 14, 165, 233;">
+                    <div class="fg-card-glow" style="background: linear-gradient(90deg, #0ea5e9, #38bdf8);"></div>
+                    <div class="fg-icon-box"
+                        style="background: rgba(14, 165, 233, 0.1); color: #0ea5e9; box-shadow: 0 0 20px rgba(14, 165, 233, 0.2);">
+                        <i class="fa-solid fa-building-circle-check"></i>
+                    </div>
+                    <h3 style="font-size: 1.4rem; margin-bottom: 1.5rem; color: var(--text-primary);">What Companies
+                        Want</h3>
+
+                    <div class="fg-tag-cloud">
+                        <div class="fg-super-tag"
+                            style="background: rgba(14, 165, 233, 0.08); border: 1px solid rgba(14, 165, 233, 0.15); color: #0284c7;">
+                            <div style="display:flex; justify-content:space-between; align-items:center;">DSA Mastery <i
+                                    class="fa-solid fa-code"></i></div>
+                            <span>Solve coding problems every day. Be confident writing code on your own.</span>
+                        </div>
+                        <div class="fg-super-tag"
+                            style="background: rgba(14, 165, 233, 0.08); border: 1px solid rgba(14, 165, 233, 0.15); color: #0284c7;">
+                            <div style="display:flex; justify-content:space-between; align-items:center;">Real Projects
+                                <i class="fa-solid fa-laptop-code"></i>
+                            </div>
+                            <span>Build 2 or 3 real apps that actually work. Avoid just copying old tutorial
+                                videos.</span>
+                        </div>
+                        <div class="fg-super-tag"
+                            style="background: rgba(14, 165, 233, 0.08); border: 1px solid rgba(14, 165, 233, 0.15); color: #0284c7;">
+                            <div style="display:flex; justify-content:space-between; align-items:center;">Clean Resume
+                                <i class="fa-solid fa-file-invoice"></i>
+                            </div>
+                            <span>Keep your resume to only 1 page. Make it very simple, neat, and honest.</span>
+                        </div>
+                        <div class="fg-super-tag"
+                            style="background: rgba(14, 165, 233, 0.08); border: 1px solid rgba(14, 165, 233, 0.15); color: #0284c7;">
+                            <div
+                                style="display:flex; justify-content:space-between; align-items:center; gap: 6px; min-width:0;">
+                                <span
+                                    style="flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Communication</span><i
+                                    class="fa-solid fa-comments" style="flex-shrink:0;"></i>
+                            </div>
+                            <span>Speak clearly! Always explain what you are thinking while you write your code.</span>
+                        </div>
+                        <div class="fg-super-tag"
+                            style="background: rgba(14, 165, 233, 0.08); border: 1px solid rgba(14, 165, 233, 0.15); color: #0284c7;">
+                            <div style="display:flex; justify-content:space-between; align-items:center;">Eager to Learn
+                                <i class="fa-solid fa-brain"></i>
+                            </div>
+                            <span>Always be ready to learn! Show them you are excited to learn new things fast.</span>
+                        </div>
+                        <div class="fg-super-tag"
+                            style="background: rgba(14, 165, 233, 0.08); border: 1px solid rgba(14, 165, 233, 0.15); color: #0284c7;">
+                            <div
+                                style="display:flex; justify-content:space-between; align-items:center; gap: 6px; min-width:0;">
+                                <span style="flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Dev
+                                    Basics</span><i class="fa-solid fa-terminal" style="flex-shrink:0;"></i>
+                            </div>
+                            <span>Know the basics like Git, GitHub, simple APIs, and basic command line typing.</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 3: Modern AI Toolkit -->
+                <div class="fg-premium-card" style="--cg: 16, 185, 129;">
+                    <div class="fg-card-glow" style="background: linear-gradient(90deg, #10b981, #34d399);"></div>
+                    <div class="fg-icon-box"
+                        style="background: rgba(16, 185, 129, 0.1); color: #10b981; box-shadow: 0 0 20px rgba(16, 185, 129, 0.2);">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    </div>
+                    <h3
+                        style="font-size: 1.4rem; margin-bottom: 1.5rem; color: var(--text-primary); display: flex; align-items: center; justify-content: space-between;">
+                        Modern AI Toolkit
+                        <span
+                            style="font-size: 0.75rem; background: rgba(16, 185, 129, 0.15); color: #059669; padding: 4px 10px; border-radius: 20px; font-weight: 800; text-transform: uppercase;">Essential</span>
+                    </h3>
+
+                    <ul class="fg-step-list" style="gap: 1.2rem;">
+                        <li class="fg-step-item">
+                            <div class="fg-step-icon" style="background: rgba(16, 185, 129, 0.1); color: #10b981;"><i
+                                    class="fa-solid fa-terminal"></i></div>
+                            <div class="fg-step-content">
+                                <h5>Smart Prompts</h5>
+                                <p style="font-size: 0.8rem;">Give clear commands. Tell the AI exactly what you need it
+                                    to do.</p>
+                            </div>
+                        </li>
+                        <li class="fg-step-item">
+                            <div class="fg-step-icon" style="background: rgba(16, 185, 129, 0.1); color: #10b981;"><i
+                                    class="fa-solid fa-bug"></i></div>
+                            <div class="fg-step-content">
+                                <h5>Fixing Errors</h5>
+                                <p style="font-size: 0.8rem;">When your code breaks, paste the error to the AI and ask,
+                                    <em>"Why did this happen?"</em>
+                                </p>
+                            </div>
+                        </li>
+                        <li class="fg-step-item">
+                            <div class="fg-step-icon" style="background: rgba(16, 185, 129, 0.1); color: #10b981;"><i
+                                    class="fa-solid fa-book-open-reader"></i></div>
+                            <div class="fg-step-content">
+                                <h5>Learning Fast</h5>
+                                <p style="font-size: 0.8rem;">Are you stuck? Ask the AI to teach you hard topics like
+                                    you are 10 years old.</p>
+                            </div>
+                        </li>
+                        <li class="fg-step-item">
+                            <div class="fg-step-icon" style="background: rgba(16, 185, 129, 0.1); color: #10b981;"><i
+                                    class="fa-solid fa-user-tie"></i></div>
+                            <div class="fg-step-content">
+                                <h5>Practice Interviews</h5>
+                                <p style="font-size: 0.8rem;">Tell the AI to act like your boss or interviewer and ask
+                                    you questions.</p>
+                            </div>
+                        </li>
+                    </ul>
+
+                    <div
+                        style="margin-top: 1.5rem; background: rgba(16, 185, 129, 0.08); padding: 14px 16px; border-radius: 12px; border-left: 4px solid #10b981; font-size: 0.9rem; font-weight: 600; color: #059669; display: flex; gap: 12px; align-items: flex-start;">
+                        <i class="fa-solid fa-lightbulb" style="font-size: 1.2rem; margin-top: 2px;"></i>
+                        <span style="line-height: 1.4;"><strong>Golden Rule:</strong> Use AI like a smart teacher to
+                            learn fast. Do not just blindly copy and paste code.</span>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>
 
-    <div class="section-container" style="margin-top: 2rem; padding-bottom: 2rem;">
-        <div class="section-header">
-            <h2>Trending Skills <i class="fa-solid fa-fire" style="color: #ef4444; margin-left: 8px;"></i></h2>
+    <!-- Recently Viewed Section -->
+    <div class="section-container reveal-on-scroll recently-viewed-mobile"
+        style="margin-top: 0.5rem; background: var(--section-bg, #f8fafc); border: 1px solid var(--border-color); border-radius: 48px; padding: 4.5rem 2rem; overflow: hidden; position: relative;">
+        <!-- Adaptive Mesh Accents -->
+        <style>
+            :root {
+                --section-bg: linear-gradient(135deg, #f5f3ff 0%, #faf5ff 50%, #fff1f2 100%);
+            }
+
+            body.dark-mode {
+                --section-bg: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #1e293b 100%);
+            }
+
+            @media (max-width: 768px) {
+                .recently-viewed-mobile {
+                    padding: 2.5rem 1.25rem !important;
+                    border-radius: 32px !important;
+                }
+            }
+        </style>
+        <div
+            style="position: absolute; top: -20%; left: -10%; width: 50%; height: 60%; background: radial-gradient(circle, rgba(168, 85, 247, var(--mesh-opacity)), transparent 70%); filter: blur(40px); transform: translateZ(0); will-change: filter; pointer-events: none;">
         </div>
-        <div class="trending-grid">
-            <a href="{{ url_for('roadmap', skill='Artificial Intelligence') }}" class="modern-card trending-card-item tc-ai">
-                <div class="trending-rank">1</div>
-                <div class="trending-info">
-                    <h5>Artificial Intelligence</h5>
+        <div
+            style="position: absolute; bottom: -20%; right: -10%; width: 50%; height: 60%; background: radial-gradient(circle, rgba(99, 102, 241, var(--mesh-opacity)), transparent 70%); filter: blur(40px); transform: translateZ(0); will-change: filter; pointer-events: none;">
+        </div>
+        <div class="fg-layout-wrapper">
+            <div class="section-header"
+                style="text-align: center; margin-bottom: 2.5rem; margin-top: 0; padding: 0; position: relative;">
+                <h2
+                    style="font-size: 1.8rem; font-weight: 800; color: var(--text-primary); margin: 0; display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap; width: 100%; text-transform: tracking-tight;">
+                    Recently Viewed Roadmaps</h2>
+                <div style="margin-top: 0.6rem; display: flex; justify-content: center;">
+                    <a href="{{ url_for('history') }}"
+                        style="color: var(--text-secondary); font-weight: 600; text-decoration: none; border-bottom: 1px solid rgba(0,0,0,0.1); padding-bottom: 2px; transition: all 0.3s ease; font-size: 0.9rem; display: flex; align-items: center; gap: 5px;"
+                        class="view-all-link">
+                        View History <i class="fa-solid fa-arrow-right-long" style="font-size: 0.8rem;"></i>
+                    </a>
                 </div>
-                <i class="fa-solid fa-robot trending-icon-small"></i>
-            </a>
-            <a href="{{ url_for('roadmap', skill='Data Science') }}" class="modern-card trending-card-item tc-ds">
-                <div class="trending-rank">2</div>
-                <div class="trending-info">
-                    <h5>Data Science</h5>
+            </div>
+
+            {% if session.guest %}
+            <div class="recently-viewed-guest-box"
+                style="text-align: center; padding: 3rem 2rem; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 20px; width: 95%; max-width: 650px; margin: 0 auto; box-shadow: var(--shadow-md);">
+                <div
+                    style="width: 60px; height: 60px; background: rgba(108, 99, 255, 0.1); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.2rem auto;">
+                    <i class="fa-solid fa-shield-halved" style="font-size: 1.6rem; color: var(--primary-color);"></i>
                 </div>
-                <i class="fa-solid fa-chart-line trending-icon-small"></i>
-            </a>
-            <a href="{{ url_for('roadmap', skill='Cloud Computing') }}" class="modern-card trending-card-item tc-cloud">
-                <div class="trending-rank">3</div>
-                <div class="trending-info">
-                    <h5>Cloud Computing</h5>
+                <h3 style="color: var(--text-primary); margin-bottom: 0.6rem; font-weight: 800; font-size: 1.4rem;">Save
+                    Your Learning Journey</h3>
+                <p
+                    style="color: var(--text-secondary); margin-bottom: 1.8rem; font-size: 0.95rem; line-height: 1.6; max-width: 450px; margin-left: auto; margin-right: auto;">
+                    Log in to store your roadmaps permanently and track your skill development over time.</p>
+                <a href="{{ url_for('login') }}" class="btn-gradient"
+                    style="padding: 12px 30px; border-radius: 12px; text-decoration: none; font-weight: 700; font-size: 0.95rem; display: inline-block;">Get
+                    Started Free</a>
+            </div>
+            {% elif recent_history %}
+            <div class="trending-grid mobile-grid-fix"
+                style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.2rem; justify-items: center; margin: 0 auto;">
+                {% for skill in recent_history %}
+                <a href="{{ url_for('roadmap', skill=skill) }}" class="recent-roadmap-card">
+                    <style>
+                        .recent-roadmap-card {
+                            position: relative !important;
+                            display: flex !important;
+                            flex-direction: column !important;
+                            justify-content: center !important;
+                            align-items: center !important;
+                            aspect-ratio: 1 / 1 !important;
+                            background: rgba(255, 255, 255, 0.4) !important;
+                            border: 1px solid rgba(255, 255, 255, 0.5) !important;
+                            backdrop-filter: blur(12px) !important;
+                            -webkit-backdrop-filter: blur(12px) !important;
+                            border-radius: 28px !important;
+                            padding: 2rem !important;
+                            text-align: center !important;
+                            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+                            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.07) !important;
+                            text-decoration: none !important;
+                            overflow: hidden !important;
+                            cursor: pointer;
+                            z-index: 1;
+                        }
+
+                        .recent-roadmap-card::after {
+                            content: '';
+                            position: absolute;
+                            top: -50%;
+                            left: -50%;
+                            width: 200%;
+                            height: 200%;
+                            background: radial-gradient(circle at center, rgba(255, 255, 255, 0.3) 0%, transparent 70%);
+                            opacity: 0;
+                            transition: opacity 0.4s ease;
+                            z-index: -1;
+                            pointer-events: none;
+                        }
+
+                        .recent-roadmap-card:hover::after {
+                            opacity: 1;
+                        }
+
+                        .recent-roadmap-card:hover {
+                            transform: translateY(-10px) scale(1.03) !important;
+                            background: rgba(255, 255, 255, 0.7) !important;
+                            box-shadow: 0 25px 50px rgba(108, 99, 255, 0.15) !important;
+                            border-color: #ffffff !important;
+                        }
+
+                        @media (max-width: 768px) {
+                            .recent-roadmap-card {
+                                aspect-ratio: auto !important;
+                                height: 160px !important;
+                                width: 100% !important;
+                                align-self: stretch !important;
+                            }
+
+                            .mobile-grid-fix {
+                                justify-items: stretch !important;
+                                gap: 1.6rem !important;
+                            }
+                        }
+                    </style>
+                    <div
+                        style="width: 50px; height: 50px; background: rgba(108, 99, 255, 0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 1rem; color: var(--primary-color);">
+                        <i class="fa-solid fa-graduation-cap" style="font-size: 1.4rem;"></i>
+                    </div>
+                    <h5
+                        style="margin: 0; font-size: 1.15rem; font-weight: 800; color: var(--text-primary); line-height: 1.3;">
+                        {{ skill }}</h5>
+                    <p style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 5px; font-weight: 500;">Last
+                        Viewed Recently</p>
+                    <div class="resume-bar">
+                        Resume Roadmap <i class="fa-solid fa-chevron-right"></i>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div
+                style="text-align: center; padding: 3rem 2rem; background: #ffffff; border: 1px solid rgba(0,0,0,0.06); border-radius: 20px; width: 100%; max-width: 650px; margin: 0 auto; box-shadow: 0 4px 20px rgba(0,0,0,0.02);">
+                <div
+                    style="width: 60px; height: 60px; background: rgba(0, 0, 0, 0.04); border-radius: 16px; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.2rem auto;">
+                    <i class="fa-solid fa-magnifying-glass-plus"
+                        style="font-size: 1.6rem; color: var(--text-secondary); opacity: 0.6;"></i>
                 </div>
-                <i class="fa-solid fa-cloud trending-icon-small"></i>
-            </a>
-            <a href="{{ url_for('roadmap', skill='Cyber Security') }}" class="modern-card trending-card-item tc-cyber">
-                <div class="trending-rank">4</div>
-                <div class="trending-info">
-                    <h5>Cyber Security</h5>
-                </div>
-                <i class="fa-solid fa-shield-halved trending-icon-small"></i>
-            </a>
+                <h3 style="color: var(--text-primary); margin-bottom: 0.6rem; font-weight: 800; font-size: 1.4rem;">No
+                    Active Roadmaps</h3>
+                <p
+                    style="color: var(--text-secondary); margin-bottom: 0; font-size: 0.95rem; line-height: 1.6; max-width: 450px; margin-left: auto; margin-right: auto;">
+                    Please <a href="{{ url_for('login') }}"
+                        style="color: var(--primary-color, #6366f1); font-weight: 700; text-decoration: none; border-bottom: 2px solid rgba(99, 102, 241, 0.2); transition: all 0.3s ease;"
+                        onmouseover="this.style.borderBottomColor='#6366f1'"
+                        onmouseout="this.style.borderBottomColor='rgba(99, 102, 241, 0.2)'">login</a> to store your
+                    roadmap</p>
+            </div>
+            {% endif %}
         </div>
     </div>
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+    <div class="section-container trending-section-mobile"
+        style="margin-top: 0.5rem; background: var(--trending-bg, #fffaf5); border: 1px solid var(--border-color); border-radius: 48px; padding: 4.5rem 2rem; overflow: hidden; position: relative;">
+        <!-- Mesh Blooms for Trending Skills Section -->
+        <style>
+            :root {
+                --trending-bg: linear-gradient(135deg, #fff7ed 0%, #fff1f2 50%, #faf5ff 100%);
+            }
 
-    <div class="section-container" style="margin-top: 2rem; padding-bottom: 4rem;">
-        <div class="section-header">
-            <h2>In-Demand Skills in Job Market <i class="fa-solid fa-briefcase" style="color: var(--primary-color); margin-left: 8px;"></i></h2>
+            body.dark-mode {
+                --trending-bg: linear-gradient(135deg, #2d1a12 0%, #1e1b4b 50%, #0f172a 100%);
+            }
+
+            @media (max-width: 768px) {
+                .trending-section-mobile {
+                    padding: 2.5rem 0.5rem !important;
+                    border-radius: 20px !important;
+                    width: 100% !important;
+                    margin-left: 0 !important;
+                    margin-right: 0 !important;
+                }
+            }
+        </style>
+        <div
+            style="position: absolute; top: -15%; right: -5%; width: 45%; height: 50%; background: radial-gradient(circle, rgba(249, 115, 22, 0.08), transparent 70%); filter: blur(40px); transform: translateZ(0); will-change: filter; pointer-events: none;">
         </div>
-        <div class="in-demand-grid">
-            <a href="{{ url_for('roadmap', skill='Full Stack Development') }}" class="modern-card trending-card-item id-fs">
-                <div class="trending-rank">1</div>
-                <div class="trending-info">
-                    <h5>Full Stack Development</h5>
-                </div>
-                <i class="fa-solid fa-laptop-code trending-icon-small"></i>
-            </a>
-            <a href="{{ url_for('roadmap', skill='DevOps') }}" class="modern-card trending-card-item id-ops">
-                <div class="trending-rank">2</div>
-                <div class="trending-info">
-                    <h5>DevOps</h5>
-                </div>
-                <i class="fa-solid fa-server trending-icon-small"></i>
-            </a>
-            <a href="{{ url_for('roadmap', skill='Cloud Computing') }}" class="modern-card trending-card-item id-cloud">
-                <div class="trending-rank">3</div>
-                <div class="trending-info">
-                    <h5>Cloud Computing</h5>
-                </div>
-                <i class="fa-solid fa-cloud trending-icon-small"></i>
-            </a>
-            <a href="{{ url_for('roadmap', skill='AI Machine Learning') }}" class="modern-card trending-card-item id-ai">
-                <div class="trending-rank">4</div>
-                <div class="trending-info">
-                    <h5>AI / Machine Learning</h5>
-                </div>
-                <i class="fa-solid fa-brain trending-icon-small"></i>
-            </a>
-            <a href="{{ url_for('roadmap', skill='Data Engineering') }}" class="modern-card trending-card-item id-data">
-                <div class="trending-rank">5</div>
-                <div class="trending-info">
-                    <h5>Data Engineering</h5>
-                </div>
-                <i class="fa-solid fa-database trending-icon-small"></i>
-            </a>
-            <a href="{{ url_for('roadmap', skill='Cyber Security') }}" class="modern-card trending-card-item id-cyber">
-                <div class="trending-rank">6</div>
-                <div class="trending-info">
-                    <h5>Cyber Security</h5>
-                </div>
-                <i class="fa-solid fa-shield-halved trending-icon-small"></i>
-            </a>
+        <div
+            style="position: absolute; bottom: -15%; left: -5%; width: 45%; height: 50%; background: radial-gradient(circle, rgba(239, 68, 68, 0.08), transparent 70%); filter: blur(40px); transform: translateZ(0); will-change: filter; pointer-events: none;">
+        </div>
+
+        <div class="fg-layout-wrapper" style="position: relative; z-index: 2;">
+            <div class="section-header"
+                style="text-align: center; margin-bottom: 2.8rem; margin-top: 0; padding: 0; width: 100%;">
+                <h2
+                    style="font-size: 2.2rem; font-weight: 800; color: var(--text-primary); margin-bottom: 0; margin-top: 0.5rem; display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap; width: 100%;">
+                    <span
+                        style="background: linear-gradient(135deg, #f97316, #ef4444, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">Trending
+                        Skills</span>
+                </h2>
+            </div>
+            <div class="trending-grid">
+                <a href="{{ url_for('roadmap', skill='Artificial Intelligence') }}"
+                    class="modern-card trending-card-item tc-ai">
+                    <div class="trending-rank">1</div>
+                    <div class="trending-info">
+                        <h5>Artificial Intelligence</h5>
+                    </div>
+                    <i class="fa-solid fa-robot trending-icon-small"></i>
+                </a>
+                <a href="{{ url_for('roadmap', skill='Data Science') }}" class="modern-card trending-card-item tc-ds">
+                    <div class="trending-rank">2</div>
+                    <div class="trending-info">
+                        <h5>Data Science</h5>
+                    </div>
+                    <i class="fa-solid fa-chart-line trending-icon-small"></i>
+                </a>
+                <a href="{{ url_for('roadmap', skill='Cloud Computing') }}"
+                    class="modern-card trending-card-item tc-cloud">
+                    <div class="trending-rank">3</div>
+                    <div class="trending-info">
+                        <h5>Cloud Computing</h5>
+                    </div>
+                    <i class="fa-solid fa-cloud trending-icon-small"></i>
+                </a>
+                <a href="{{ url_for('roadmap', skill='Cyber Security') }}"
+                    class="modern-card trending-card-item tc-cyber">
+                    <div class="trending-rank">4</div>
+                    <div class="trending-info">
+                        <h5>Cyber Security</h5>
+                    </div>
+                    <i class="fa-solid fa-shield-halved trending-icon-small"></i>
+                </a>
+            </div>
         </div>
     </div>
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+    <div class="section-container reveal-on-scroll id-section-mobile"
+        style="margin-top: 0.5rem; background: var(--id-bg, #f0f9ff); border: 1px solid var(--border-color); border-radius: 48px; padding: 4.5rem 2rem; overflow: hidden; position: relative;">
+        <!-- Mesh Blooms for In-Demand Skills Section -->
+        <style>
+            :root {
+                --id-bg: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #f1f5f9 100%);
+            }
+
+            body.dark-mode {
+                --id-bg: linear-gradient(135deg, #0c4a6e 0%, #1e1b4b 50%, #0f172a 100%);
+            }
+
+            @media (max-width: 768px) {
+                .id-section-mobile {
+                    padding: 2.5rem 0.5rem !important;
+                    border-radius: 20px !important;
+                    width: 100% !important;
+                    margin-left: 0 !important;
+                    margin-right: 0 !important;
+                }
+            }
+        </style>
+        <div
+            style="position: absolute; top: -15%; right: -5%; width: 45%; height: 50%; background: radial-gradient(circle, rgba(14, 165, 233, 0.08), transparent 70%); filter: blur(40px); transform: translateZ(0); will-change: filter; pointer-events: none;">
+        </div>
+        <div
+            style="position: absolute; bottom: -15%; left: -5%; width: 45%; height: 50%; background: radial-gradient(circle, rgba(99, 102, 241, 0.08), transparent 70%); filter: blur(40px); transform: translateZ(0); will-change: filter; pointer-events: none;">
+        </div>
+
+        <div class="fg-layout-wrapper" style="position: relative; z-index: 2;">
+            <div class="section-header"
+                style="text-align: center; margin-bottom: 2.8rem; margin-top: 0; padding: 0; width: 100%;">
+                <h2
+                    style="font-size: 2.2rem; font-weight: 800; color: var(--text-primary); margin-bottom: 0; margin-top: 0.5rem; display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap; width: 100%;">
+                    <span
+                        style="background: linear-gradient(135deg, #06b6d4, #3b82f6, #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">In-Demand
+                        Skills in Job Market</span> <span
+                        style="margin-left: 10px; font-size: 1.6rem; filter: grayscale(100%);">📈</span>
+                </h2>
+            </div>
+            <div class="in-demand-grid">
+                <a href="{{ url_for('roadmap', skill='Full Stack Development') }}"
+                    class="modern-card trending-card-item id-fs">
+                    <div class="trending-rank">1</div>
+                    <div class="trending-info">
+                        <h5>Full Stack Development</h5>
+                    </div>
+                    <span class="trending-icon-small" style="filter: grayscale(100%);">💻</span>
+                </a>
+                <a href="{{ url_for('roadmap', skill='DevOps') }}" class="modern-card trending-card-item id-ops">
+                    <div class="trending-rank">2</div>
+                    <div class="trending-info">
+                        <h5>DevOps</h5>
+                    </div>
+                    <span class="trending-icon-small" style="filter: grayscale(100%);">♾️</span>
+                </a>
+                <a href="{{ url_for('roadmap', skill='Cloud Computing') }}"
+                    class="modern-card trending-card-item id-cloud">
+                    <div class="trending-rank">3</div>
+                    <div class="trending-info">
+                        <h5>Cloud Computing</h5>
+                    </div>
+                    <span class="trending-icon-small" style="filter: grayscale(100%);">☁️</span>
+                </a>
+                <a href="{{ url_for('roadmap', skill='AI Machine Learning') }}"
+                    class="modern-card trending-card-item id-ai">
+                    <div class="trending-rank">4</div>
+                    <div class="trending-info">
+                        <h5>AI / Machine Learning</h5>
+                    </div>
+                    <span class="trending-icon-small" style="filter: grayscale(100%);">🤖</span>
+                </a>
+                <a href="{{ url_for('roadmap', skill='Data Engineering') }}"
+                    class="modern-card trending-card-item id-data">
+                    <div class="trending-rank">5</div>
+                    <div class="trending-info">
+                        <h5>Data Engineering</h5>
+                    </div>
+                    <span class="trending-icon-small" style="filter: grayscale(100%);">📊</span>
+                </a>
+                <a href="{{ url_for('roadmap', skill='Cyber Security') }}"
+                    class="modern-card trending-card-item id-cyber">
+                    <div class="trending-rank">6</div>
+                    <div class="trending-info">
+                        <h5>Cyber Security</h5>
+                    </div>
+                    <span class="trending-icon-small" style="filter: grayscale(100%);">🛡️</span>
+                </a>
+            </div>
+        </div>
+    </div>
 
     <!-- Skill Demand Bar Chart Section -->
-    <div class="section-container" style="margin-top: 2rem; padding-bottom: 1rem;">
-        <div class="section-header">
-            <h2>Market Demand Analysis <i class="fa-solid fa-chart-bar" style="color: var(--primary-color); margin-left: 8px;"></i></h2>
+    <div class="section-container reveal-on-scroll market-demand-section-mobile"
+        style="margin-top: 0.5rem; background: var(--market-bg, #f0fdfa); border: 1px solid var(--border-color); border-radius: 48px; padding: 4.5rem 2rem; overflow: hidden; position: relative;">
+        <!-- Mesh Blooms for Market Demand Analysis Section -->
+        <style>
+            :root {
+                --market-bg: linear-gradient(135deg, #f0fdfa 0%, #ecfeff 50%, #f0f9ff 100%);
+            }
+
+            body.dark-mode {
+                --market-bg: linear-gradient(135deg, #042f2e 0%, #083344 50%, #0f172a 100%);
+            }
+
+            @media (max-width: 768px) {
+                .market-demand-section-mobile {
+                    padding: 2.5rem 0.5rem !important;
+                    border-radius: 20px !important;
+                    width: 100% !important;
+                    margin-left: 0 !important;
+                    margin-right: 0 !important;
+                }
+            }
+        </style>
+        <div
+            style="position: absolute; top: -15%; right: -5%; width: 45%; height: 50%; background: radial-gradient(circle, rgba(20, 184, 166, 0.08), transparent 70%); filter: blur(40px); transform: translateZ(0); will-change: filter; pointer-events: none;">
         </div>
-        
-        <div style="max-width: 850px; margin: 0 auto;">
-            
-            <!-- Skill 1 -->
-            <div class="demand-item-box di-ai" onclick="this.classList.toggle('glow-active')">
-                <div style="display: flex; justify-content: space-between; margin-bottom: 0.8rem;">
-                    <span style="font-weight: 600; color: var(--text-primary); font-size: 1.1rem;">AI / Machine Learning</span>
-                    <span class="di-value" style="font-weight: 700; font-size: 1.15rem;">95%</span>
-                </div>
-                <div style="width: 100%; height: 12px; background: rgba(0, 0, 0, 0.05); border-radius: 10px; overflow: hidden;">
-                    <div class="di-bar" style="width: 95%; height: 100%; border-radius: 10px; transition: width 1.5s ease-out;"></div>
-                </div>
+        <div
+            style="position: absolute; bottom: -15%; left: -5%; width: 45%; height: 50%; background: radial-gradient(circle, rgba(8, 145, 178, 0.08), transparent 70%); filter: blur(40px); transform: translateZ(0); will-change: filter; pointer-events: none;">
+        </div>
+
+        <div class="fg-layout-wrapper" style="position: relative; z-index: 2;">
+            <div class="section-header"
+                style="text-align: center; margin-bottom: 2.8rem; margin-top: 0; padding: 0; width: 100%;">
+                <h2
+                    style="font-size: 2.2rem; font-weight: 800; color: var(--text-primary); margin-bottom: 0; margin-top: 0.5rem; display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap; width: 100%;">
+                    <span
+                        style="background: linear-gradient(135deg, #10b981, #059669, #0d9488); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">Market
+                        Demand Analysis</span> <span
+                        style="font-size: 1.8rem; margin-left: 10px; filter: grayscale(100%); opacity: 0.8;">📊</span>
+                    <i class="fa-solid fa-chart-bar"
+                        style="color: var(--text-muted, #94a3b8); margin-left: 8px; opacity: 0.8;"></i>
+                </h2>
             </div>
 
-            <!-- Skill 2 -->
-            <div class="demand-item-box di-cloud" onclick="this.classList.toggle('glow-active')">
-                <div style="display: flex; justify-content: space-between; margin-bottom: 0.8rem;">
-                    <span style="font-weight: 600; color: var(--text-primary); font-size: 1.1rem;">Cloud Computing</span>
-                    <span class="di-value" style="font-weight: 700; font-size: 1.15rem;">88%</span>
+            <div
+                style="max-width: 900px; margin: 0 auto; position: relative; padding: 20px; background: rgba(255,255,255,0.02); border-radius: 20px; border: 1px solid var(--border-color);">
+                <div id="demandLoader"
+                    style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.8); z-index: 10; border-radius: 20px;">
+                    <div style="text-align: center;">
+                        <i class="fa-solid fa-circle-notch fa-spin"
+                            style="font-size: 2rem; color: var(--primary-color); margin-bottom: 1rem;"></i>
+                        <p style="font-weight: 500; color: var(--text-secondary);">Analyzing Market Trends...</p>
+                    </div>
                 </div>
-                <div style="width: 100%; height: 12px; background: rgba(0, 0, 0, 0.05); border-radius: 10px; overflow: hidden;">
-                    <div class="di-bar" style="width: 88%; height: 100%; border-radius: 10px; transition: width 1.5s ease-out;"></div>
-                </div>
+                <canvas id="marketDemandChart" style="width: 100%; height: 400px;"></canvas>
             </div>
-
-            <!-- Skill 3 -->
-            <div class="demand-item-box di-web" onclick="this.classList.toggle('glow-active')">
-                <div style="display: flex; justify-content: space-between; margin-bottom: 0.8rem;">
-                    <span style="font-weight: 600; color: var(--text-primary); font-size: 1.1rem;">Web Development</span>
-                    <span class="di-value" style="font-weight: 700; font-size: 1.15rem;">85%</span>
-                </div>
-                <div style="width: 100%; height: 12px; background: rgba(0, 0, 0, 0.05); border-radius: 10px; overflow: hidden;">
-                    <div class="di-bar" style="width: 85%; height: 100%; border-radius: 10px; transition: width 1.5s ease-out;"></div>
-                </div>
-            </div>
-
-            <!-- Skill 4 -->
-            <div class="demand-item-box di-data" onclick="this.classList.toggle('glow-active')">
-                <div style="display: flex; justify-content: space-between; margin-bottom: 0.8rem;">
-                    <span style="font-weight: 600; color: var(--text-primary); font-size: 1.1rem;">Data Engineering</span>
-                    <span class="di-value" style="font-weight: 700; font-size: 1.15rem;">82%</span>
-                </div>
-                <div style="width: 100%; height: 12px; background: rgba(0, 0, 0, 0.05); border-radius: 10px; overflow: hidden;">
-                    <div class="di-bar" style="width: 82%; height: 100%; border-radius: 10px; transition: width 1.5s ease-out;"></div>
-                </div>
-            </div>
-
-            <!-- Skill 5 -->
-            <div class="demand-item-box di-cyber" onclick="this.classList.toggle('glow-active')">
-                <div style="display: flex; justify-content: space-between; margin-bottom: 0.8rem;">
-                    <span style="font-weight: 600; color: var(--text-primary); font-size: 1.1rem;">Cyber Security</span>
-                    <span class="di-value" style="font-weight: 700; font-size: 1.15rem;">80%</span>
-                </div>
-                <div style="width: 100%; height: 12px; background: rgba(0, 0, 0, 0.05); border-radius: 10px; overflow: hidden;">
-                    <div class="di-bar" style="width: 80%; height: 100%; border-radius: 10px; transition: width 1.5s ease-out;"></div>
-                </div>
-            </div>
-            
         </div>
     </div>
 
     <!-- MNC Hiring Section (reusable partial) -->
-    {% include '_mnc_hiring.html' %}
+    <div class="section-container reveal-on-scroll mnc-hiring-section-mobile"
+        style="margin-top: 0.5rem; background: var(--mnc-bg, #fdf2f8); border: 1px solid var(--border-color); border-radius: 48px; padding: 4.5rem 2rem; overflow: hidden; position: relative;">
+        <!-- Vibrant Rose & Fuchsia Mesh Blooms for MNC Hiring Section -->
+        <style>
+            :root {
+                --mnc-bg: linear-gradient(135deg, #fdf2f8 0%, #fce7f3 50%, #f5f3ff 100%);
+            }
+
+            body.dark-mode {
+                --mnc-bg: linear-gradient(135deg, #4c0519 0%, #312e81 50%, #0f172a 100%);
+            }
+
+            @media (max-width: 768px) {
+                .mnc-hiring-section-mobile {
+                    padding: 2.5rem 0.5rem !important;
+                    border-radius: 20px !important;
+                    width: 100% !important;
+                    margin-left: 0 !important;
+                    margin-right: 0 !important;
+                }
+            }
+        </style>
+        <div
+            style="position: absolute; top: -15%; right: -5%; width: 45%; height: 50%; background: radial-gradient(circle, rgba(219, 39, 119, 0.08), transparent 70%); filter: blur(40px); transform: translateZ(0); will-change: filter; pointer-events: none;">
+        </div>
+        <div
+            style="position: absolute; bottom: -15%; left: -5%; width: 45%; height: 50%; background: radial-gradient(circle, rgba(139, 92, 246, 0.08), transparent 70%); filter: blur(40px); transform: translateZ(0); will-change: filter; pointer-events: none;">
+        </div>
+
+        <div class="fg-layout-wrapper" style="position: relative; z-index: 2;">
+            {% include '_mnc_hiring.html' %}
+        </div>
+    </div>
 </div>
 
 <style>
-/* === Unique Trending Card Colors & Card Glow === */
+    /* === In-Demand Skills Grid Fix === */
+    .in-demand-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.5rem;
+        align-items: stretch;
+        margin-bottom: 2rem;
+    }
 
-/* Base transition for smooth card glow */
-.trending-card-item {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
+    @media (max-width: 1024px) {
+        .in-demand-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
 
-/* Card 1: AI — Indigo-Purple */
-.tc-ai { border-top-color: #6366f1 !important; }
-.tc-ai:hover { 
-    box-shadow: 0 10px 30px rgba(99, 102, 241, 0.15), 0 0 20px rgba(99, 102, 241, 0.3) !important; 
-    border-color: #6366f1 !important; 
-}
-.tc-ai .trending-info h5 {
-    color: #6366f1 !important; /* Indigo */
-}
-.tc-ai .trending-rank { background: linear-gradient(135deg, #6366f1, #a855f7) !important; }
-.tc-ai .trending-icon-small { color: #818cf8 !important; }
+    @media (max-width: 768px) {
 
-/* Card 2: Data Science — Cyan-Teal */
-.tc-ds { border-top-color: #06b6d4 !important; }
-.tc-ds:hover { 
-    box-shadow: 0 10px 30px rgba(6, 182, 212, 0.15), 0 0 20px rgba(6, 182, 212, 0.3) !important; 
-    border-color: #06b6d4 !important; 
-}
-.tc-ds .trending-info h5 {
-    color: #0d9488 !important; /* Teal */
-}
-.tc-ds .trending-rank { background: linear-gradient(135deg, #06b6d4, #0284c7) !important; }
-.tc-ds .trending-icon-small { color: #22d3ee !important; }
+        .in-demand-grid,
+        .trending-grid,
+        .mobile-grid-fix {
+            grid-template-columns: 1fr !important;
+            gap: 1.2rem;
+            width: 100% !important;
+        }
 
-/* Card 3: Cloud — Sky-Blue */
-.tc-cloud { border-top-color: #38bdf8 !important; }
-.tc-cloud:hover { 
-    box-shadow: 0 10px 30px rgba(56, 189, 248, 0.15), 0 0 20px rgba(56, 189, 248, 0.3) !important; 
-    border-color: #38bdf8 !important; 
-}
-.tc-cloud .trending-info h5 {
-    color: #0284c7 !important; /* Ocean Blue */
-}
-.tc-cloud .trending-rank { background: linear-gradient(135deg, #38bdf8, #2563eb) !important; }
-.tc-cloud .trending-icon-small { color: #7dd3fc !important; }
+        .recently-viewed-guest-box {
+            padding: 2rem 1.2rem !important;
+            width: auto !important;
+            margin: 0 1rem !important;
+        }
+    }
 
-/* Card 4: Cyber Security — Rose-Orange */
-.tc-cyber { border-top-color: #f43f5e !important; }
-.tc-cyber:hover { 
-    box-shadow: 0 10px 30px rgba(244, 63, 94, 0.15), 0 0 20px rgba(244, 63, 94, 0.3) !important; 
-    border-color: #f43f5e !important; 
-}
-.tc-cyber .trending-info h5 {
-    color: #e11d48 !important; /* Crimson Red */
-}
-.tc-cyber .trending-rank { background: linear-gradient(135deg, #f43f5e, #f97316) !important; }
-.tc-cyber .trending-icon-small { color: #fb7185 !important; }
+    @media (max-width: 640px) {
+        .in-demand-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.8rem;
+            max-width: 380px;
+            margin-left: auto;
+            margin-right: auto;
+            width: 100%;
+        }
 
-/* In-Demand 1: Full Stack — Magenta */
-.id-fs { border-top-color: #db2777 !important; }
-.id-fs:hover { 
-    box-shadow: 0 10px 30px rgba(219, 39, 119, 0.15), 0 0 20px rgba(219, 39, 119, 0.3) !important; 
-    border-color: #db2777 !important; 
-}
-.id-fs .trending-info h5 { color: #be185d !important; /* Deep Magenta */ }
-.id-fs .trending-rank { background: linear-gradient(135deg, #db2777, #9d174d) !important; }
-.id-fs .trending-icon-small { color: #f472b6 !important; }
+        .in-demand-grid .modern-card {
+            padding: 0.75rem 1rem !important;
+            min-height: 50px !important;
+        }
 
-/* In-Demand 2: DevOps — Orange/Amber */
-.id-ops { border-top-color: #ea580c !important; }
-.id-ops:hover { 
-    box-shadow: 0 10px 30px rgba(234, 88, 12, 0.15), 0 0 20px rgba(234, 88, 12, 0.3) !important; 
-    border-color: #ea580c !important; 
-}
-.id-ops .trending-info h5 { color: #c2410c !important; /* Solid Orange */ }
-.id-ops .trending-rank { background: linear-gradient(135deg, #ea580c, #c2410c) !important; }
-.id-ops .trending-icon-small { color: #fb923c !important; }
+        .in-demand-grid h5 {
+            font-size: 0.8rem !important;
+            margin: 0 !important;
+        }
 
-/* In-Demand 3: Cloud Computing — Emerald Green */
-.id-cloud { border-top-color: #22c55e !important; }
-.id-cloud:hover { 
-    box-shadow: 0 10px 30px rgba(34, 197, 94, 0.15), 0 0 20px rgba(34, 197, 94, 0.3) !important; 
-    border-color: #22c55e !important; 
-}
-.id-cloud .trending-info h5 { color: #15803d !important; /* Forest Green */ }
-.id-cloud .trending-rank { background: linear-gradient(135deg, #22c55e, #166534) !important; }
-.id-cloud .trending-icon-small { color: #4ade80 !important; }
+        .in-demand-grid .trending-icon-small {
+            font-size: 0.9rem !important;
+        }
 
-/* In-Demand 4: AI / Machine Learning — Purple */
-.id-ai { border-top-color: #a855f7 !important; }
-.id-ai:hover { 
-    box-shadow: 0 10px 30px rgba(168, 85, 247, 0.15), 0 0 20px rgba(168, 85, 247, 0.3) !important; 
-    border-color: #a855f7 !important; 
-}
-.id-ai .trending-info h5 { color: #7e22ce !important; /* Deep Purple */ }
-.id-ai .trending-rank { background: linear-gradient(135deg, #a855f7, #6b21a8) !important; }
-.id-ai .trending-icon-small { color: #c084fc !important; }
+        .in-demand-grid .trending-rank {
+            width: 22px !important;
+            height: 22px !important;
+            font-size: 0.75rem !important;
+            line-height: 22px !important;
+        }
+    }
 
-/* In-Demand 5: Data Engineering — Golden Yellow */
-.id-data { border-top-color: #eab308 !important; }
-.id-data:hover { 
-    box-shadow: 0 10px 30px rgba(234, 179, 8, 0.15), 0 0 20px rgba(234, 179, 8, 0.3) !important; 
-    border-color: #eab308 !important; 
-}
-.id-data .trending-info h5 { color: #a16207 !important; /* Bronze/Gold */ }
-.id-data .trending-rank { background: linear-gradient(135deg, #eab308, #854d0e) !important; }
-.id-data .trending-icon-small { color: #fde047 !important; }
+    .in-demand-grid .modern-card {
+        height: 100%;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        padding: 1.25rem 1.5rem !important;
+    }
 
-/* In-Demand 6: Cyber Security — Slate Gray/Blue */
-.id-cyber { border-top-color: #64748b !important; }
-.id-cyber:hover { 
-    box-shadow: 0 10px 30px rgba(100, 116, 139, 0.15), 0 0 20px rgba(100, 116, 139, 0.3) !important; 
-    border-color: #64748b !important; 
-}
-.id-cyber .trending-info h5 { color: #334155 !important; /* Slate Gray */ }
-.id-cyber .trending-rank { background: linear-gradient(135deg, #64748b, #334155) !important; }
-.id-cyber .trending-icon-small { color: #94a3b8 !important; }
+    /* Restore text visibility on mobile for hero button */
+    @media (max-width: 480px) {
+        .search-container .btn-gradient {
+            width: auto !important;
+            height: auto !important;
+            padding: 0.7rem 1.5rem !important;
+            border-radius: 30px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4) !important;
+        }
 
-/* === Unique Demand Card Colors & Card Glow === */
+        .search-container .btn-text {
+            display: block !important;
+            font-size: 0.9rem !important;
+            font-weight: 700 !important;
+        }
 
-/* Demand 1: AI / ML — Indigo */
-.di-ai { border-top-color: #6366f1 !important; }
-.di-ai:hover { 
-    box-shadow: 0 10px 30px rgba(99, 102, 241, 0.15), 0 0 20px rgba(99, 102, 241, 0.3) !important; 
-    border-color: #6366f1 !important; 
-}
-.di-ai .di-value { color: #6366f1 !important; }
-.di-ai .di-bar { background: linear-gradient(90deg, #818cf8, #4f46e5) !important; }
+        .search-container .btn-mobile-icon {
+            display: none !important;
+        }
+    }
 
-/* Demand 2: Cloud Computing — Ocean Blue */
-.di-cloud { border-top-color: #0ea5e9 !important; }
-.di-cloud:hover { 
-    box-shadow: 0 10px 30px rgba(14, 165, 233, 0.15), 0 0 20px rgba(14, 165, 233, 0.3) !important; 
-    border-color: #0ea5e9 !important; 
-}
-.di-cloud .di-value { color: #0ea5e9 !important; }
-.di-cloud .di-bar { background: linear-gradient(90deg, #38bdf8, #0284c7) !important; }
+    /* === Trending/Demand Card Coloring & Glow Effects === */
+    .tc-ai {
+        border-top-color: #6366f1 !important;
+    }
 
-/* Demand 3: Web Development — Emerald Green */
-.di-web { border-top-color: #10b981 !important; }
-.di-web:hover { 
-    box-shadow: 0 10px 30px rgba(16, 185, 129, 0.15), 0 0 20px rgba(16, 185, 129, 0.3) !important; 
-    border-color: #10b981 !important; 
-}
-.di-web .di-value { color: #10b981 !important; }
-.di-web .di-bar { background: linear-gradient(90deg, #34d399, #059669) !important; }
+    .tc-ai .trending-info h5 {
+        color: #6366f1 !important;
+    }
 
-/* Demand 4: Data Engineering — Amber Orange */
-.di-data { border-top-color: #f59e0b !important; }
-.di-data:hover { 
-    box-shadow: 0 10px 30px rgba(245, 158, 11, 0.15), 0 0 20px rgba(245, 158, 11, 0.3) !important; 
-    border-color: #f59e0b !important; 
-}
-.di-data .di-value { color: #f59e0b !important; }
-.di-data .di-bar { background: linear-gradient(90deg, #fbbf24, #d97706) !important; }
+    .tc-ai .trending-rank {
+        background: linear-gradient(135deg, #6366f1, #a855f7) !important;
+    }
 
-/* Demand 5: Cyber Security — Rose Red */
-.di-cyber { border-top-color: #f43f5e !important; }
-.di-cyber:hover { 
-    box-shadow: 0 10px 30px rgba(244, 63, 94, 0.15), 0 0 20px rgba(244, 63, 94, 0.3) !important; 
-    border-color: #f43f5e !important; 
-}
-.di-cyber .di-value { color: #f43f5e !important; }
-.di-cyber .di-bar { background: linear-gradient(90deg, #fb7185, #e11d48) !important; }
+    .tc-ds {
+        border-top-color: #06b6d4 !important;
+    }
 
-body.dark-theme .demand-item-box {
-    background: #1e293b !important;
-}
+    .tc-ds .trending-info h5 {
+        color: #0d9488 !important;
+    }
+
+    .tc-ds .trending-rank {
+        background: linear-gradient(135deg, #06b6d4, #0284c7) !important;
+    }
+
+    .tc-cloud {
+        border-top-color: #38bdf8 !important;
+    }
+
+    .tc-cloud .trending-info h5 {
+        color: #0284c7 !important;
+    }
+
+    .tc-cloud .trending-rank {
+        background: linear-gradient(135deg, #38bdf8, #2563eb) !important;
+    }
+
+    .tc-cyber {
+        border-top-color: #f43f5e !important;
+    }
+
+    .tc-cyber .trending-info h5 {
+        color: #e11d48 !important;
+    }
+
+    .tc-cyber .trending-rank {
+        background: linear-gradient(135deg, #f43f5e, #f97316) !important;
+    }
+
+    .id-fs {
+        border-top-color: #db2777 !important;
+    }
+
+    .id-ops {
+        border-top-color: #ea580c !important;
+    }
+
+    .id-cloud {
+        border-top-color: #22c55e !important;
+    }
+
+    .id-ai {
+        border-top-color: #a855f7 !important;
+    }
+
+    .id-data {
+        border-top-color: #eab308 !important;
+    }
+
+    .id-cyber {
+        border-top-color: #64748b !important;
+    }
+
+    /* Demand Bars */
+    .di-ai {
+        border-top: 3px solid #6366f1 !important;
+    }
+
+    .di-ai .di-value {
+        color: #6366f1 !important;
+    }
+
+    .di-ai .di-bar {
+        background: linear-gradient(90deg, #818cf8, #4f46e5) !important;
+    }
+
+    .di-cloud {
+        border-top: 3px solid #0ea5e9 !important;
+    }
+
+    .di-cloud .di-value {
+        color: #0ea5e9 !important;
+    }
+
+    .di-cloud .di-bar {
+        background: linear-gradient(90deg, #38bdf8, #0284c7) !important;
+    }
+
+    .di-web {
+        border-top: 3px solid #10b981 !important;
+    }
+
+    .di-web .di-value {
+        color: #10b981 !important;
+    }
+
+    .di-web .di-bar {
+        background: linear-gradient(90deg, #34d399, #059669) !important;
+    }
+
+    .di-data {
+        border-top: 3px solid #f59e0b !important;
+    }
+
+    .di-data .di-value {
+        color: #f59e0b !important;
+    }
+
+    .di-data .di-bar {
+        background: linear-gradient(90deg, #fbbf24, #d97706) !important;
+    }
+
+    /* === Mobile Alignment Optimization === */
+    @media (max-width: 768px) {
+        .fg-layout-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .fg-layout-wrapper>* {
+            width: 100%;
+            max-width: 100%;
+        }
+
+        .hero-title-new,
+        .hero-subtitle {
+            text-align: center !important;
+        }
+
+        .search-wrapper {
+            margin: 1.5rem auto !important;
+            max-width: 500px;
+        }
+
+        .trending-header {
+            justify-content: center !important;
+            text-align: center;
+        }
+
+        .in-demand-grid,
+        .trending-grid {
+            justify-content: center !important;
+        }
+
+        .trending-card-item {
+            margin: 0 auto;
+        }
+    }
+
+    .di-cyber {
+        border-top: 3px solid #f43f5e !important;
+    }
+
+    .di-cyber .di-value {
+        color: #f43f5e !important;
+    }
+
+    .di-cyber .di-bar {
+        background: linear-gradient(90deg, #fb7185, #e11d48) !important;
+    }
+
+    /* AI Suggestions Premium UI */
+    .ai-suggestions {
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100%;
+        max-width: 550px;
+        background: var(--glass-bg);
+        backdrop-filter: blur(12px);
+        border-radius: 16px;
+        margin-top: 12px;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(99, 102, 241, 0.1);
+        z-index: 1000000 !important;
+        overflow: hidden !important;
+        border: 1px solid var(--glass-border);
+        display: none;
+    }
+
+    .recent-roadmap-card {
+        position: relative !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+        align-items: center !important;
+        aspect-ratio: 1 / 1 !important;
+        background: var(--glass-bg) !important;
+        border: 1px solid var(--glass-border) !important;
+        backdrop-filter: blur(12px) !important;
+        -webkit-backdrop-filter: blur(12px) !important;
+        border-radius: 28px !important;
+        padding: 2rem !important;
+        text-align: center !important;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+        box-shadow: var(--shadow-sm) !important;
+        text-decoration: none !important;
+        overflow: hidden !important;
+        cursor: pointer;
+        z-index: 1;
+    }
+
+    /* Remove the 'disturbing' neon rotation effect from search-wrapper */
+    .search-wrapper::before,
+    .search-wrapper::after {
+        display: none !important;
+        opacity: 0 !important;
+        width: 0 !important;
+        height: 0 !important;
+        content: none !important;
+    }
+
+    body.dark-mode .ai-suggestions {
+        background: rgba(15, 23, 42, 0.96);
+        border-color: rgba(255, 255, 255, 0.1);
+        box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05);
+    }
+
+    .suggestion-item {
+        padding: 12px 18px;
+        cursor: pointer;
+        font-size: 0.92rem;
+        color: #1e293b;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    body.dark-mode .suggestion-item {
+        color: #f1f5f9;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    }
+
+    .suggestion-item:last-child {
+        border-bottom: none;
+    }
+
+    .suggestion-item:hover {
+        background: rgba(99, 102, 241, 0.08);
+        padding-left: 24px;
+        color: #6366f1;
+    }
+
+    .suggestion-item i {
+        font-size: 0.9rem;
+        opacity: 0.5;
+        color: #6366f1;
+    }
+
+    .suggestion-item:hover i {
+        opacity: 1;
+        transform: translateX(4px);
+    }
 </style>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const input = document.querySelector("#careerInput");
+        const generateBtn = document.querySelector("#generateBtn");
+        const suggestionBox = document.querySelector("#aiSuggestionBox");
+        const ctx = document.getElementById('marketDemandChart');
+        const loader = document.getElementById('demandLoader');
+        const isDarkMode = document.body.classList.contains('dark-mode');
+
+        // Chart.js Default Config
+        if (ctx) {
+            Chart.defaults.color = isDarkMode ? '#bbbbbb' : '#4b5563';
+            Chart.defaults.font.family = "'Inter', sans-serif";
+
+            async function loadMarketChart() {
+                try {
+                    const response = await fetch('/api/market-demand');
+                    const data = await response.json();
+
+                    if (loader) loader.style.display = 'none';
+
+                    new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: data.skills.map(s => s.name),
+                            datasets: [{
+                                label: 'Market Demand (%)',
+                                data: data.skills.map(s => s.demand),
+                                backgroundColor: data.skills.map(s => {
+                                    const color = s.color || '#6366f1';
+                                    const gradient = ctx.getContext('2d').createLinearGradient(0, 0, 400, 0);
+                                    gradient.addColorStop(0, color + 'cc');
+                                    gradient.addColorStop(1, color + '44');
+                                    return gradient;
+                                }),
+                                borderColor: data.skills.map(s => s.color || '#6366f1'),
+                                borderWidth: 1,
+                                borderRadius: 8,
+                                barThickness: 28
+                            }]
+                        },
+                        options: {
+                            indexAxis: 'y',
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { display: false },
+                                tooltip: {
+                                    backgroundColor: isDarkMode ? 'rgba(30, 41, 59, 0.95)' : 'rgba(255, 255, 255, 0.95)',
+                                    titleColor: isDarkMode ? '#ffffff' : '#1e293b',
+                                    bodyColor: isDarkMode ? '#94a3b8' : '#64748b',
+                                    borderColor: 'rgba(99, 102, 241, 0.2)',
+                                    borderWidth: 1,
+                                    padding: 12,
+                                    callbacks: {
+                                        label: function (item) {
+                                            const growth = data.skills[item.dataIndex].growth;
+                                            return [`Demand: ${item.formattedValue}%`, `Growth: +${growth}% (YoY)`];
+                                        }
+                                    }
+                                }
+                            },
+                            scales: {
+                                x: {
+                                    grid: { color: isDarkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)' },
+                                    max: 100,
+                                    ticks: { callback: value => value + '%' }
+                                },
+                                y: {
+                                    grid: { display: false }
+                                }
+                            },
+                            animation: {
+                                duration: 2000,
+                                easing: 'easeOutQuart'
+                            }
+                        }
+                    });
+                } catch (err) {
+                    console.error('Failed to load chart:', err);
+                    if (loader) loader.innerHTML = `<p style="color: #ef4444;">Failed to load real-time analysis.</p>`;
+                }
+            }
+            loadMarketChart();
+        }
+
+        if (input && suggestionBox) {
+            let debounceTimer;
+
+            input.addEventListener("input", () => {
+                const value = input.value.trim();
+                clearTimeout(debounceTimer);
+
+                if (value.length < 2) {
+                    suggestionBox.innerHTML = "";
+                    suggestionBox.style.display = "none";
+                    return;
+                }
+
+                suggestionBox.innerHTML = `
+            <div style="padding: 10px 16px; background: rgba(99, 102, 241, 0.08); border-bottom: 1px solid rgba(99, 102, 241, 0.15); font-size: 0.7rem; color: #6366f1; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 8px;">
+                <i class="fa-solid fa-wand-magic-sparkles"></i> AI Analyst Thinking
+            </div>
+            <div style="padding: 15px 18px; color: #64748b; font-size: 0.88rem; display: flex; align-items: center; gap: 10px;">
+                <i class="fa-solid fa-circle-notch fa-spin"></i> Exploring career paths for "${value}"...
+            </div>
+        `;
+                suggestionBox.style.display = "block";
+
+                debounceTimer = setTimeout(async () => {
+                    try {
+                        const res = await fetch(`/api/ai_suggest?q=${encodeURIComponent(value)}`);
+                        if (!res.ok) throw new Error("API failed");
+                        const suggestions = await res.json();
+                        showSuggestions(suggestions);
+                    } catch (err) {
+                        console.error("AI Suggestions Error:", err);
+                        suggestionBox.style.display = "none";
+                    }
+                }, 400);
+            });
+
+            document.addEventListener("click", (e) => {
+                if (!input.contains(e.target) && !suggestionBox.contains(e.target)) {
+                    suggestionBox.style.display = "none";
+                }
+            });
+
+            function showSuggestions(list) {
+                if (!list || list.length === 0) {
+                    suggestionBox.style.display = "none";
+                    return;
+                }
+
+                let html = `
+            <div style="padding: 12px 20px; background: rgba(99, 102, 241, 0.1); border-bottom: 1px solid rgba(99, 102, 241, 0.2); font-size: 0.75rem; color: #6366f1; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 8px;">
+                <i class="fa-solid fa-wand-magic-sparkles"></i> Recommended Roadmaps
+            </div>
+        `;
+
+                list.forEach((item, index) => {
+                    html += `
+                <div class="suggestion-item" data-index="${index}">
+                    <i class="fa-solid fa-route"></i> 
+                    <span>${item}</span>
+                </div>
+            `;
+                });
+
+                suggestionBox.innerHTML = html;
+                suggestionBox.style.display = "block";
+
+                suggestionBox.querySelectorAll(".suggestion-item").forEach(el => {
+                    el.addEventListener("click", function () {
+                        const text = list[this.getAttribute("data-index")];
+                        input.value = text;
+                        suggestionBox.innerHTML = "";
+                        suggestionBox.style.display = "none";
+                        if (generateBtn) generateBtn.click();
+                    });
+                });
+            }
+
+        }
+
+
+        // --- Roadmap Progress Loader & Card Highlighter ---
+        async function loadUserProgress() {
+            const section = document.getElementById('continueLearning');
+            const grid = document.getElementById('userProgressGrid');
+            if (!section || !grid) return;
+
+            try {
+                const res = await fetch('/api/user-progress');
+                const data = await res.json();
+
+                if (data.success && data.progress && data.progress.length > 0) {
+                    section.style.display = 'block';
+
+                    // 1. Populate the 'Resume Learning' grid (Limit to 3)
+                    const top3 = data.progress.slice(0, 3);
+                    grid.innerHTML = top3.map(p => `
+                        <a href="/roadmap?skill=${encodeURIComponent(p.skill.toLowerCase())}" class="prog-card">
+                            <div class="prog-card-top">
+                                <span class="prog-skill-name">${p.skill}</span>
+                                <div style="display:flex; align-items:center; gap:12px;">
+                                    <span class="prog-pct-pill">${p.percentage}%</span>
+                                    <button class="prog-delete-btn" onclick="deleteHistoryItem('${p.skill}', event)" title="Remove from list">
+                                        <i class="fa-solid fa-trash-can"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="prog-bar-track">
+                                <div class="prog-bar-fill" style="width: ${p.percentage}%"></div>
+                            </div>
+                            <div class="prog-card-action">
+                                Continue Journey <i class="fa-solid fa-chevron-right"></i>
+                            </div>
+                        </a>
+                    `).join('');
+
+                    if (data.progress.length > 3) {
+                        const viewAll = document.createElement('div');
+                        viewAll.style.cssText = 'grid-column: 1/-1; text-align: center; margin-top: 1rem;';
+                        viewAll.innerHTML = `<a href="/my-learning" style="color:#6366f1; font-weight:700; text-decoration:none; font-size:0.9rem;">View All Learning Paths (${data.progress.length}) <i class="fa-solid fa-arrow-right"></i></a>`;
+                        grid.appendChild(viewAll);
+                    }
+
+                    // 2. Highlight Predefined Cards (Trending/In-Demand)
+                    data.progress.forEach(p => {
+                        const skillName = p.skill.toLowerCase();
+                        // Find all links on the page that point to this roadmap
+                        const links = document.querySelectorAll(`a[href*="skill=${encodeURIComponent(skillName)}"], a[href*="skill=${skillName.replace(/ /g, '+')}"]`);
+
+                        links.forEach(link => {
+                            if (link.classList.contains('trending-card-item')) {
+                                // Add a completion badge or mini-ring to the trending card
+                                if (!link.querySelector('.card-progress-mini')) {
+                                    const badge = document.createElement('div');
+                                    badge.className = 'card-progress-mini';
+                                    badge.innerHTML = `<i class="fa-solid fa-circle-check"></i> ${p.percentage}%`;
+                                    badge.style.cssText = `
+                                        position: absolute;
+                                        top: 10px;
+                                        right: 12px;
+                                        font-size: 0.65rem;
+                                        font-weight: 800;
+                                        color: #10b981;
+                                        background: rgba(16, 185, 129, 0.1);
+                                        padding: 3px 8px;
+                                        border-radius: 20px;
+                                        display: flex;
+                                        align-items: center;
+                                        gap: 4px;
+                                        z-index: 5;
+                                    `;
+                                    link.style.position = 'relative';
+                                    link.appendChild(badge);
+                                    link.style.borderColor = 'rgba(16, 185, 129, 0.4)';
+                                }
+                            }
+                        });
+                    });
+                }
+            } catch (e) {
+                console.warn("Could not load user progress:", e);
+            }
+        }
+        loadUserProgress();
+
+        async function deleteHistoryItem(skill, event) {
+            if (event) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            if (!confirm(`Are you sure you want to remove your "${skill}" progress?`)) return;
+
+            try {
+                const res = await fetch('/api/delete-progress', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ skill: skill })
+                });
+                const d = await res.json();
+                if (d.success) {
+                    loadUserProgress(); // Refresh list
+                }
+            } catch (e) { console.error("Error deleting progress:", e); }
+        }
+        window.deleteHistoryItem = deleteHistoryItem;
+
+        // Scroll Reveal Intersection Observer
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: "0px 0px -50px 0px"
+        };
+
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('revealed');
+                    revealObserver.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.reveal-on-scroll').forEach(section => {
+            revealObserver.observe(section);
+        });
+
+
+
+    });
+</script>
 {% endblock %}

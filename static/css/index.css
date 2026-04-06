@@ -1,13 +1,24 @@
+        /* --- IN-DEMAND SKILLS GRID --- */
         .in-demand-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(3, 1fr);
             gap: 1.5rem;
+            align-items: stretch;
+            margin-bottom: 2rem;
         }
-        @media (max-width: 768px) {
+
+        @media (max-width: 992px) {
+            .in-demand-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 640px) {
             .in-demand-grid {
                 grid-template-columns: 1fr;
             }
         }
+
         .demand-item-box {
             padding: 1.5rem 1.8rem;
             background: #ffffff;
@@ -21,34 +32,403 @@
             position: relative;
             overflow: hidden;
         }
+
         .demand-item-box::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 100%;
+            top: 0; left: 0; right: 0; height: 100%;
             background: linear-gradient(135deg, rgba(108, 99, 255, 0.05), transparent 60%);
             opacity: 0;
             transition: opacity 0.35s ease;
             pointer-events: none;
         }
-        .demand-item-box:hover::before {
-            opacity: 1;
-        }
-        body.dark-theme .demand-item-box {
+
+        .demand-item-box:hover::before { opacity: 1; }
+
+        body.dark-mode .demand-item-box {
             background: #1e1e1e !important;
             border-color: #333 !important;
         }
+
         .demand-item-box:hover {
             transform: translateY(-6px);
             box-shadow: 0 12px 30px rgba(108, 99, 255, 0.2);
             border-color: var(--primary-color);
         }
-        .demand-item-box.glow-active {
-            box-shadow: 0 0 25px rgba(108, 99, 255, 0.5) !important;
-            border-color: var(--primary-color) !important;
-            transform: scale(1.02);
-            z-index: 10;
+
+        /* ═══════════════════════════════════════════════════════════════
+           PREMIUM SEARCH BAR — COMPLETE REDESIGN (Universal)
+           Matches reference exactly: separate dark input + gradient pill button
+           ═══════════════════════════════════════════════════════════════ */
+
+        /* Main container becomes a transparent flex wrapper */
+        .search-wrapper,
+        #roadmapForm.search-container,
+        #roadmapForm.search-form {
+            position: relative;
+            z-index: 1001;
+            width: 100%;
+            max-width: 780px;
+            margin: 0 auto;
+            display: flex !important;
+            align-items: center !important;
+            flex-direction: row !important;
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+            padding: 0 !important;
+            gap: 16px !important;
+            overflow: visible !important;
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
+            animation: none !important;
         }
 
+        /* Kill any animated gradient overlays from base css */
+        #roadmapForm.search-container::before,
+        #roadmapForm.search-form::before,
+        .search-wrapper::before {
+            display: none !important;
+            content: none !important;
+        }
+
+        #roadmapForm.search-container:hover,
+        #roadmapForm.search-form:hover {
+            box-shadow: none !important;
+            transform: none !important;
+            background: transparent !important;
+        }
+
+        #roadmapForm.search-container:focus-within,
+        #roadmapForm.search-form:focus-within {
+            transform: none !important;
+            box-shadow: none !important;
+            border-color: transparent !important;
+            background: transparent !important;
+            animation: none !important;
+        }
+
+        /* Absolute position the left search icon inside the dark input */
+        .search-icon {
+            display: block !important;
+            position: absolute !important;
+            left: 20px !important;
+            top: 50% !important;
+            transform: translateY(-50%) !important;
+            color: #d1d5db !important;
+            font-size: 18px !important;
+            z-index: 10 !important;
+            margin: 0 !important;
+            pointer-events: none !important;
+        }
+
+        /* The dark input field */
+        .search-input {
+            flex: 1 !important;
+            height: 56px !important;
+            background: #1e293b !important;
+            border-radius: 999px !important;
+            padding: 0 24px 0 52px !important; /* space for icon */
+            color: #f8fafc !important;
+            font-size: 16px !important;
+            font-weight: 500 !important;
+            border: 2px solid rgba(168, 85, 247, 0.4) !important; /* soft purple/rose border */
+            box-shadow: 0 0 15px rgba(168, 85, 247, 0.15) !important; /* soft ambient glow */
+            outline: none !important;
+            transition: all 0.3s ease !important;
+            letter-spacing: normal !important;
+            line-height: normal !important;
+        }
+
+        .search-input:focus {
+            border: 2px solid rgba(168, 85, 247, 0.8) !important;
+            box-shadow: 0 0 20px rgba(168, 85, 247, 0.3) !important;
+        }
+
+        .search-input::placeholder {
+            color: #9ca3af !important;
+            font-weight: 400 !important;
+            font-size: 15px !important;
+        }
+
+        /* Gradient pill button */
+        .btn-gradient {
+            height: 56px !important;
+            min-width: auto !important;
+            width: auto !important;
+            max-width: none !important;
+            padding: 0 32px !important;
+            border-radius: 999px !important;
+            background: linear-gradient(90deg, #8b5cf6 0%, #3b82f6 100%) !important;
+            color: #ffffff !important;
+            font-size: 16px !important;
+            font-weight: 600 !important;
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3) !important;
+            border: none !important;
+            cursor: pointer !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+            animation: none !important;
+            flex-shrink: 0 !important;
+            position: static !important;
+        }
+
+        .btn-gradient:hover {
+            transform: translateY(-2px) !important;
+            box-shadow: 0 12px 25px rgba(99, 102, 241, 0.4) !important;
+            filter: brightness(1.05) !important;
+        }
+
+        .btn-gradient:active {
+            transform: scale(0.96) !important;
+        }
+
+        /* Show text, hide fake icon */
+        .btn-gradient .btn-text {
+            display: block !important;
+        }
+
+        .btn-gradient::before {
+            display: none !important;
+            content: none !important;
+        }
+
+        /* ── Dark mode overrides for search bar ── */
+        body.dark-mode #roadmapForm.search-container,
+        body.dark-mode #roadmapForm.search-form {
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+            backdrop-filter: none !important;
+        }
+
+        body.dark-mode .search-input {
+            background: #0f172a !important; /* Slightly darker */
+            color: #f8fafc !important;
+            border: 2px solid rgba(192, 132, 252, 0.6) !important;
+        }
+
+        body.dark-mode .search-input::placeholder {
+            color: #64748b !important;
+        }
+
+        body.dark-mode .btn-gradient {
+            background: linear-gradient(90deg, #7c3aed 0%, #2563eb 100%) !important;
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4) !important;
+        }
+
+        /* ── Mobile Stacking ── */
+        @media (max-width: 600px) {
+            #roadmapForm.search-container,
+            #roadmapForm.search-form,
+            .search-wrapper {
+                flex-direction: column !important;
+                gap: 12px !important;
+            }
+            .search-input {
+                width: 100% !important;
+                font-size: 15px !important;
+                height: 52px !important;
+            }
+            .search-icon {
+                top: 26px !important; /* Half of 52px */
+            }
+            .btn-gradient {
+                width: 100% !important;
+                height: 52px !important;
+            }
+        }
+
+        /* --- AI SUGGESTIONS --- */
+        .ai-suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            z-index: 1001;
+            margin-top: 10px;
+            max-height: 250px;
+            overflow-y: auto;
+        }
+
+        .suggestion-item {
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .suggestion-item:hover {
+            background: #f8fafc;
+        }
+
+        body.dark-mode .ai-suggestions {
+            background: #1e293b;
+        }
+
+        body.dark-mode .suggestion-item:hover {
+            background: #334155;
+        }
+
+
+
+        /* --- PRO DASHBOARD CARD STYLING --- */
+        .recent-roadmap-card {
+            position: relative !important;
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: center !important;
+            align-items: center !important;
+            aspect-ratio: 1 / 1 !important;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(108, 99, 255, 0.05) 100%), #ffffff !important;
+            border: 1px solid rgba(108, 99, 255, 0.1) !important;
+            border-radius: 24px !important;
+            padding: 2rem !important;
+            text-align: center !important;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1) !important;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02) !important;
+            text-decoration: none !important;
+            overflow: hidden !important;
+            cursor: pointer;
+            z-index: 1;
+        }
+
+        .recent-roadmap-card::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at center, rgba(108, 99, 255, 0.08) 0%, transparent 50%);
+            opacity: 0;
+            transition: opacity 0.5s ease, transform 0.5s ease;
+            z-index: -1;
+            transform: scale(0.5);
+            pointer-events: none;
+        }
+
+        .recent-roadmap-card:hover::after {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .recent-roadmap-card:hover {
+            transform: translateY(-8px) scale(1.02) !important;
+            border-color: rgba(108, 99, 255, 0.3) !important;
+            background: #ffffff !important;
+            box-shadow: 0 20px 40px rgba(108, 99, 255, 0.1) !important;
+        }
+
+        .recent-roadmap-card .resume-bar {
+            position: absolute !important;
+            bottom: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            background: var(--primary-color) !important;
+            color: white !important;
+            padding: 10px !important;
+            font-size: 0.85rem !important;
+            font-weight: 700 !important;
+            transform: translateY(100%) !important;
+            transition: transform 0.3s cubic-bezier(0.2, 1, 0.3, 1) !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 8px !important;
+        }
+
+        .recent-roadmap-card:hover .resume-bar {
+            transform: translateY(0) !important;
+        }
+
+
+        body.dark-mode .recent-roadmap-card {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.8) 0%, rgba(108, 99, 255, 0.08) 100%), #1e293b !important;
+            border-color: rgba(255, 255, 255, 0.08) !important;
+        }
+
+        body.dark-mode .recent-roadmap-card:hover {
+            background: #1e293b !important;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5) !important;
+        }
+
+        .recent-roadmap-badge {
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 20px;
+            background: rgba(108, 99, 255, 0.1);
+            color: #6366f1;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+            display: inline-block;
+        }
+
+        /* Grid Layout for Recently Viewed */
+        .trending-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 480px) {
+            .trending-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+                width: 92%;
+                margin: 0 auto;
+            }
+        }
+
+        /* --- SECTION SEPARATOR & ALIGNMENT --- */
+        .section-divider {
+            width: 60%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.2), transparent);
+            margin: 3.5rem auto;
+            opacity: 0.5;
+        }
+
+        .fg-layout-wrapper {
+            max-width: 1120px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+            width: 100%;
+        }
+
+        .section-container {
+            padding: 1rem 0 !important;
+            width: 100%;
+        }
+
+
+        @media (max-width: 1120px) {
+            .fresher-guide-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .fresher-guide-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .fg-layout-wrapper {
+                padding: 0 1rem;
+            }
+
+            .section-divider {
+                width: 80%;
+            }
+
+            .fg-card {
+                padding: 1.5rem !important;
+            }
+        }

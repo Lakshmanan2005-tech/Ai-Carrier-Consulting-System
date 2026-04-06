@@ -4,3 +4,28 @@
     transform: scale(1.15) translateY(-2px);
     box-shadow: 0 8px 20px rgba(108, 99, 255, 0.4) !important;
 }
+
+/* --- Mobile Center Alignment for History Section --- */
+@media (max-width: 600px) {
+    .history-container h2 {
+        font-size: 1.8rem !important;
+        margin-bottom: 1.5rem !important;
+    }
+    
+    .grid-layout-system {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        gap: 1.2rem !important;
+    }
+    
+    .history-card {
+        width: 100% !important;
+        max-width: 340px !important;
+        padding: 1.8rem 1.2rem !important;
+    }
+    
+    .history-card .card-icon-wrapper {
+        margin: 0 auto 1rem auto !important;
+    }
+}

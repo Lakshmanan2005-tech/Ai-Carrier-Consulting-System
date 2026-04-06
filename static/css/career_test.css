@@ -34,28 +34,28 @@
 }
 
 /* Dark Mode Overrides for UI Elements */
-body.dark-theme .quiz-option {
+body.dark-mode .quiz-option {
     background: #1e1e1e !important;
     border-color: #333 !important;
     color: #ffffff !important;
 }
-body.dark-theme .quiz-option:hover {
+body.dark-mode .quiz-option:hover {
     background: rgba(108, 99, 255, 0.15) !important;
     border-color: var(--primary-color) !important;
 }
-body.dark-theme .quiz-option.selected {
+body.dark-mode .quiz-option.selected {
     background: rgba(108, 99, 255, 0.3) !important;
     border-color: var(--primary-color) !important;
 }
-body.dark-theme .test-card-bg {
+body.dark-mode .test-card-bg {
     background: #1e1e1e !important;
     border-color: #333 !important;
 }
-body.dark-theme .test-gradient-bg {
+body.dark-mode .test-gradient-bg {
     background: linear-gradient(135deg, rgba(108, 99, 255, 0.2) 0%, rgba(74, 144, 226, 0.2) 100%) !important;
     border-color: rgba(108, 99, 255, 0.4) !important;
 }
-body.dark-theme .features-grid-item {
+body.dark-mode .features-grid-item {
     background: rgba(255, 255, 255, 0.05) !important;
 }
 

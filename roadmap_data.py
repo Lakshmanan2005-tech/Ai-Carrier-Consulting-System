@@ -7,7 +7,7 @@ ROADMAPS = {
             {"title": "Advanced Level", "content": "• Asynchronous Programming (Asyncio)<br>• Memory Management<br>• Networking & Sockets<br>• Python C-Extensions"},
             {"title": "Tools & Technologies", "content": "• Pip & Virtual Environments<br>• PyCharm / VS Code<br>• pytest / unittest<br>• Flask / Django / FastAPI"},
             {"title": "Projects", "content": "• CLI File Organizer<br>• Weather REST API<br>• Web Scraper Application<br>• Stock Price Tracker<br>• Expense Tracker (CSV/DB)<br>• Telegram Bot<br>• Discord Notifier<br>• Simple ML Model (Scikit-learn)"},
-            {"title": "Career Opportunities", "content": "• Python Backend Developer<br>• Data Engineer<br>• Automation Engineer<br>• Python Scraper Developer"}
+            {"title": "Career Opportunities", "content": "• Python Backend Developer<br>• Data Engineer<br>• Automation QA Engineer<br>• Python Scraper / Bot Developer<br>• DevOps / Scripting Engineer<br>• ML Engineer (entry-level)<br>• Freelance Python Developer"}
         ],
         "job_url": "https://www.naukri.com/python-developer-jobs"
     },
@@ -22,7 +22,7 @@ ROADMAPS = {
             {"title": "Database", "content": "• SQL (SELECT, JOIN, GROUP BY)<br>• MySQL / PostgreSQL<br>• JDBC basics"},
             {"title": "Frameworks", "content": "• Spring Framework<br>• Spring Boot<br>• Spring MVC<br>• Spring Security<br>• Hibernate / JPA"},
             {"title": "Projects", "content": "• Airline Reservation System<br>• Employee Management API<br>• Multi-threaded Chat App<br>• Library Management System<br>• Banking System (JDBC)<br>• Student Grade Portal<br>• Spring Boot Blog API<br>• Android Unit Converter"},
-            {"title": "Career Opportunities", "content": "• Java Developer<br>• Enterprise Software Engineer<br>• Android Backend Developer"}
+            {"title": "Career Opportunities", "content": "• Java Developer (Backend)<br>• Enterprise Software Engineer<br>• Android Backend Developer<br>• Spring Boot Microservices Dev<br>• Java Full Stack Developer<br>• Technical Lead (Java)<br>• Freelance API Developer"}
         ],
         "job_url": "https://www.naukri.com/java-developer-jobs"
     },
@@ -34,7 +34,7 @@ ROADMAPS = {
             {"title": "Advanced Level", "content": "• Standard Template Library (STL)<br>• Smart Pointers & Move Semantics<br>• Multithreading & Mutexes<br>• Memory Optimization"},
             {"title": "Tools & Technologies", "content": "• GCC/Clang Compilers<br>• CMake / Make<br>• Visual Studio / CLion<br>• GDB / Valgrind Testing"},
             {"title": "Projects", "content": "• Custom Game Engine Physics<br>• High-performance Trading Matcher<br>• Command Line Shell<br>• Memory Allocator (Custom)<br>• Sudoku Solver (Backtracking)<br>• Encryption Tool (AES)<br>• File Compression Tool (Huffman)<br>• Keylogger (Education/Audit)"},
-            {"title": "Career Opportunities", "content": "• C++ Software Engineer<br>• Game Developer<br>• Quantitative Developer<br>• Embedded Systems Engineer"}
+            {"title": "Career Opportunities", "content": "• C++ Software Engineer<br>• Game Developer (Unreal/Unity)<br>• Quantitative / Algo Developer<br>• Embedded Systems Engineer<br>• Systems Programmer<br>• Compiler Engineer<br>• High-Frequency Trading Dev"}
         ],
         "job_url": "https://www.naukri.com/c-plus-plus-developer-jobs"
     },
@@ -46,7 +46,7 @@ ROADMAPS = {
             {"title": "Advanced Level", "content": "• Web Accessibility (a11y) & SEO<br>• Web Performance Optimization<br>• Service Workers & PWA<br>• Web Security Basics (CORS, XSS)"},
             {"title": "Tools & Technologies", "content": "• React / Vue / Angular<br>• Vite / Webpack<br>• Git & GitHub<br>• Chrome DevTools"},
             {"title": "Projects", "content": "• Responsive Portfolio Website<br>• Weather App with API Integration<br>• Interactive To-Do Tracker<br>• Quiz App (JS)<br>• Personal Finance Dashboard<br>• Markdown Previewer<br>• Countdown Timer<br>• Movie Database (OMDb)"},
-            {"title": "Career Opportunities", "content": "• Frontend Developer<br>• Web UI Engineer<br>• Web Master<br>• Freelance Web Developer"}
+            {"title": "Career Opportunities", "content": "• Frontend Developer<br>• Web UI Engineer<br>• Web Master / Site Manager<br>• Freelance Web Developer<br>• WordPress / CMS Developer<br>• React / Vue Specialist<br>• Web Accessibility Specialist"}
         ],
         "job_url": "https://www.naukri.com/web-developer-jobs"
     },
@@ -58,7 +58,7 @@ ROADMAPS = {
             {"title": "Advanced Level", "content": "• Microservices Architecture<br>• GraphQL APIs<br>• Authentication (JWT, OAuth)<br>• Containerization (Docker)"},
             {"title": "Tools & Technologies", "content": "• MongoDB / PostgreSQL<br>• Node.js / Django<br>• Postman / Swagger<br>• AWS / Vercel / Heroku"},
             {"title": "Projects", "content": "• Full E-Commerce Storefront<br>• Social Media App Web Client<br>• Real-time Chat Application<br>• Blog Platform (MERN)<br>• Task Management System (Auth)<br>• Event Booking System<br>• Inventory Management Dashboard<br>• Video Streaming Interface"},
-            {"title": "Career Opportunities", "content": "• Full Stack Engineer<br>• MERN/MEAN Developer<br>• Software Architect<br>• Technical Lead"}
+            {"title": "Career Opportunities", "content": "• Full Stack Engineer (MERN/MEAN)<br>• Software Architect<br>• Technical Lead<br>• API / Backend Developer<br>• Startup Co-founder / CTO<br>• SaaS Product Developer<br>• Freelance Web App Developer"}
         ],
         "job_url": "https://www.naukri.com/full-stack-developer-jobs"
     },
@@ -70,7 +70,7 @@ ROADMAPS = {
             {"title": "Advanced Level", "content": "• Machine Learning Models (Regression, Classifications)<br>• Feature Engineering<br>• Big Data Processing<br>• Time Series Analysis"},
             {"title": "Tools & Technologies", "content": "• Pandas & NumPy<br>• Scikit-Learn<br>• Matplotlib & Seaborn<br>• Jupyter Notebooks"},
             {"title": "Projects", "content": "• House Price Predictor Model<br>• Customer Churn Analysis<br>• Interactive Sales Dashboard<br>• Titanic Survival Prediction<br>• Sentiment Analysis (Twitter)<br>• Image Compression (K-Means)<br>• Recommendation System<br>• Fraud Detection Model"},
-            {"title": "Career Opportunities", "content": "• Data Scientist<br>• Data Analyst<br>• Quantitative Analyst<br>• Product Analyst"}
+            {"title": "Career Opportunities", "content": "• Data Scientist<br>• Data Analyst<br>• Quantitative / Financial Analyst<br>• Product Analyst<br>• Business Intelligence Analyst<br>• Research Scientist<br>• Data Visualization Engineer"}
         ],
         "job_url": "https://www.naukri.com/data-scientist-jobs"
     },
@@ -82,7 +82,7 @@ ROADMAPS = {
             {"title": "Advanced Level", "content": "• Neural Networks & Deep Learning Basics<br>• Hyperparameter Tuning<br>• Recommender Systems<br>• Natural Language Processing Basics"},
             {"title": "Tools & Technologies", "content": "• TensorFlow / PyTorch<br>• Scikit-Learn<br>• Keras<br>• MLflow / Weights & Biases"},
             {"title": "Projects", "content": "• Movie Recommendation Engine<br>• Spam Email Classifier<br>• Handwritten Digit Recognizer<br>• Face Detection (OpenCV)<br>• Stock Market Forecaster (LSTM)<br>• Language Translator (Basic)<br>• Object Detection (YOLO)<br>• Voice Assistant (Python)"},
-            {"title": "Career Opportunities", "content": "• Machine Learning Engineer<br>• Predictive Modeler<br>• Research Scientist<br>• AI Engineer"}
+            {"title": "Career Opportunities", "content": "• Machine Learning Engineer<br>• Predictive Modeler<br>• Research Scientist (ML)<br>• AI / ML Product Developer<br>• NLP / Computer Vision Engineer<br>• Data Scientist (Advanced)<br>• Freelance AI Consultant"}
         ],
         "job_url": "https://www.naukri.com/machine-learning-engineer-jobs"
     },
@@ -94,7 +94,7 @@ ROADMAPS = {
             {"title": "Advanced Level", "content": "• Transformers & LLMs (BERT, GPT)<br>• Generative Adversarial Networks (GANs)<br>• Advanced Computer Vision<br>• Autonomous Agent Design"},
             {"title": "Tools & Technologies", "content": "• PyTorch / TensorFlow<br>• Hugging Face Transformers<br>• OpenCV<br>• OpenAI API / LangChain"},
             {"title": "Projects", "content": "• Custom Chatbot Application<br>• Facial Recognition System<br>• Autonomous Flappy Bird Bot<br>• AI Chess Engine<br>• Virtual Personal Assistant<br>• Text-to-Image Generator (API)<br>• Deepfake Detection<br>• Smart Traffic Control System"},
-            {"title": "Career Opportunities", "content": "• Artificial Intelligence Engineer<br>• NLP Engineer<br>• Deep Learning Researcher<br>• Computer Vision Architect"}
+            {"title": "Career Opportunities", "content": "• Artificial Intelligence Engineer<br>• NLP Engineer<br>• Deep Learning Researcher<br>• Computer Vision Architect<br>• Generative AI Developer<br>• AI Product Manager<br>• Freelance LLM Developer"}
         ],
         "job_url": "https://www.naukri.com/ai-engineer-jobs"
     },
@@ -106,7 +106,7 @@ ROADMAPS = {
             {"title": "Advanced Level", "content": "• Ethical Hacking / Penetration Testing<br>• Incident Response & Forensics<br>• Security Information Management (SIEM)<br>• Reverse Engineering"},
             {"title": "Tools & Technologies", "content": "• Kali Linux<br>• Wireshark & Nmap<br>• Burp Suite / Metasploit<br>• Splunk"},
             {"title": "Projects", "content": "• Set up a Secure Virtual Lab<br>• Web App Penetration Test Trace<br>• Custom Keylogger/Encryption Script<br>• Firewall Scanner (Nmap Wrapper)<br>• Steganography Tool<br>• Brute Force Protection Script<br>• Vulnerability Scanner (Python)<br>• Packet Sniffer"},
-            {"title": "Career Opportunities", "content": "• Ethical Hacker<br>• Security Analyst<br>• Penetration Tester<br>• Incident Responder"}
+            {"title": "Career Opportunities", "content": "• Ethical Hacker / Pen Tester<br>• Security Analyst (SOC)<br>• Incident Responder<br>• Cyber Forensics Expert<br>• Cloud Security Engineer<br>• Malware Analyst<br>• Bug Bounty Hunter (Freelance)"}
         ],
         "job_url": "https://www.naukri.com/cyber-security-jobs"
     },
@@ -118,7 +118,7 @@ ROADMAPS = {
             {"title": "Advanced Level", "content": "• Serverless Architecture (Lambda/Cloud Functions)<br>• Infrastructure as Code (IaC)<br>• System Architecture & Load Balancing<br>• Cloud Security & Compliance"},
             {"title": "Tools & Technologies", "content": "• AWS / Azure / GCP<br>• Terraform / CloudFormation<br>• Docker & Kubernetes<br>• Ansible"},
             {"title": "Projects", "content": "• Deploy a 3-Tier Web App on AWS<br>• Serverless Image Processing Pipeline<br>• Automated Terraform Infrastructure<br>• Hybrid Cloud Connectivity Setup<br>• S3 Bucket Static Hosting<br>• GCP Kubernetes Cluster Deployment<br>• Azure Active Directory Integration<br>• Cloud Watch Monitoring Setup"},
-            {"title": "Career Opportunities", "content": "• Cloud Engineer<br>• Cloud Solutions Architect<br>• Systems Administrator<br>• Cloud Security Engineer"}
+            {"title": "Career Opportunities", "content": "• Cloud Engineer (AWS/Azure/GCP)<br>• Cloud Solutions Architect<br>• Cloud Security Engineer<br>• Systems Administrator<br>• FinOps / Cloud Cost Analyst<br>• Cloud DevOps Engineer<br>• Freelance Cloud Consultant"}
         ],
         "job_url": "https://www.naukri.com/cloud-engineer-jobs"
     },
@@ -130,7 +130,7 @@ ROADMAPS = {
             {"title": "Advanced Level", "content": "• Container Orchestration (Kubernetes)<br>• Infrastructure as Code (IaC)<br>• Observability & Monitoring<br>• DevSecOps integration"},
             {"title": "Tools & Technologies", "content": "• Jenkins / GitHub Actions / GitLab CI<br>• Docker & Kubernetes<br>• Terraform & Ansible<br>• Prometheus / Grafana / ELK Stack"},
             {"title": "Projects", "content": "• Containerize a Microservices App<br>• Create an automated CI/CD Pipeline<br>• Deploy Monitoring Dashboards<br>• Infrastructure as Code (Terraform)<br>• Kubernetes Cluster Autoscaling<br>• Jenkins Pipeline as Code<br>• Ansible Configuration Management<br>• Log Rotation & Backup Scripts"},
-            {"title": "Career Opportunities", "content": "• DevOps Engineer<br>• Site Reliability Engineer (SRE)<br>• Release Engineer<br>• Platform Engineer"}
+            {"title": "Career Opportunities", "content": "• DevOps Engineer<br>• Site Reliability Engineer (SRE)<br>• Platform / Infrastructure Engineer<br>• Release / Build Engineer<br>• Cloud DevOps Architect<br>• DevSecOps Engineer<br>• Freelance CI/CD Consultant"}
         ],
         "job_url": "https://www.naukri.com/devops-engineer-jobs"
     },
@@ -142,7 +142,7 @@ ROADMAPS = {
             {"title": "Advanced Level", "content": "• Jetpack Arch Components (ViewModel, LiveData)<br>• Dependency Injection (Dagger/Hilt)<br>• Background Processing (WorkManager)<br>• Testing (Espresso/JUnit)"},
             {"title": "Tools & Technologies", "content": "• Android Studio<br>• Kotlin Coroutines / RxJava<br>• Firebase<br>• Retrofit & Room"},
             {"title": "Projects", "content": "• E-Commerce Inventory App<br>• Live Weather Tracker App<br>• Habit Tracker leveraging Room DB<br>• Fitness Calculator<br>• News Feed App (Retrofit)<br>• QR Code Scanner<br>• Simple Social App (Firebase)<br>• Multi-player Quiz (Bluetooth)"},
-            {"title": "Career Opportunities", "content": "• Android Developer<br>• Mobile Software Engineer<br>• Kotlin Specialist<br>• Mobile App Architect"}
+            {"title": "Career Opportunities", "content": "• Android Developer<br>• Mobile Software Engineer<br>• Kotlin / Jetpack Specialist<br>• Mobile App Architect<br>• Freelance App Developer<br>• React Native Developer<br>• Flutter Developer"}
         ],
         "job_url": "https://www.naukri.com/android-developer-jobs"
     },
@@ -154,7 +154,7 @@ ROADMAPS = {
             {"title": "Advanced Level", "content": "• Concurrency (Grand Central Dispatch, async/await)<br>• Advanced SwiftUI & Combine<br>• Memory Management (ARC)<br>• App Store Deployment & CI/CD"},
             {"title": "Tools & Technologies", "content": "• Xcode & Swift<br>• CocoaPods / Swift Package Manager<br>• TestFlight<br>• Firebase / Realm"},
             {"title": "Projects", "content": "• Finance Tracker iOS App<br>• Recipe Finder with REST APIs<br>• Real-time Chat App<br>• Travel Journal (Core Data)<br>• Reminder App (Local Notifications)<br>• AR Measurement Tool<br>• Food Delivery Interface<br>• Health Metric Tracker"},
-            {"title": "Career Opportunities", "content": "• iOS Developer<br>• Swift Engineer<br>• Mobile App Architect<br>• Apple Ecosystem Developer"}
+            {"title": "Career Opportunities", "content": "• iOS Developer<br>• Swift Engineer<br>• Mobile App Architect<br>• Apple Ecosystem Developer<br>• Freelance iOS Developer<br>• SwiftUI Specialist<br>• AR/VR App Developer (ARKit)"}
         ],
         "job_url": "https://www.naukri.com/ios-developer-jobs"
     },
@@ -166,7 +166,7 @@ ROADMAPS = {
             {"title": "Advanced Level", "content": "• Design Systems & Component Libraries<br>• Usability Testing & A/B Testing<br>• Handoff to Developers<br>• Advanced Animations"},
             {"title": "Tools & Technologies", "content": "• Figma / Adobe XD<br>• Sketch / InVision<br>• Zeplin<br>• Miro / Balsamiq"},
             {"title": "Projects", "content": "• Re-design a popular App UI<br>• Create a complete E-Commerce Wireframe<br>• Build an Interactive Clickable Prototype<br>• Design a SaaS Dashboard<br>• Mobile App Onboarding Flow<br>• Brand Identity Kit<br>• Accessibility Audit for Web<br>• Micro-interactions Prototype"},
-            {"title": "Career Opportunities", "content": "• UX Researcher<br>• UI Designer<br>• Product Designer<br>• Interaction Designer"}
+            {"title": "Career Opportunities", "content": "• UX Researcher<br>• UI Designer<br>• Product Designer<br>• Interaction Designer<br>• Design System Architect<br>• Freelance UI/UX Consultant<br>• Motion Designer"}
         ],
         "job_url": "https://www.naukri.com/ui-ux-designer-jobs"
     },
@@ -178,7 +178,7 @@ ROADMAPS = {
             {"title": "Advanced Level", "content": "• Framework Designing (Page Object Model)<br>• Load & Performance Testing<br>• Security Testing<br>• CI/CD Pipeline Test Integration"},
             {"title": "Tools & Technologies", "content": "• Selenium WebDriver<br>• Postman / REST Assured<br>• JMeter / LoadRunner<br>• JIRA / Bugzilla"},
             {"title": "Projects", "content": "• Automate a Login Flow over 5 Websites<br>• Perform Load Testing on a REST API<br>• Create a structured Test Report for an open-source app<br>• Cross-browser Compatibility Test Suite<br>• Regression Suite for E-commerce<br>• Performance Profiling for Mobile App<br>• API Automation Framework (REST Assured)<br>• Accessibility Testing Audit"},
-            {"title": "Career Opportunities", "content": "• Quality Assurance (QA) Engineer<br>• Automation Tester<br>• SDET (Software Dev Engineer in Test)<br>• Performance Analyst"}
+            {"title": "Career Opportunities", "content": "• Quality Assurance (QA) Engineer<br>• Automation Test Engineer<br>• SDET (Software Dev Engineer in Test)<br>• Performance Test Analyst<br>• Security Tester<br>• Mobile QA Engineer<br>• Freelance Test Consultant"}
         ],
         "job_url": "https://www.naukri.com/software-testing-jobs"
     },
@@ -190,7 +190,7 @@ ROADMAPS = {
             {"title": "Advanced Level", "content": "• Decentralized Finance (DeFi) Protocols<br>• Smart Contract Security (Reentrancy, Integer Overflow)<br>• Layer 2 Scaling Solutions<br>• Zero-Knowledge Proofs"},
             {"title": "Tools & Technologies", "content": "• Solidity / Rust<br>• Hardhat / Truffle<br>• Web3.js / Ethers.js<br>• Metamask & Infura"},
             {"title": "Projects", "content": "• Create a custom ERC-20 Token<br>• Build a Decentralized Voting DApp<br>• Launch an NFT Marketplace Contract<br>• Supply Chain Tracking System<br>• Decentralized Crowdfunding Platform<br>• Multi-signature Wallet<br>• Staking Dashboard<br>• Blockchain Explorer (Basic)"},
-            {"title": "Career Opportunities", "content": "• Blockchain Developer<br>• Smart Contract Auditor<br>• Web3 Engineer<br>• Protocol Architect"}
+            {"title": "Career Opportunities", "content": "• Blockchain Developer<br>• Smart Contract Auditor<br>• Web3 / DeFi Engineer<br>• Protocol Architect<br>• NFT Platform Developer<br>• Crypto Exchange Developer<br>• Freelance Solidity Developer"}
         ],
         "job_url": "https://www.naukri.com/blockchain-developer-jobs"
     },
@@ -202,7 +202,7 @@ ROADMAPS = {
             {"title": "Advanced Level", "content": "• Artificial Intelligence for NPCs (NavMesh)<br>• Graphics Programming & Shaders<br>• Multiplayer Networking (Netcode)<br>• Memory Optimization & Profiling"},
             {"title": "Tools & Technologies", "content": "• Unity / Unreal Engine<br>• C# / C++<br>• Blender / Maya (3D Assets)<br>• FMOD / Wwise"},
             {"title": "Projects", "content": "• 2D Platformer Prototype<br>• First-person Shooter Demo<br>• Multiplayer Racing Arena<br>• Tile-based Strategy Game<br>• Procedural Dungeon Generator<br>• VR Exploration Scene<br>• Endless Runner (Unity)<br>• Physics-based Puzzle Game"},
-            {"title": "Career Opportunities", "content": "• Gameplay Programmer<br>• Game Designer<br>• Graphics/Engine Programmer<br>• Technical Artist"}
+            {"title": "Career Opportunities", "content": "• Gameplay Programmer<br>• Game Designer<br>• Graphics / Engine Programmer<br>• Technical Artist<br>• VR / AR Developer<br>• Indie Game Developer<br>• Freelance Game Modder"}
         ],
         "job_url": "https://www.naukri.com/game-developer-jobs"
     }
@@ -212,20 +212,32 @@ SKILL_ALIASES = {
     "app development": "android development",
     "mobile app": "android development",
     "android": "android development",
+    "android developer": "android development",
     "ios": "ios development",
+    "ios developer": "ios development",
     "react native": "android development",
     "flutter": "android development",
     "data analyst": "data science",
     "ml": "machine learning",
+    "ml engineer": "machine learning",
     "ai": "artificial intelligence",
+    "ai engineer": "artificial intelligence",
     "web dev": "web development",
+    "web developer": "web development",
     "frontend": "web development",
+    "frontend developer": "web development",
     "backend": "web development",
+    "backend developer": "web development",
     "full stack": "full stack development",
+    "full stack developer": "full stack development",
+    "python developer": "python",
+    "java developer": "java",
     "cpp": "c++",
     "c plus plus": "c++",
+    "c++ developer": "c++",
     "ui design": "ui/ux design",
     "ux design": "ui/ux design",
+    "ui/ux designer": "ui/ux design",
     "tester": "software testing",
     "qa": "software testing",
     "automation": "software testing",
@@ -236,7 +248,9 @@ SKILL_ALIASES = {
     "unity": "game development",
     "unreal": "game development",
     "aws": "cloud computing",
-    "azure": "cloud computing"
+    "azure": "cloud computing",
+    "cloud developer": "cloud computing",
+    "devops engineer": "devops"
 }
 
 RESOURCES_MAP = {

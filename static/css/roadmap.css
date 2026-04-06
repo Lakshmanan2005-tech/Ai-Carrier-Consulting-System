@@ -1,42 +1,1284 @@
-            .interview-q-item {
+            /* =============================================
+               TOP INTERVIEW QUESTIONS — Modern SaaS Card
+               ============================================= */
+
+            /* Fade-in animation */
+            @keyframes iqFadeIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(12px);
+                }
+
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            /* Section wrapper — centers the card */
+            .iq-section-wrapper {
                 display: flex;
-                align-items: flex-start;
-                margin-bottom: 1.2rem;
-                padding-bottom: 1.2rem;
-                border-bottom: 1px solid rgba(108, 99, 255, 0.1);
+                justify-content: center;
+                margin: 3rem auto 0 auto;
+                padding: 0 1rem;
+                animation: iqFadeIn 0.4s ease both;
             }
-            .interview-q-item:last-child {
-                border-bottom: none;
-                margin-bottom: 0;
-                padding-bottom: 0;
+
+            /* Card container */
+            .iq-card {
+                max-width: 650px;
+                width: 100%;
+                background: #ffffff;
+                border-radius: 20px;
+                padding: 24px;
+                transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+                position: relative;
+                z-index: 1;
+                border: 1px solid rgba(99, 102, 241, 0.1);
+                overflow: visible;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
             }
-            .interview-q-item i {
-                color: var(--primary-color);
-                font-size: 1.2rem;
-                margin-right: 1.2rem;
-                margin-top: 0.2rem;
+
+            /* Lightweight Indigo-Violet Glow Effect */
+            .iq-card::before {
+                content: "";
+                position: absolute;
+                inset: -1px;
+                background: linear-gradient(135deg, #6366f1, #9333ea);
+                border-radius: 22px;
+                z-index: -1;
+                opacity: 0;
+                transition: all 0.4s ease;
             }
-            .interview-q-text {
-                color: var(--text-secondary);
-                font-size: 1.05rem;
-                line-height: 1.6;
+
+            .iq-card:hover {
+                transform: translateY(-10px) scale(1.01);
+                box-shadow: 0 20px 40px rgba(99, 102, 241, 0.2), 0 0 20px rgba(99, 102, 241, 0.1);
+                border-color: rgba(99, 102, 241, 0.4);
             }
-            .interview-q-text b {
-                color: var(--primary-color);
+
+            .iq-card:hover::before {
+                opacity: 0.35;
+                filter: blur(14px);
+                transform: scale(1.015);
+            }
+
+            /* Title */
+            .iq-title {
+                font-size: 20px;
+                font-weight: 600;
+                color: #1f2937;
+                text-align: center;
+                margin: 0 0 18px 0;
+            }
+
+            /* Question list */
+            .iq-list {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+                margin-bottom: 20px;
+            }
+
+            /* Individual question item */
+            .iq-item {
+                display: flex;
+                align-items: center;
+                padding: 12px 14px;
+                border-radius: 10px;
+                background: transparent;
+                border: 1px solid rgba(0, 0, 0, 0.05);
+                transition: all 0.2s ease;
+                cursor: pointer;
+            }
+
+            .iq-item:hover {
+                background: rgba(59, 130, 246, 0.05);
+                border-color: #3b82f6;
+                color: #3b82f6;
+                transform: translateX(4px);
+            }
+
+            .iq-item:hover {
+                background: #eef4ff;
+                transform: translateX(3px);
+            }
+
+            /* Circular icon */
+            .iq-icon {
+                width: 28px;
+                height: 28px;
+                min-width: 28px;
+                border-radius: 8px; /* Modern Squircle */
+                background: rgba(59, 130, 246, 0.1);
+                color: #3b82f6;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-right: 12px;
+                flex-shrink: 0;
+            }
+
+            .iq-icon i {
+                font-size: 11px;
+                line-height: 1;
+            }
+
+            /* Question text */
+            .iq-text {
+                font-size: 14.5px;
+                color: #374151;
+                font-weight: 500;
+                line-height: 1.5;
+            }
+
+            .iq-text b,
+            .iq-text strong {
+                color: #4f46e5;
                 font-weight: 600;
             }
-            .resource-row {
-                display: flex; 
-                align-items: center; 
-                padding: 1.2rem 1.5rem; 
-                background: #ffffff; 
-                border-radius: 12px; 
-                text-decoration: none; 
-                transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease;
-                border: 1px solid rgba(108, 99, 255, 0.05);
+
+            /* Buttons area */
+            .iq-actions {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 10px;
+                margin-top: 4px;
             }
-            .resource-row:hover {
-                transform: translateY(-4px);
-                box-shadow: 0 12px 25px rgba(108, 99, 255, 0.12);
-                border-color: rgba(108, 99, 255, 0.2);
+
+            /* Primary gradient button */
+            .iq-btn-primary {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                gap: 6px;
+                width: 100%;
+                max-width: 320px;
+                padding: 12px 20px;
+                background: linear-gradient(135deg, #6366f1, #a855f7);
+                color: #ffffff !important;
+                font-size: 14.5px;
+                font-weight: 700;
+                border: none;
+                border-radius: 12px;
+                text-decoration: none;
+                cursor: pointer;
+                box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
+                transition: all 0.3s ease;
+            }
+
+            .iq-btn-primary:hover {
+                transform: scale(1.03);
+                box-shadow: 0 6px 22px rgba(99, 102, 241, 0.5);
+                color: #ffffff !important;
+            }
+
+            /* Secondary transparent button */
+            .iq-btn-secondary {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                gap: 4px;
+                background: transparent;
+                color: #4f46e5 !important;
+                font-size: 14px;
+                font-weight: 500;
+                border: none;
+                text-decoration: none;
+                cursor: pointer;
+                padding: 6px 12px;
+                border-radius: 8px;
+                transition: background 0.2s ease;
+            }
+
+            .iq-btn-secondary:hover {
+                background: rgba(79, 70, 229, 0.06);
+                color: #4338ca !important;
+            }
+
+            /* ===== Dark Mode Support ===== */
+            body.dark-mode .iq-card {
+                background: #1e293b !important;
+                border: 1px solid rgba(99, 102, 241, 0.3) !important;
+                box-shadow: 0 0 30px rgba(99, 102, 241, 0.1) !important;
+            }
+            body.dark-mode .iq-card:hover {
+                border-color: rgba(99, 102, 241, 0.6) !important;
+                box-shadow: 0 0 40px rgba(99, 102, 241, 0.2) !important;
+            }
+
+            body.dark-mode .iq-card:hover::before {
+                opacity: 0.5;
+                filter: blur(20px);
+            }
+
+            body.dark-mode .iq-title {
+                color: #ffffff !important;
+            }
+
+            body.dark-mode .iq-item {
+                background: rgba(255, 255, 255, 0.05) !important;
+                border-color: rgba(255, 255, 255, 0.08) !important;
+            }
+
+            body.dark-mode .iq-item:hover {
+                background: rgba(99, 102, 241, 0.15) !important;
+            }
+
+            body.dark-mode .iq-icon {
+                background: rgba(59, 130, 246, 0.2) !important;
+                color: #3b82f6 !important;
+            }
+
+            body.dark-mode .iq-text {
+                color: #cbd5e1 !important;
+            }
+
+            body.dark-mode .iq-text b,
+            body.dark-mode .iq-text strong {
+                color: #a5b4fc !important;
+            }
+
+            body.dark-mode .iq-btn-secondary {
+                color: #a5b4fc !important;
+            }
+
+            body.dark-mode .iq-btn-secondary:hover {
+                background: rgba(99, 102, 241, 0.1) !important;
+            }
+
+            /* ===== Mobile Responsive ===== */
+            @media (max-width: 600px) {
+                .iq-section-wrapper {
+                    padding: 0 12px !important;
+                    margin-top: 2rem !important;
+                    width: 100% !important;
+                    box-sizing: border-box !important;
+                }
+            
+                .iq-card {
+                    padding: 16px 14px !important;
+                    border-radius: 12px !important;
+                    width: 100% !important;
+                    max-width: 100% !important;
+                }
+            
+                .iq-title {
+                    font-size: 18px;
+                    margin-bottom: 14px !important;
+                }
+            
+                .iq-item {
+                    padding: 10px 10px;
+                    gap: 8px;
+                }
+            
+                .iq-icon {
+                    width: 24px;
+                    height: 24px;
+                    min-width: 24px;
+                    margin-right: 8px;
+                }
+            
+                .iq-icon i {
+                    font-size: 10px;
+                }
+            
+                .iq-text {
+                    font-size: 13px;
+                }
+            
+                .iq-actions {
+                    padding: 0 5px !important;
+                    width: 100% !important;
+                }
+            
+                .iq-btn-primary {
+                    max-width: 100% !important;
+                    width: 100% !important;
+                    font-size: 14px;
+                    padding: 11px 14px;
+                }
+
+                .iq-btn-secondary {
+                    font-size: 13px;
+                    padding: 8px 12px;
+                }
+            }
+
+
+            /* =============================================
+               LEARNING RESOURCES — Modern SaaS Card
+               ============================================= */
+
+            /* Fade-in animation (reuses iqFadeIn if already defined) */
+            @keyframes lrFadeIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(12px);
+                }
+
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            /* Section wrapper — centers the card */
+            .lr-section-wrapper {
+                display: flex;
+                justify-content: center;
+                margin: 3rem auto 0 auto;
+                padding: 0 1rem;
+                animation: lrFadeIn 0.4s ease both;
+            }
+
+            /* Card container */
+            .lr-card {
+                max-width: 650px;
+                width: 100%;
+                background: #ffffff;
+                border-radius: 20px;
+                padding: 24px;
+                transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+                position: relative;
+                z-index: 1;
+                border: 1px solid rgba(16, 185, 129, 0.1);
+                overflow: visible;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            }
+
+            /* Lightweight Emerald-Teal Glow Effect */
+            .lr-card::before {
+                content: "";
+                position: absolute;
+                inset: -1px;
+                background: linear-gradient(135deg, #10b981, #34d399);
+                border-radius: 22px;
+                z-index: -1;
+                opacity: 0;
+                transition: all 0.4s ease;
+            }
+
+            .lr-card:hover {
+                transform: translateY(-10px) scale(1.01);
+                box-shadow: 0 20px 40px rgba(16, 185, 129, 0.2), 0 0 20px rgba(16, 185, 129, 0.1);
+                border-color: rgba(16, 185, 129, 0.4);
+            }
+
+            .lr-card:hover::before {
+                opacity: 0.35;
+                filter: blur(14px);
+                transform: scale(1.015);
+            }
+
+            /* Title */
+            .lr-title {
+                font-size: 20px;
+                font-weight: 600;
+                color: #1f2937;
+                text-align: center;
+                margin: 0 0 16px 0;
+            }
+
+            /* Resource list */
+            .lr-list {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            /* Individual resource item */
+            .lr-item {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 14px;
+                border-radius: 10px;
+                background: transparent;
+                border: 1px solid rgba(0, 0, 0, 0.05);
+                text-decoration: none;
+                transition: all 0.25s ease;
+                cursor: pointer;
+            }
+
+            .lr-item:hover {
+                background: rgba(59, 130, 246, 0.05);
+                border-color: #3b82f6;
+                transform: translateY(-2px);
+            }
+
+            .lr-item:hover {
+                background: #eef4ff;
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(99, 102, 241, 0.08);
+            }
+
+            /* Left side: icon + text */
+            .lr-item-left {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                flex: 1;
+                min-width: 0;
+            }
+
+            /* Circular icon */
+            .lr-icon {
+                width: 28px;
+                height: 28px;
+                min-width: 28px;
+                border-radius: 8px; /* Modern Squircle */
+                background: rgba(59, 130, 246, 0.1);
+                color: #3b82f6;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                flex-shrink: 0;
+            }
+
+            .lr-icon i {
+                font-size: 11px;
+                line-height: 1;
+            }
+
+            /* Text block */
+            .lr-text-block {
+                display: flex;
+                flex-direction: column;
+                gap: 2px;
+                min-width: 0;
+            }
+
+            .lr-name {
+                font-size: 15px;
+                font-weight: 600;
+                color: #111827;
+                line-height: 1.3;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            .lr-desc {
+                font-size: 13px;
+                color: #6b7280;
+                line-height: 1.4;
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                line-clamp: 2;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+            }
+
+            /* External link icon (right side) */
+            .lr-external-icon {
+                color: #6b7280;
+                font-size: 13px;
+                margin-left: 12px;
+                flex-shrink: 0;
+                transition: color 0.2s ease;
+            }
+
+            .lr-item:hover .lr-external-icon {
+                color: #3b82f6;
+            }
+
+            /* ===== Dark Mode Support ===== */
+            body.dark-mode .lr-card {
+                background: #1e1e1e !important;
+                border: 1px solid rgba(16, 185, 129, 0.3) !important;
+                box-shadow: 0 0 20px rgba(16, 185, 129, 0.1) !important;
+            }
+
+            body.dark-mode .lr-card::before {
+                opacity: 0.2;
+                filter: blur(12px);
+                background: radial-gradient(circle, #34d399, transparent 70%);
+            }
+
+            body.dark-mode .lr-card:hover {
+                box-shadow: 0 0 35px rgba(16, 185, 129, 0.2) !important;
+                border-color: rgba(16, 185, 129, 0.5) !important;
+            }
+
+            body.dark-mode .lr-card:hover::before {
+                opacity: 0.5;
+                filter: blur(20px);
+            }
+
+            body.dark-mode .lr-title {
+                color: #ffffff !important;
+            }
+
+            body.dark-mode .lr-item {
+                background: rgba(255, 255, 255, 0.05) !important;
+                border-color: rgba(255, 255, 255, 0.08) !important;
+            }
+
+            body.dark-mode .lr-item:hover {
+                background: rgba(99, 102, 241, 0.15) !important;
+            }
+
+            body.dark-mode .lr-icon {
+                background: rgba(99, 102, 241, 0.2) !important;
+                color: #a5b4fc !important;
+            }
+
+            body.dark-mode .lr-name {
+                color: #f1f5f9 !important;
+            }
+
+            body.dark-mode .lr-desc {
+                color: #94a3b8 !important;
+            }
+
+            body.dark-mode .lr-external-icon {
+                color: #64748b !important;
+            }
+
+            body.dark-mode .lr-item:hover .lr-external-icon {
+                color: #a5b4fc !important;
+            }
+
+            /* ===== Mobile Responsive ===== */
+            @media (max-width: 600px) {
+                .lr-section-wrapper {
+                    padding: 0 0.8rem;
+                    margin-top: 2rem !important;
+                }
+
+                .lr-card {
+                    padding: 16px 16px;
+                    border-radius: 14px;
+                }
+
+                .lr-title {
+                    font-size: 18px;
+                }
+
+                .lr-item {
+                    padding: 12px;
+                }
+
+                .lr-icon {
+                    width: 24px;
+                    height: 24px;
+                    min-width: 24px;
+                }
+
+                .lr-icon i {
+                    font-size: 10px;
+                }
+
+                .lr-name {
+                    font-size: 14px;
+                }
+
+                .lr-desc {
+                    font-size: 12px;
+                }
+            }
+
+
+            /* =============================================
+               CAREER MOVE — Modern SaaS Cards
+               ============================================= */
+
+            @keyframes cmFadeIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(14px);
+                }
+
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            /* Top Separator Line */
+            .cm-separator {
+                width: 100%;
+                height: 1px;
+                background: rgba(0, 0, 0, 0.05);
+                margin: 30px 0 20px 0;
+            }
+
+            /* Section wrapper */
+            .cm-section-wrapper {
+                max-width: 900px;
+                margin: 0 auto 40px auto;
+                /* Added bottom margin */
+                padding: 30px 1rem 20px 1rem;
+                animation: cmFadeIn 0.4s ease both;
+            }
+
+            /* Title */
+            .cm-title {
+                font-size: 24px;
+                font-weight: 600;
+                color: #111827;
+                text-align: center;
+                margin: 0 0 6px 0;
+                /* Updated margin-bottom */
+            }
+
+            /* Subtitle */
+            .cm-subtitle {
+                font-size: 14px;
+                color: #6b7280;
+                text-align: center;
+                margin: 0 0 16px 0;
+                /* Updated margins */
+            }
+
+            /* Card grid */
+            .cm-grid {
+                display: flex;
+                justify-content: center;
+                align-items: stretch;
+                /* Cards stretch to equal height */
+                gap: 20px;
+                flex-wrap: wrap;
+            }
+
+            /* Individual card */
+            .cm-card {
+                background: #ffffff;
+                border-radius: 20px;
+                padding: 28px 22px;
+                width: 260px;
+                border: 1px solid rgba(0, 0, 0, 0.04);
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+                transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.04);
+            }
+
+            /* When cursor enters section, ALL cards start glowing softly with unique colors */
+            .cm-section-wrapper:hover .cm-card:nth-child(3n+1) {
+                box-shadow: 0 0 25px rgba(59, 130, 246, 0.2);
+                border-color: rgba(59, 130, 246, 0.3);
+            }
+
+            .cm-section-wrapper:hover .cm-card:nth-child(3n+2) {
+                box-shadow: 0 0 25px rgba(168, 85, 247, 0.2);
+                border-color: rgba(168, 85, 247, 0.3);
+            }
+
+            .cm-section-wrapper:hover .cm-card:nth-child(3n+3) {
+                box-shadow: 0 0 25px rgba(16, 185, 129, 0.2);
+                border-color: rgba(16, 185, 129, 0.3);
+            }
+
+            /* The specific card being hovered glows intensely and lifts */
+            .cm-section-wrapper .cm-card:nth-child(3n+1):hover {
+                transform: translateY(-12px) scale(1.03);
+                box-shadow: 0 20px 40px rgba(59, 130, 246, 0.4), 0 0 30px rgba(59, 130, 246, 0.25);
+                border-color: rgba(59, 130, 246, 0.7);
+            }
+
+            .cm-section-wrapper .cm-card:nth-child(3n+2):hover {
+                transform: translateY(-12px) scale(1.03);
+                box-shadow: 0 20px 40px rgba(168, 85, 247, 0.4), 0 0 30px rgba(168, 85, 247, 0.25);
+                border-color: rgba(168, 85, 247, 0.7);
+            }
+
+            .cm-section-wrapper .cm-card:nth-child(3n+3):hover {
+                transform: translateY(-12px) scale(1.03);
+                box-shadow: 0 20px 40px rgba(16, 185, 129, 0.4), 0 0 30px rgba(16, 185, 129, 0.25);
+                border-color: rgba(16, 185, 129, 0.7);
+            }
+
+            /* Icon */
+            .cm-icon {
+                width: 40px;
+                height: 40px;
+                border-radius: 10px; /* Modern Squircle */
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 16px;
+                flex-shrink: 0;
+                margin-bottom: 12px;
+                background: rgba(59, 130, 246, 0.1) !important;
+                color: #3b82f6 !important;
+                border: 1px solid rgba(59, 130, 246, 0.2);
+            }
+
+            /* Role title */
+            .cm-role {
+                font-size: 17px;
+                font-weight: 600;
+                color: #1f2937;
+                margin: 0 0 8px 0;
+            }
+
+            /* Description */
+            .cm-desc {
+                font-size: 13.5px;
+                color: #6b7280;
+                margin: 0 0 20px 0;
+                line-height: 1.6;
+                flex: 1;
+            }
+
+            /* Apply button */
+            .cm-btn {
+                display: block;
+                width: 100%;
+                margin-top: auto;
+                padding: 12px;
+                color: #ffffff !important;
+                font-size: 15px;
+                font-weight: 500;
+                border: none;
+                border-radius: 10px;
+                text-decoration: none;
+                text-align: center;
+                cursor: pointer;
+                transition: transform 0.25s ease, box-shadow 0.25s ease;
+            }
+
+            .cm-card:nth-child(3n+1) .cm-btn {
+                background: linear-gradient(135deg, #3b82f6, #60a5fa);
+                box-shadow: 0 6px 18px rgba(59, 130, 246, 0.3);
+            }
+
+            .cm-card:nth-child(3n+2) .cm-btn {
+                background: linear-gradient(135deg, #a855f7, #c084fc);
+                box-shadow: 0 6px 18px rgba(168, 85, 247, 0.3);
+            }
+
+            .cm-card:nth-child(3n+3) .cm-btn {
+                background: linear-gradient(135deg, #10b981, #34d399);
+                box-shadow: 0 6px 18px rgba(16, 185, 129, 0.3);
+            }
+
+            .cm-card:nth-child(3n+1) .cm-btn:hover {
+                transform: scale(1.03);
+                box-shadow: 0 6px 22px rgba(59, 130, 246, 0.5);
+            }
+
+            .cm-card:nth-child(3n+2) .cm-btn:hover {
+                transform: scale(1.03);
+                box-shadow: 0 6px 22px rgba(168, 85, 247, 0.5);
+            }
+
+            .cm-card:nth-child(3n+3) .cm-btn:hover {
+                transform: scale(1.03);
+                box-shadow: 0 6px 22px rgba(16, 185, 129, 0.5);
+            }
+
+            /* ===== Dark Mode ===== */
+            body.dark-mode .cm-title {
+                color: #ffffff !important;
+            }
+
+            body.dark-mode .cm-subtitle {
+                color: #94a3b8 !important;
+            }
+
+            body.dark-mode .cm-card {
+                background: #1e1e1e !important;
+                border: 1px solid rgba(59, 130, 246, 0.4) !important;
+                box-shadow: 0 0 20px rgba(59, 130, 246, 0.2) !important;
+            }
+
+            body.dark-mode .cm-card:nth-child(3n+1) {
+                border: 1px solid rgba(59, 130, 246, 0.4) !important;
+                box-shadow: 0 0 20px rgba(59, 130, 246, 0.15) !important;
+            }
+
+            body.dark-mode .cm-card:nth-child(3n+2) {
+                border: 1px solid rgba(168, 85, 247, 0.4) !important;
+                box-shadow: 0 0 20px rgba(168, 85, 247, 0.15) !important;
+            }
+
+            body.dark-mode .cm-card:nth-child(3n+3) {
+                border: 1px solid rgba(16, 185, 129, 0.4) !important;
+                box-shadow: 0 0 20px rgba(16, 185, 129, 0.15) !important;
+            }
+
+            body.dark-mode .cm-section-wrapper:hover .cm-card:nth-child(3n+1) {
+                box-shadow: 0 0 25px rgba(59, 130, 246, 0.3) !important;
+                border-color: rgba(59, 130, 246, 0.6) !important;
+            }
+
+            body.dark-mode .cm-section-wrapper:hover .cm-card:nth-child(3n+2) {
+                box-shadow: 0 0 25px rgba(168, 85, 247, 0.3) !important;
+                border-color: rgba(168, 85, 247, 0.6) !important;
+            }
+
+            body.dark-mode .cm-section-wrapper:hover .cm-card:nth-child(3n+3) {
+                box-shadow: 0 0 25px rgba(16, 185, 129, 0.3) !important;
+                border-color: rgba(16, 185, 129, 0.6) !important;
+            }
+
+            body.dark-mode .cm-section-wrapper .cm-card:nth-child(3n+1):hover {
+                box-shadow: 0 0 35px rgba(59, 130, 246, 0.5), inset 0 0 15px rgba(59, 130, 246, 0.1) !important;
+                border-color: rgba(59, 130, 246, 0.8) !important;
+                transform: translateY(-8px) scale(1.02);
+            }
+
+            body.dark-mode .cm-section-wrapper .cm-card:nth-child(3n+2):hover {
+                box-shadow: 0 0 35px rgba(168, 85, 247, 0.5), inset 0 0 15px rgba(168, 85, 247, 0.1) !important;
+                border-color: rgba(168, 85, 247, 0.8) !important;
+                transform: translateY(-8px) scale(1.02);
+            }
+
+            body.dark-mode .cm-section-wrapper .cm-card:nth-child(3n+3):hover {
+                box-shadow: 0 0 35px rgba(16, 185, 129, 0.5), inset 0 0 15px rgba(16, 185, 129, 0.1) !important;
+                border-color: rgba(16, 185, 129, 0.8) !important;
+                transform: translateY(-8px) scale(1.02);
+            }
+
+            body.dark-mode .cm-card:nth-child(3n+1) .cm-icon {
+                background: rgba(59, 130, 246, 0.2) !important;
+                color: #60a5fa !important;
+            }
+
+            body.dark-mode .cm-card:nth-child(3n+2) .cm-icon {
+                background: rgba(168, 85, 247, 0.2) !important;
+                color: #c084fc !important;
+            }
+
+            body.dark-mode .cm-card:nth-child(3n+3) .cm-icon {
+                background: rgba(16, 185, 129, 0.2) !important;
+                color: #34d399 !important;
+            }
+
+            body.dark-mode .cm-role {
+                color: #f1f5f9 !important;
+            }
+
+            body.dark-mode .cm-desc {
+                color: #94a3b8 !important;
+            }
+
+            /* ===== Mobile Responsive ===== */
+            @media (max-width: 768px) {
+                .cm-section-wrapper {
+                    margin-top: 20px;
+                    padding-top: 10px;
+                }
+            }
+
+            @media (max-width: 860px) {
+                .cm-grid {
+                    justify-content: center;
+                }
+
+                .cm-card {
+                    width: calc(50% - 12px);
+                    min-width: 220px;
+                }
+            }
+
+            @media (max-width: 560px) {
+                .cm-section-wrapper {
+                    padding: 20px 0.8rem 16px 0.8rem;
+                }
+
+                .cm-title {
+                    font-size: 20px;
+                }
+
+                .cm-subtitle {
+                    font-size: 13px;
+                }
+
+                .cm-grid {
+                    flex-direction: column;
+                    align-items: center;
+                    gap: 14px;
+                }
+
+                .cm-card {
+                    width: 100%;
+                    max-width: 340px;
+                }
+            }
+
+            /* --- Topic Pill Design for Grid Cards --- */
+            .grid-card-content li,
+            .grid-card-content p {
+                background: #f8fafc;
+                /* light clean white */
+                border-radius: 10px;
+                padding: 6px 12px !important;
+                margin: 0 0 8px 0 !important;
+
+                display: block !important;
+                border: 1px solid rgba(0, 0, 0, 0.05);
+                transition: all 0.2s ease;
+                list-style: none !important;
+                line-height: 1.4 !important;
+            }
+
+            .grid-card-content li:hover,
+            .grid-card-content p:hover {
+                background: #eef2ff;
+                transform: translateX(2px);
+                box-shadow: 0 4px 12px rgba(99, 102, 241, 0.08);
+            }
+
+            /* EMOJI / ICON FIX */
+            .grid-card-content li span:first-child,
+            .grid-card-content p span:first-child {
+                display: inline-block !important;
+                width: 20px !important;
+                text-align: center !important;
+                margin-right: 6px !important;
+                vertical-align: middle !important;
+            }
+
+            /* TEXT FIX */
+            .grid-card-content li span:last-child,
+            .grid-card-content p span:last-child {
+                display: inline !important;
+                vertical-align: middle !important;
+            }
+
+            /* Dark Mode Support */
+            body.dark-mode .grid-card-content li,
+            body.dark-mode .grid-card-content p {
+                background: rgba(255, 255, 255, 0.05) !important;
+                border: 1px solid rgba(255, 255, 255, 0.08) !important;
+                color: rgba(255, 255, 255, 0.9) !important;
+            }
+
+            body.dark-mode .grid-card-content li:hover,
+            body.dark-mode .grid-card-content p:hover {
+                background: rgba(99, 102, 241, 0.15) !important;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2) !important;
+            }
+
+            /* --- Card Layout & Spacing Tweaks --- */
+            .grid-card-modern {
+                min-height: 300px !important;
+                display: flex !important;
+                flex-direction: column !important;
+                justify-content: space-between !important;
+                padding: 18px !important;
+            }
+
+            /* --- Card Title & Icon Centering (Desktop & Global) --- */
+            .grid-card-modern .title-icon,
+            .grid-card-modern .card-icon-wrapper {
+                margin-left: auto !important;
+                margin-right: auto !important;
+                display: flex !important;
+                justify-content: center !important;
+                align-items: center !important;
+            }
+
+            .grid-card-modern .card-title {
+                justify-content: center !important;
+                text-align: center !important;
+                width: 100% !important;
+                margin-top: -4px !important;
+                margin-bottom: 6px !important;
+                display: flex !important;
+                align-items: center !important;
+                gap: 10px !important;
+            }
+
+            .grid-card-content {
+                margin-top: 4px !important;
+                /* reduce top gap */
+                display: flex !important;
+                flex-direction: column !important;
+                gap: 12px !important;
+                /* consistent gap like aptitude card */
+                flex: 1 !important;
+            }
+
+            .grid-card-modern hr,
+            .grid-card-modern .divider {
+                margin: 6px 0 !important;
+                /* reduce large divider gaps */
+            }
+
+            .grid-card-content li {
+                margin: 0 !important;
+                padding: 8px 10px !important;
+                /* same inner spacing as aptitude */
+                background: rgba(0, 0, 0, 0.03) !important;
+                /* subtle boxed background */
+                border-radius: 8px !important;
+                line-height: 1.5 !important;
+                color: #111 !important;
+                /* darker text for readability */
+                font-weight: 500 !important;
+                /* slightly bolder */
+            }
+
+            /* Ensure nested spans inherit or follow dark rules */
+            .grid-card-content li span:last-child {
+                color: #111 !important;
+                font-weight: 500 !important;
+            }
+
+            /* Secondary small text contrast */
+            .grid-card-content li small,
+            .grid-card-content li span.secondary {
+                color: #444 !important;
+            }
+
+            /* Dark Mode Support for boxed items and text */
+            body.dark-mode .grid-card-content li,
+            body.dark-mode .grid-card-content li span:last-child {
+                background: rgba(255, 255, 255, 0.05) !important;
+                color: #f1f1f1 !important;
+            }
+
+            body.dark-mode .grid-card-content li small,
+            body.dark-mode .grid-card-content li span.secondary {
+                color: #ccc !important;
+            }
+
+            /* --- Responsive Card Width Constraints --- */
+            .grid-card-modern {
+                max-width: 420px !important;
+                width: 100% !important;
+                margin-left: auto !important;
+                margin-right: auto !important;
+            }
+
+            .grid-layout-system,
+            .roadmap-cards-grid {
+                display: flex !important;
+                flex-wrap: wrap !important;
+                justify-content: center !important;
+                gap: 20px !important;
+            }
+
+            /* --- Industrial Workflow Card Undo (Restore Original Size) --- */
+            .workflow-card {
+                width: 280px !important;
+                min-width: 280px !important;
+                max-width: 280px !important;
+                flex-shrink: 0 !important;
+                margin: 0 !important;
+                /* remove auto-margins from global grid-card override */
+            }
+
+            /* Dark Mode Support for Workflow Cards */
+            body.dark-mode .workflow-card {
+                background: rgba(255, 255, 255, 0.05) !important;
+                border-color: rgba(255, 255, 255, 0.1) !important;
+            }
+
+            body.dark-mode .workflow-card:hover {
+                background: rgba(255, 255, 255, 0.08) !important;
+            }
+
+            /* Tablet Width Constraints */
+            @media (max-width: 992px) {
+                .grid-card-modern {
+                    max-width: 380px !important;
+                }
+            }
+
+            /* Mobile Full Width (Safety) */
+            @media (max-width: 576px) {
+                .grid-card-modern {
+                    max-width: 100% !important;
+                    margin: 0 !important;
+                }
+            }
+
+            /* --- Final Advice Section - Image Accurate Horizontal View --- */
+            .final-advice-card .grid-card-content {
+                display: grid !important;
+                grid-template-columns: 1fr 1fr !important;
+                /* 🔥 2 columns like photo */
+                gap: 16px 24px !important;
+                margin-top: 2rem !important;
+                max-width: 800px !important;
+                margin-left: auto !important;
+                margin-right: auto !important;
+            }
+
+            .final-advice-card .grid-card-content ul {
+                display: contents !important;
+            }
+
+            .advice-pill-item {
+                background: #fdf6e7 !important;
+                /* Creamy/tan background from photo */
+                padding: 14px 28px !important;
+                border-radius: 50px !important;
+                color: #333 !important;
+                font-weight: 500 !important;
+                font-size: 0.95rem !important;
+                text-align: center !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                border: 1px solid rgba(0, 0, 0, 0.04) !important;
+                min-height: 52px !important;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02) !important;
+                white-space: nowrap !important;
+                transition: transform 0.3s ease !important;
+            }
+
+            .advice-pill-item:hover {
+                transform: translateY(-2px);
+                background: #f9f0d5 !important;
+            }
+
+            .advice-pill-item span {
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                position: relative !important;
+                top: 2px !important;
+            }
+
+            .final-advice-card {
+                max-width: 1200px !important;
+                /* 🔥 Full width horizontal bar */
+                width: 100% !important;
+                margin: 4rem auto !important;
+                padding: 45px 30px !important;
+                /* Spacious like photo */
+                border-radius: 20px !important;
+                box-shadow: 0 15px 50px rgba(0, 0, 0, 0.03) !important;
+                background: #ffffff !important;
+            }
+
+            body.dark-mode .final-advice-card {
+                background: rgba(255, 255, 255, 0.02) !important;
+                border: 1px solid rgba(255, 255, 255, 0.08) !important;
+            }
+
+            .final-advice-card .card-title {
+                text-align: center !important;
+                justify-content: center !important;
+                margin-bottom: 1.5rem !important;
+            }
+
+            /* --- Comprehensive Mobile Optimization --- */
+            @media (max-width: 650px) {
+
+                /* Container & Padding */
+                .roadmap-container {
+                    padding: 0.8rem !important;
+                }
+
+                .roadmap-header-centered {
+                    padding: 0 0.5rem !important;
+                    margin-bottom: 2rem !important;
+                }
+
+                /* Font Scaling */
+                .roadmap-title {
+                    font-size: 1.8rem !important;
+                    word-wrap: break-word !important;
+                }
+
+                .roadmap-header-centered p {
+                    font-size: 1rem !important;
+                }
+
+                /* Grid Layout System */
+                .grid-layout-system,
+                .roadmap-cards-grid {
+                    display: flex !important;
+                    flex-direction: column !important;
+                    align-items: center !important;
+                    gap: 16px !important;
+                    width: 100% !important;
+                }
+
+                /* Standard Grid Cards */
+                .grid-card-modern {
+                    max-width: 100% !important;
+                    width: 100% !important;
+                    margin: 0 0 10px 0 !important;
+                    min-height: auto !important;
+                    padding: 1.25rem !important;
+                }
+
+                /* Final Advice Section - Mobile Pill Design Only */
+                .final-advice-card .grid-card-content {
+                    display: grid !important;
+                    grid-template-columns: 1fr !important;
+                    gap: 12px !important;
+                    margin-top: 1.5rem !important;
+                }
+
+                .final-advice-card .grid-card-content ul {
+                    display: contents !important;
+                }
+
+                .advice-pill-item {
+                    background: #fdf6e7 !important;
+                    padding: 12px 20px !important;
+                    border-radius: 40px !important;
+                    color: #333 !important;
+                    font-weight: 500 !important;
+                    font-size: 0.9rem !important;
+                    text-align: center !important;
+                    display: flex !important;
+                    align-items: center !important;
+                    justify-content: center !important;
+                    border: 1px solid rgba(0, 0, 0, 0.05) !important;
+                    min-height: 44px !important;
+                    margin-bottom: 8px !important;
+                }
+
+                .advice-pill-item span {
+                    display: flex !important;
+                    align-items: center !important;
+                    justify-content: center !important;
+                    position: relative !important;
+                    top: 2px !important;
+                }
+
+                body.dark-mode .advice-pill-item {
+                    background: rgba(255, 255, 255, 0.08) !important;
+                    border-color: rgba(255, 255, 255, 0.1) !important;
+                    color: #f1f1f1 !important;
+                }
+
+                .final-advice-card .card-title {
+                    font-size: 1.3rem !important;
+                }
+
+                .card-title {
+                    text-align: center !important;
+                    justify-content: center !important;
+                    width: 100% !important;
+                }
+
+                /* Aptitude Card Specific Mobile Fix */
+                .final-advice-card[style*="rgba(59, 130, 246, 0.4)"] [style*="position: absolute"] {
+                    position: relative !important;
+                    display: inline-block !important;
+                    top: 0 !important;
+                    right: 0 !important;
+                    margin-bottom: 1rem !important;
+                }
+            }
+
+            /* Extra Small Screen Fixes (iPhone SE / Fold) */
+            @media (max-width: 380px) {
+                .roadmap-title {
+                    font-size: 1.6rem !important;
+                }
+
+                .grid-card-modern {
+                    padding: 1rem !important;
+                }
+
+                .card-title {
+                    font-size: 1.1rem !important;
+                }
             }

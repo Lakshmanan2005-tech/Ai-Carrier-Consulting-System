@@ -3,280 +3,180 @@
     .mnc-hiring-section-wrapper {
         width: 100%;
         max-width: 850px;
-        height: 78vh;
+        height: 72vh;
         margin: 0 auto;
         padding: 1.5rem;
         overflow-y: auto;
         scroll-behavior: smooth;
         scroll-snap-type: y proximity;
         scrollbar-width: thin;
-        scrollbar-color: rgba(99, 102, 241, 0.25) transparent;
+        scrollbar-color: rgba(109, 40, 217, 0.2) transparent;
         border-radius: 20px;
-        background: rgba(248, 250, 252, 0.5);
-        border: 1px solid #f1f5f9;
+        background: rgba(245, 243, 255, 0.5);
+        border: 1px solid #ede9fe;
     }
 
-    .mnc-hiring-section-wrapper::-webkit-scrollbar {
-        width: 5px;
-    }
+    .mnc-hiring-section-wrapper::-webkit-scrollbar { width: 5px; }
+    .mnc-hiring-section-wrapper::-webkit-scrollbar-thumb { background: rgba(109, 40, 217, 0.2); border-radius: 10px; }
+    .mnc-hiring-section-wrapper::-webkit-scrollbar-track { background: transparent; }
 
-    .mnc-hiring-section-wrapper::-webkit-scrollbar-thumb {
-        background: rgba(99, 102, 241, 0.25);
-        border-radius: 10px;
-    }
-
-    .mnc-hiring-section-wrapper::-webkit-scrollbar-track {
-        background: transparent;
-    }
-
-    .mnc-section-container {
-        display: flex;
-        flex-direction: column;
-        gap: 1.5rem;
-        width: 100%;
-    }
+    .mnc-section-container { display: flex; flex-direction: column; gap: 1.2rem; width: 100%; }
 
     .mnc-hiring-card {
-        --accent: #6366f1;
-        --accent-light: rgba(99, 102, 241, 0.08);
-        --accent-glow: rgba(99, 102, 241, 0.25);
+        --accent: #6d28d9;
+        --accent-light: rgba(109, 40, 217, 0.06);
+        --accent-glow: rgba(109, 40, 217, 0.18);
         background: #ffffff;
-        border-radius: var(--radius-lg);
-        padding: 1.5rem 1.8rem;
-        box-shadow: var(--shadow-md);
-        border: 1px solid var(--border-color);
-        border-top: 3px solid var(--accent);
-        transition: all 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        border-radius: 16px;
+        padding: 1.4rem 1.8rem;
+        box-shadow: 0 2px 10px rgba(109, 40, 217, 0.06);
+        border: 1px solid #ede9fe;
+        border-left: 4px solid var(--accent);
+        transition: all 0.3s ease;
         display: flex;
         flex-direction: column;
         gap: 1rem;
         opacity: 0;
-        transform: translateY(20px);
-        position: relative;
-        overflow: hidden;
+        transform: translateY(16px);
         scroll-snap-align: start;
     }
 
-    .mnc-hiring-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 100%;
-        background: linear-gradient(135deg, var(--accent-light), transparent 60%);
-        opacity: 0;
-        transition: opacity 0.35s ease;
-        pointer-events: none;
-    }
+    .mnc-hiring-card.scroll-reveal.visible { opacity: 1; transform: translateY(0); }
+    .mnc-hiring-card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px var(--accent-glow); }
 
-    .mnc-hiring-card:hover::before {
-        opacity: 1;
-    }
+    .mnc-card-blue    { --accent: #3b82f6; --accent-light: rgba(59,130,246,0.06); --accent-glow: rgba(59,130,246,0.15); }
+    .mnc-card-teal    { --accent: #14b8a6; --accent-light: rgba(20,184,166,0.06); --accent-glow: rgba(20,184,166,0.15); }
+    .mnc-card-rose    { --accent: #f43f5e; --accent-light: rgba(244,63,94,0.06);  --accent-glow: rgba(244,63,94,0.15); }
+    .mnc-card-amber   { --accent: #f59e0b; --accent-light: rgba(245,158,11,0.06); --accent-glow: rgba(245,158,11,0.15); }
+    .mnc-card-emerald { --accent: #10b981; --accent-light: rgba(16,185,129,0.06); --accent-glow: rgba(16,185,129,0.15); }
+    .mnc-card-violet  { --accent: #8b5cf6; --accent-light: rgba(139,92,246,0.06); --accent-glow: rgba(139,92,246,0.15); }
+    .mnc-card-pink    { --accent: #ec4899; --accent-light: rgba(236,72,153,0.06); --accent-glow: rgba(236,72,153,0.15); }
 
-    .mnc-hiring-card.scroll-reveal.visible {
-        opacity: 1;
-        transform: translateY(0);
-    }
-
-    .mnc-hiring-card:hover {
-        transform: translateY(-6px);
-        box-shadow: 0 12px 30px var(--accent-glow);
-        border-color: var(--accent);
-    }
-
-    /* Per-card accent colors */
-    .mnc-card-blue {
-        --accent: #3b82f6;
-        --accent-light: rgba(59, 130, 246, 0.07);
-        --accent-glow: rgba(59, 130, 246, 0.2);
-    }
-
-    .mnc-card-teal {
-        --accent: #14b8a6;
-        --accent-light: rgba(20, 184, 166, 0.07);
-        --accent-glow: rgba(20, 184, 166, 0.2);
-    }
-
-    .mnc-card-rose {
-        --accent: #f43f5e;
-        --accent-light: rgba(244, 63, 94, 0.07);
-        --accent-glow: rgba(244, 63, 94, 0.2);
-    }
-
-    .mnc-card-amber {
-        --accent: #f59e0b;
-        --accent-light: rgba(245, 158, 11, 0.07);
-        --accent-glow: rgba(245, 158, 11, 0.2);
-    }
-
-    .mnc-card-emerald {
-        --accent: #10b981;
-        --accent-light: rgba(16, 185, 129, 0.07);
-        --accent-glow: rgba(16, 185, 129, 0.2);
-    }
-
-    .mnc-card-violet {
-        --accent: #8b5cf6;
-        --accent-light: rgba(139, 92, 246, 0.07);
-        --accent-glow: rgba(139, 92, 246, 0.2);
-    }
-
-    .mnc-card-pink {
-        --accent: #ec4899;
-        --accent-light: rgba(236, 72, 153, 0.07);
-        --accent-glow: rgba(236, 72, 153, 0.2);
-    }
-
-    .mnc-card-header {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-    }
+    .mnc-card-header { display: flex; align-items: center; gap: 0.75rem; }
 
     .mnc-month-icon {
-        width: 36px;
-        height: 36px;
-        border-radius: 10px;
-        background: var(--accent-light);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
+        width: 36px; height: 36px; border-radius: 10px;
+        background: var(--accent-light); display: flex;
+        align-items: center; justify-content: center; flex-shrink: 0;
     }
+    .mnc-month-icon i { color: var(--accent); font-size: 1rem; }
 
-    .mnc-month-icon i {
-        color: var(--accent);
-        font-size: 1rem;
-    }
+    .mnc-month-label { font-size: 1.1rem; font-weight: 800; color: #1e293b; margin: 0; }
 
-    .mnc-month-label {
-        font-size: 1.25rem;
-        font-weight: 800;
-        color: #1e293b;
-        margin: 0;
-        letter-spacing: -0.3px;
-    }
-
-    .mnc-card-pills {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.6rem;
-    }
+    .mnc-card-pills { display: flex; flex-wrap: wrap; gap: 0.55rem; }
 
     .mnc-company-pill {
-        padding: 0.45rem 1rem;
-        background: #f8fafc;
-        border: 1px solid #e2e8f0;
+        padding: 0.4rem 1rem;
+        background: #f8f7ff;
+        border: 1px solid #ede9fe;
         border-radius: 50px;
-        color: #475569;
+        color: #4c1d95;
         font-weight: 600;
-        font-size: 0.88rem;
+        font-size: 0.85rem;
         text-decoration: none;
-        transition: all 0.25s ease;
-        position: relative;
-        z-index: 1;
+        transition: all 0.2s ease;
     }
-
     .mnc-company-pill:hover {
         background: var(--accent);
-        color: #ffffff;
+        color: #fff;
         border-color: var(--accent);
         transform: translateY(-2px);
         box-shadow: 0 4px 12px var(--accent-glow);
     }
 
-    @media (max-width: 600px) {
-        .mnc-hiring-section-wrapper {
-            height: 68vh;
-            padding: 1rem;
-        }
-
-        .mnc-hiring-card {
-            padding: 1.2rem 1.3rem;
-        }
-
-        .mnc-month-label {
-            font-size: 1.1rem;
-        }
-
-        .mnc-company-pill {
-            padding: 0.35rem 0.8rem;
-            font-size: 0.82rem;
-        }
-
-        .mnc-month-icon {
-            width: 30px;
-            height: 30px;
-        }
-    }
-    /* Dark theme overrides */
-    body.dark-theme .mnc-hiring-section-wrapper {
-        background: rgba(30, 41, 59, 0.5);
-        border-color: #334155;
+    .mnc-main-container {
+        width: 100%; max-width: 1100px;
+        margin: 0 auto; padding: 0 0;
+        display: flex; flex-direction: column; align-items: center;
     }
 
-    body.dark-theme .mnc-hiring-card {
-        background: #1e293b;
-        border-color: #334155;
-    }
-
-    body.dark-theme .mnc-month-label {
-        color: #f1f5f9;
-    }
-
-    body.dark-theme .mnc-company-pill {
-        background: #334155;
-        border-color: #475569;
-        color: #e2e8f0;
-    }
-
-    body.dark-theme .mnc-company-pill:hover {
-        background: var(--accent);
-        color: #ffffff;
-        border-color: var(--accent);
-    }
-
-    body.dark-theme .mnc-section-title {
-        color: #f1f5f9 !important;
-    }
-
-    body.dark-theme .mnc-section-subtitle {
-        color: #94a3b8 !important;
+    @media (max-width: 768px) {
+        .mnc-hiring-section-wrapper { max-width: 100%; height: 60vh; padding: 0.8rem; }
+        .mnc-hiring-card { padding: 1rem 1.2rem; border-radius: 12px; }
     }
 </style>
 
-<!-- Top MNC Off-Campus Hiring Schedule -->
-<div
-    style="margin-top: 1.5rem; margin-bottom: 1.5rem; width: 100%; max-width: 1200px; margin-left: auto; margin-right: auto; padding: 0 1.5rem; display: flex; flex-direction: column; align-items: center;">
-    <div style="text-align: center; margin-bottom: 3rem; width: 100%; max-width: 800px;">
-        <h3 class="mnc-section-title" style="font-size: 1.8rem; color: #1e293b; font-weight: 800; margin-bottom: 0.6rem; letter-spacing: -0.5px;">
-            <i class="fa-solid fa-building" style="color: #6366f1; margin-right: 0.6rem;"></i>Top MNC Off-Campus Hiring
-            Months
-        </h3>
-        <p class="mnc-section-subtitle" style="color: #64748b; font-size: 1.05rem; font-weight: 500; margin: 0 auto;">Click on any company to visit
-            their official careers portal.</p>
+<div class="mnc-main-container" style="margin-top: 2.5rem;">
+    <div style="text-align:center; margin-bottom: 2rem; width: 100%;">
+        <h2 style="font-family:'Plus Jakarta Sans',sans-serif; font-size: 1.8rem; font-weight: 800; color: #1e1b4b; margin-bottom: 0.4rem; display:flex; align-items:center; justify-content:center; gap:0.6rem;">
+            <i class="fa-solid fa-building" style="color:#7c3aed;"></i> Top MNC Off-Campus Hiring
+        </h2>
+        <p style="color: #64748b; font-size: 0.97rem;">Click any company to visit their official careers portal.</p>
     </div>
 
     <div class="mnc-hiring-section-wrapper">
         <div class="mnc-section-container">
-            <!-- April -->
+            <div class="mnc-hiring-card mnc-card-violet scroll-reveal">
+                <div class="mnc-card-header">
+                    <div class="mnc-month-icon"><i class="fa-solid fa-calendar-days"></i></div>
+                    <h4 class="mnc-month-label">January</h4>
+                </div>
+                <div class="mnc-card-pills">
+                    <a href="https://www.tcs.com/careers" target="_blank" class="mnc-company-pill">TCS</a>
+                    <a href="https://www.infosys.com/careers" target="_blank" class="mnc-company-pill">Infosys</a>
+                    <a href="https://careers.wipro.com" target="_blank" class="mnc-company-pill">Wipro</a>
+                    <a href="https://www.hcltech.com/careers" target="_blank" class="mnc-company-pill">HCL</a>
+                    <a href="https://www.capgemini.com/careers" target="_blank" class="mnc-company-pill">Capgemini</a>
+                </div>
+            </div>
+
+            <div class="mnc-hiring-card mnc-card-pink scroll-reveal">
+                <div class="mnc-card-header">
+                    <div class="mnc-month-icon"><i class="fa-solid fa-calendar-days"></i></div>
+                    <h4 class="mnc-month-label">February</h4>
+                </div>
+                <div class="mnc-card-pills">
+                    <a href="https://www.accenture.com/in-en/careers" target="_blank" class="mnc-company-pill">Accenture</a>
+                    <a href="https://www.ibm.com/careers" target="_blank" class="mnc-company-pill">IBM</a>
+                    <a href="https://careers.cognizant.com" target="_blank" class="mnc-company-pill">Cognizant</a>
+                    <a href="https://careers.techmahindra.com" target="_blank" class="mnc-company-pill">Tech Mahindra</a>
+                    <a href="https://www.oracle.com/careers" target="_blank" class="mnc-company-pill">Oracle</a>
+                </div>
+            </div>
+
+            <div class="mnc-hiring-card mnc-card-emerald scroll-reveal">
+                <div class="mnc-card-header">
+                    <div class="mnc-month-icon"><i class="fa-solid fa-calendar-days"></i></div>
+                    <h4 class="mnc-month-label">March</h4>
+                </div>
+                <div class="mnc-card-pills">
+                    <a href="https://www.amazon.jobs" target="_blank" class="mnc-company-pill">Amazon</a>
+                    <a href="https://careers.microsoft.com" target="_blank" class="mnc-company-pill">Microsoft</a>
+                    <a href="https://careers.google.com" target="_blank" class="mnc-company-pill">Google</a>
+                    <a href="https://jobs.deloitte.com" target="_blank" class="mnc-company-pill">Deloitte</a>
+                    <a href="https://careers.zoho.com" target="_blank" class="mnc-company-pill">Zoho</a>
+                </div>
+            </div>
+
             <div class="mnc-hiring-card mnc-card-blue scroll-reveal">
                 <div class="mnc-card-header">
                     <div class="mnc-month-icon"><i class="fa-solid fa-calendar-days"></i></div>
                     <h4 class="mnc-month-label">April</h4>
                 </div>
                 <div class="mnc-card-pills">
-                    <a href="https://careers.cognizant.com/global/en" target="_blank" class="mnc-company-pill">Cognizant</a>
+                    <a href="https://careers.cognizant.com" target="_blank" class="mnc-company-pill">Cognizant</a>
                     <a href="https://www2.deloitte.com/us/en/careers.html" target="_blank" class="mnc-company-pill">Deloitte</a>
                     <a href="https://www.amazon.jobs/en/" target="_blank" class="mnc-company-pill">Amazon</a>
                     <a href="https://careers.linkedin.com/" target="_blank" class="mnc-company-pill">LinkedIn</a>
-                    <a href="https://aexp.eightfold.ai/careers" target="_blank" class="mnc-company-pill">American Express</a>
+                    <a href="https://aexp.eightfold.ai/careers" target="_blank" class="mnc-company-pill">Amex</a>
                     <a href="https://www.larsentoubro.com/corporate/careers/" target="_blank" class="mnc-company-pill">L&T</a>
                 </div>
             </div>
 
-            <!-- June -->
+            <div class="mnc-hiring-card mnc-card-amber scroll-reveal">
+                <div class="mnc-card-header">
+                    <div class="mnc-month-icon"><i class="fa-solid fa-calendar-days"></i></div>
+                    <h4 class="mnc-month-label">May</h4>
+                </div>
+                <div class="mnc-card-pills">
+                    <a href="https://www.capgemini.com/careers" target="_blank" class="mnc-company-pill">Capgemini</a>
+                    <a href="https://careers.dxc.com/" target="_blank" class="mnc-company-pill">DXC Technology</a>
+                    <a href="https://www.ltimindtree.com/careers/" target="_blank" class="mnc-company-pill">LTIMindtree</a>
+                    <a href="https://hexaware.com/careers/" target="_blank" class="mnc-company-pill">Hexaware</a>
+                    <a href="https://www.tcs.com/careers" target="_blank" class="mnc-company-pill">TCS</a>
+                </div>
+            </div>
+
             <div class="mnc-hiring-card mnc-card-teal scroll-reveal">
                 <div class="mnc-card-header">
                     <div class="mnc-month-icon"><i class="fa-solid fa-calendar-days"></i></div>
@@ -284,11 +184,11 @@
                 </div>
                 <div class="mnc-card-pills">
                     <a href="https://jobs.cisco.com/" target="_blank" class="mnc-company-pill">Cisco</a>
-                    <a href="https://careers.wipro.com/careers-home/" target="_blank" class="mnc-company-pill">Wipro</a>
+                    <a href="https://careers.wipro.com/" target="_blank" class="mnc-company-pill">Wipro</a>
+                    <a href="https://www.mphasis.com/careers.html" target="_blank" class="mnc-company-pill">Mphasis</a>
                 </div>
             </div>
 
-            <!-- July -->
             <div class="mnc-hiring-card mnc-card-rose scroll-reveal">
                 <div class="mnc-card-header">
                     <div class="mnc-month-icon"><i class="fa-solid fa-calendar-days"></i></div>
@@ -298,10 +198,10 @@
                     <a href="https://careers.walmart.com/" target="_blank" class="mnc-company-pill">Walmart</a>
                     <a href="https://www.flipkartcareers.com/" target="_blank" class="mnc-company-pill">Flipkart</a>
                     <a href="https://www.deshawindia.com/careers" target="_blank" class="mnc-company-pill">De Shaw</a>
+                    <a href="https://www.paytm.com/careers" target="_blank" class="mnc-company-pill">Paytm</a>
                 </div>
             </div>
 
-            <!-- August -->
             <div class="mnc-hiring-card mnc-card-amber scroll-reveal">
                 <div class="mnc-card-header">
                     <div class="mnc-month-icon"><i class="fa-solid fa-calendar-days"></i></div>
@@ -315,7 +215,6 @@
                 </div>
             </div>
 
-            <!-- September -->
             <div class="mnc-hiring-card mnc-card-emerald scroll-reveal">
                 <div class="mnc-card-header">
                     <div class="mnc-month-icon"><i class="fa-solid fa-calendar-days"></i></div>
@@ -325,10 +224,10 @@
                     <a href="https://www.amazon.jobs/en/" target="_blank" class="mnc-company-pill">Amazon</a>
                     <a href="https://juspay.in/careers" target="_blank" class="mnc-company-pill">JusPay</a>
                     <a href="https://careers.myntra.com/" target="_blank" class="mnc-company-pill">Myntra</a>
+                    <a href="https://www.swiggy.com/careers" target="_blank" class="mnc-company-pill">Swiggy</a>
                 </div>
             </div>
 
-            <!-- October -->
             <div class="mnc-hiring-card mnc-card-violet scroll-reveal">
                 <div class="mnc-card-header">
                     <div class="mnc-month-icon"><i class="fa-solid fa-calendar-days"></i></div>
@@ -337,10 +236,10 @@
                 <div class="mnc-card-pills">
                     <a href="https://www.morganstanley.com/people/experienced-professionals" target="_blank" class="mnc-company-pill">Morgan Stanley</a>
                     <a href="https://careers.ey.com/ey/en/home" target="_blank" class="mnc-company-pill">EY</a>
+                    <a href="https://www.bain.com/careers/" target="_blank" class="mnc-company-pill">Bain</a>
                 </div>
             </div>
 
-            <!-- November -->
             <div class="mnc-hiring-card mnc-card-pink scroll-reveal">
                 <div class="mnc-card-header">
                     <div class="mnc-month-icon"><i class="fa-solid fa-calendar-days"></i></div>
@@ -349,6 +248,20 @@
                 <div class="mnc-card-pills">
                     <a href="https://jobs.intuit.com/" target="_blank" class="mnc-company-pill">Intuit</a>
                     <a href="https://careers.google.com/" target="_blank" class="mnc-company-pill">Google</a>
+                    <a href="https://razorpay.com/jobs/" target="_blank" class="mnc-company-pill">Razorpay</a>
+                </div>
+            </div>
+
+            <div class="mnc-hiring-card mnc-card-teal scroll-reveal">
+                <div class="mnc-card-header">
+                    <div class="mnc-month-icon"><i class="fa-solid fa-calendar-days"></i></div>
+                    <h4 class="mnc-month-label">December</h4>
+                </div>
+                <div class="mnc-card-pills">
+                    <a href="https://www.ibm.com/careers" target="_blank" class="mnc-company-pill">IBM</a>
+                    <a href="https://home.kpmg/xx/en/home/careers.html" target="_blank" class="mnc-company-pill">KPMG</a>
+                    <a href="https://www.hcltech.com/careers" target="_blank" class="mnc-company-pill">HCL</a>
+                    <a href="https://www.tcs.com/careers" target="_blank" class="mnc-company-pill">TCS</a>
                 </div>
             </div>
         </div>
@@ -357,20 +270,15 @@
 
 <script>
 (function() {
-    // Scroll-reveal observer for MNC cards (works for all instances)
     const revealObserver = new IntersectionObserver((entries) => {
         entries.forEach((entry, index) => {
             if (entry.isIntersecting) {
-                setTimeout(() => {
-                    entry.target.classList.add('visible');
-                }, index * 100);
+                setTimeout(() => entry.target.classList.add('visible'), index * 80);
                 revealObserver.unobserve(entry.target);
             }
         });
-    }, { threshold: 0.15 });
+    }, { threshold: 0.1 });
 
-    document.querySelectorAll('.mnc-hiring-card.scroll-reveal:not(.visible)').forEach(card => {
-        revealObserver.observe(card);
-    });
+    document.querySelectorAll('.mnc-hiring-card.scroll-reveal').forEach(card => revealObserver.observe(card));
 })();
 </script>

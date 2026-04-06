@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="dashboard-container" style="padding-top: 2rem;">
+    <div class="section-container" style="max-width: 1200px; margin: 0 auto; width: 100%;">
+        <div style="text-align: center; margin-bottom: 3.5rem;">
+            <div style="display:inline-block; background:rgba(99, 102, 241, 0.1); color:#6366f1; font-size:0.75rem; font-weight:800; letter-spacing:2px; text-transform:uppercase; padding:6px 16px; border-radius:30px; margin-bottom:1.5rem; border:1px solid rgba(99, 102, 241, 0.15);">My Learning Journey</div>
+            <h1 style="font-size: 2.8rem; font-weight: 900; color: var(--text-primary); letter-spacing: -0.04em; margin: 0;">Resume Learning</h1>
+            <p style="color: var(--text-muted); margin-top: 1rem; font-size: 1.1rem; max-width: 600px; margin-left: auto; margin-right: auto;">Keep track of all your active career roadmaps and technical skill paths in one place.</p>
+        </div>
+
+        <div id="fullProgressGrid" class="progress-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 2rem;">
+            <!-- Loading state -->
+            <div style="grid-column: 1/-1; text-align: center; padding: 5rem 0;">
+                <i class="fa-solid fa-circle-notch fa-spin" style="font-size: 2.5rem; color: #6366f1;"></i>
+                <p style="margin-top: 1.5rem; color: var(--text-muted); font-weight: 600;">Retrieving your learning progress...</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Reuse premium card styles from dashboard or define specialized ones for this page */
+    .prog-card {
+        background: var(--glass-bg, rgba(255, 255, 255, 0.8));
+        border: 1px solid var(--glass-border, rgba(99, 102, 241, 0.1));
+        backdrop-filter: blur(16px);
+        border-radius: 28px;
+        padding: 2rem;
+        text-decoration: none;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+    }
+    body.dark-mode .prog-card {
+        background: rgba(15, 23, 42, 0.6);
+        border-color: rgba(255, 255, 255, 0.05);
+    }
+    .prog-card:hover {
+        transform: translateY(-8px);
+        border-color: #6366f1;
+        box-shadow: 0 20px 40px rgba(99, 102, 241, 0.15);
+    }
+    .prog-card-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .prog-skill-name {
+        font-weight: 800;
+        font-size: 1.2rem;
+        color: var(--text-primary);
+    }
+    .prog-pct-pill {
+        font-size: 0.8rem;
+        font-weight: 900;
+        color: #fff;
+        background: #6366f1;
+        padding: 4px 12px;
+        border-radius: 20px;
+    }
+    .prog-bar-track {
+        height: 10px;
+        background: rgba(0,0,0,0.05);
+        border-radius: 10px;
+        overflow: hidden;
+    }
+    body.dark-mode .prog-bar-track { background: rgba(255,255,255,0.05); }
+    .prog-bar-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #6366f1, #a855f7, #6366f1);
+        background-size: 200% 100%;
+        animation: gradientShift 3s linear infinite;
+        transition: width 1s ease-out;
+    }
+    @keyframes gradientShift {
+        0% { background-position: 0% 50%; }
+        100% { background-position: 200% 50%; }
+    }
+    .prog-card-action {
+        font-size: 0.9rem;
+        font-weight: 700;
+        color: #6366f1;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 1rem;
+    }
+    .prog-delete-btn {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        border: none;
+        background: rgba(239, 68, 68, 0.1);
+        color: #ef4444;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        z-index: 10;
+    }
+    .prog-delete-btn:hover {
+        background: #ef4444;
+        color: #fff;
+        transform: scale(1.1);
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const grid = document.getElementById('fullProgressGrid');
+
+    async function loadProgress() {
+        try {
+            const res = await fetch('/api/user-progress');
+            const data = await res.json();
+            
+            if (data.success && data.progress && data.progress.length > 0) {
+                grid.innerHTML = data.progress.map(p => `
+                    <div class="prog-card" style="cursor: pointer;" onclick="window.location.href='/roadmap?skill=${encodeURIComponent(p.skill.toLowerCase())}'">
+                        <div class="prog-card-top">
+                            <span class="prog-skill-name">${p.skill}</span>
+                            <div style="display:flex; align-items:center; gap:12px;">
+                                <span class="prog-pct-pill">${p.percentage}%</span>
+                                <button class="prog-delete-btn" onclick="deleteHistoryItem('${p.skill}', event)" title="Remove roadmap">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="prog-bar-track">
+                            <div class="prog-bar-fill" style="width: ${p.percentage}%"></div>
+                        </div>
+                        <div class="prog-card-action">
+                            Launch Roadmap <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                        </div>
+                    </div>
+                `).join('');
+            } else {
+                grid.innerHTML = `
+                    <div style="grid-column: 1/-1; text-align: center; padding: 5rem 0;">
+                        <i class="fa-solid fa-graduation-cap" style="font-size: 3rem; color: var(--text-muted); opacity: 0.2; margin-bottom: 1.5rem;"></i>
+                        <h3 style="color: var(--text-primary); font-weight: 800;">No roadmaps started yet.</h3>
+                        <p style="color: var(--text-muted); margin-top: 0.5rem;">Search for a skill on the dashboard to begin your adventure!</p>
+                        <a href="{{ url_for('dashboard') }}" class="btn-gradient" style="display:inline-block; margin-top: 2rem; padding: 12px 24px; text-decoration:none; border-radius:12px; color:#fff;">Explore Skills</a>
+                    </div>
+                `;
+            }
+        } catch (e) {
+            console.error("Progress Fetch Error:", e);
+            grid.innerHTML = `<p style="grid-column: 1/-1; text-align: center; color: #ef4444;">Failed to sync your learning journey.</p>`;
+        }
+    }
+
+    window.deleteHistoryItem = async function(skill, event) {
+        if (event) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        if (!confirm(`Are you sure you want to remove your "${skill}" progress?`)) return;
+        
+        try {
+            const res = await fetch('/api/delete-progress', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ skill: skill })
+            });
+            const d = await res.json();
+            if (d.success) {
+                loadProgress(); 
+            }
+        } catch (e) { console.error("Error deleting progress:", e); }
+    }
+
+    loadProgress();
+});
+</script>
+{% endblock %}

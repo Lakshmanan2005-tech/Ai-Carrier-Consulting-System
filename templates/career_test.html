@@ -9,7 +9,7 @@
             <h1 class="hero-title-new">Career Personality Test</h1>
             <p class="hero-subtitle-new">Take our quick assessment to discover career paths that perfectly match your personality and skills.</p>
             
-            <div class="test-card-bg" style="max-width: 600px; margin: 2rem auto; background: var(--card-bg, #ffffff); padding: 3rem 2rem; border-radius: 16px; border: 1px solid var(--border-color); text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
+            <div class="test-card-bg" style="max-width: 600px; margin: 2rem auto; background: var(--card-bg); padding: 3rem 2rem; border-radius: 16px; border: 1px solid var(--border-color); text-align: center; box-shadow: var(--shadow-md);">
                 <i class="fa-solid fa-brain" style="font-size: 3.5rem; color: var(--primary-color); margin-bottom: 1.5rem;"></i>
                 <h3 style="color: var(--text-primary); margin-bottom: 1rem; font-size: 1.4rem;">Ready to find your ideal tech role?</h3>
                 <p style="color: var(--text-secondary); margin-bottom: 2rem;">Answer 5 quick behavioral questions. Our system will analyze your preferences and recommend the best technology roles for you.</p>
@@ -20,13 +20,13 @@
         </div>
 
         <div id="quizArea" style="max-width: 600px; margin: 2rem auto; display: none;">
-            <div class="test-card-bg" style="background: var(--card-bg, #ffffff); padding: 3rem 2rem; border-radius: 16px; border: 1px solid var(--border-color); box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
+            <div class="test-card-bg" style="background: var(--card-bg); padding: 3rem 2rem; border-radius: 16px; border: 1px solid var(--border-color); box-shadow: var(--shadow-md);">
                 
                 <div style="margin-bottom: 2rem;">
                     <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; color: var(--text-secondary); font-size: 0.9rem;">
                         <span id="questionProgress">Question 1 of 5</span>
                     </div>
-                    <div style="width: 100%; background: #e5e7eb; height: 8px; border-radius: 4px;">
+                    <div style="width: 100%; background: var(--border-color); height: 8px; border-radius: 4px;">
                         <div id="progressBar" style="width: 20%; background: var(--primary-color); height: 100%; border-radius: 4px; transition: width 0.3s ease;"></div>
                     </div>
                 </div>
@@ -78,11 +78,13 @@
             <div class="test-gradient-bg" style="background: linear-gradient(135deg, rgba(108, 99, 255, 0.1) 0%, rgba(74, 144, 226, 0.1) 100%); padding: 3rem 2rem; border-radius: 16px; border: 1px solid rgba(108, 99, 255, 0.3); text-align: center; box-shadow: 0 10px 30px rgba(108,99,255,0.15);">
                 <i id="resultIcon" class="fa-solid fa-trophy" style="font-size: 4rem; color: var(--primary-color); margin-bottom: 1rem;"></i>
                 <h4 style="color: var(--text-secondary); text-transform: uppercase; font-size: 0.9rem; letter-spacing: 2px; margin-bottom: 0.5rem;">Your Ideal Career Match</h4>
+                <p id="atsErrorMessage" style="color: #ef4444; margin-bottom: 1rem; font-weight: 500; display: none; text-align: center;"><i class="fa-solid fa-circle-exclamation"></i> Please upload a resume before testing.</p>
+                <div id="atsSuccessMessage" style="background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 2rem; margin-bottom: 2rem; display: none; text-align: center;">
                 <h2 id="resultTitle" style="color: var(--text-primary); margin-bottom: 1rem; font-size: 2.2rem; font-weight: 700;">Software Developer</h2>
                 
                 <p id="resultDesc" style="color: var(--text-secondary); margin-bottom: 2rem; font-size: 1.1rem; line-height: 1.6;">You love logical problem solving and building systems from scratch.</p>
                 
-                <div class="test-card-bg" style="text-align: left; background: var(--card-bg, #ffffff); padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border-color);">
+                <div class="test-card-bg" style="text-align: left; background: var(--card-bg); padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border-color);">
                     <h5 style="margin-bottom: 1rem; color: var(--text-primary); font-size: 1.1rem;">Recommended Skills:</h5>
                     <div id="resultSkills" style="display: flex; flex-wrap: wrap; gap: 0.8rem;">
                         <span style="background: rgba(108, 99, 255, 0.1); color: var(--primary-color); padding: 0.4rem 1rem; border-radius: 20px; font-weight: 600;">Python</span>

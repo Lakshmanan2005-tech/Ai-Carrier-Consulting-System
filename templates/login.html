@@ -3,52 +3,47 @@
 {% block content %}
 <div class="login-container">
     <div class="login-card">
-        <div class="login-header" style="margin-bottom: 2rem;">
-            <img src="/static/ai-logo.png" class="login-logo" alt="AI Logo" />
-            <h2 style="font-size: 1.8rem; margin-bottom: 0.5rem; font-weight: 700;">AI Career Consulting</h2>
-            <p id="authSubtitle" style="font-size: 0.95rem; font-weight: 500; transition: opacity 0.3s ease;">Your path
-                to success starts here</p>
+        <div class="login-header">
+            <img src="/static/ai-logo.png" style="width: 28px; height: 28px; border-radius: 8px; margin-bottom: 0.3rem; box-shadow: 0 4px 10px rgba(99, 102, 241, 0.08); border: 1px solid rgba(255, 255, 255, 0.1);" alt="AI Logo" />
+            <h2 id="authTitle" style="font-size: 1.05rem; margin-bottom: 0.1rem;">AI Career Consulting</h2>
+            <p id="authSubtitle" style="font-size: 0.68rem; margin-bottom: 0.6rem;">Your path to success</p>
         </div>
 
         {% if success %}
-        <p
-            style="color: #10b981; margin-bottom: 1rem; font-weight: 500; background: rgba(16, 185, 129, 0.1); padding: 0.8rem; border-radius: 8px;">
-            {{ success }}</p>
+        <p class="alert-success">{{ success }}</p>
         {% endif %}
         {% if error %}
-        <p
-            style="color: #ef4444; margin-bottom: 1rem; font-weight: 500; background: rgba(239, 68, 68, 0.1); padding: 0.8rem; border-radius: 8px;">
-            {{ error }}</p>
+        <p class="alert-error">{{ error }}</p>
         {% endif %}
 
         <form method="POST" action="{{ url_for('login') }}">
             <input type="hidden" id="authMode" name="auth_mode" value="login">
-            <!-- Hidden Username Field for Sign Up Mode -->
-            <div id="usernameField" class="form-group"
-                style="display: none; opacity: 0; transition: opacity 0.3s ease;">
+            
+            <div id="usernameField" class="form-group" style="display: none;">
                 <input type="text" id="usernameInput" name="username" class="form-control" placeholder="Username">
             </div>
 
             <div class="form-group">
                 <input type="email" name="email" class="form-control" placeholder="Email ID" required>
             </div>
-            <div class="form-group" style="margin-bottom: 0.5rem;">
+            
+            <div class="form-group">
                 <input type="password" name="password" class="form-control" placeholder="Password" required>
             </div>
-            <div id="forgotPwdContainer"
-                style="text-align: right; margin-bottom: 1.5rem; transition: opacity 0.3s ease;">
-                <a href="#" onclick="openForgotModal(); return false;"
-                    style="font-size: 0.9rem; font-weight: 500;">Forgot Password?</a>
-            </div>
-            <button type="submit" id="mainSubmitBtn" name="action" value="login" class="btn-gradient btn-block"
-                style="padding: 1rem; font-size: 1.1rem; border-radius: 8px; transition: opacity 0.3s ease;">Login</button>
-            <button type="submit" id="guestBtn" name="action" value="guest" class="btn-secondary btn-block"
-                style="padding: 1rem; margin-top: 10px; border-radius: 8px; transition: opacity 0.3s ease;"
-                formnovalidate>Continue as Guest</button>
 
-            <div id="toggleTextContainer" style="margin-top: 1.5rem; transition: opacity 0.3s ease;">
-                <span id="togglePrefix">Don't have an account?</span> <a href="#" id="toggleAuthBtn"
-                    style="font-weight: 600;" onclick="toggleAuthMode(event)">Sign Up</a>
+            <div id="forgotPwdContainer" class="text-right">
+                <a href="#" onclick="openForgotModal(); return false;">Forgot Password?</a>
+            </div>
+
+            <button type="submit" id="mainSubmitBtn" name="action" value="login" class="btn-gradient btn-block">Login</button>
+            <button type="submit" id="guestBtn" name="action" value="guest" class="btn-secondary btn-block guest-btn-premium" formnovalidate>
+                <i class="fa-solid fa-user-secret" style="margin-right: 8px; opacity: 0.8;"></i>
+                Continue as Guest
+            </button>
+
+            <div id="toggleTextContainer" class="toggle-container">
+                <span id="togglePrefix">Don't have an account?</span> 
+                <a href="#" id="toggleAuthBtn" onclick="toggleAuthMode(event)">Sign Up</a>
             </div>
         </form>
     </div>
@@ -58,55 +53,73 @@
 <div class="forgot-pwd-modal" id="forgotPwdModal">
     <div class="fp-card">
         <button class="close-modal" onclick="closeForgotModal()">&times;</button>
-        <h3 style="margin-bottom: 1rem;">Reset Password</h3>
+        <h3>Reset Password</h3>
 
         <!-- Step 1: Email -->
         <div id="fp-step-1">
-            <p style="margin-bottom: 1.2rem; font-size: 0.95rem;">Enter your registered email address.</p>
+            <p>Enter your registered email address below.</p>
             <div class="form-group">
                 <input type="email" id="fpEmail" class="form-control" placeholder="Email Address">
             </div>
-            <button class="btn-gradient btn-block" id="btnSendOtp" onclick="sendOtp()"
-                style="padding: 1rem; border-radius: 8px; display: flex; align-items: center; justify-content: center; gap: 10px;">
+            <button class="btn-gradient btn-block" id="btnSendOtp" onclick="sendOtp()">
                 <span id="sendOtpText">Send OTP</span>
                 <i class="fa-solid fa-spinner fa-spin" id="sendOtpLoader" style="display: none;"></i>
             </button>
-            <p id="fpError1" style="color: #ef4444; margin-top: 10px; font-size: 0.85rem; display: none;"></p>
-            <p style="color: #10b981; font-size: 0.8rem; margin-top: 1rem; font-weight: 600;">(Demo Note: The OTP is
-                fixed at 944588)</p>
+            <p id="fpError1" class="error-msg"></p>
+            <p class="demo-note">(Demo: OTP is fixed at 944588)</p>
         </div>
 
         <!-- Step 2: OTP -->
         <div id="fp-step-2" style="display: none;">
-            <p style="margin-bottom: 1.2rem; font-size: 0.95rem;">Enter the 6-digit OTP sent to your email.</p>
+            <p>Enter the 6-digit OTP sent to your email.</p>
             <div class="form-group">
                 <input type="text" id="fpOtp" class="form-control" placeholder="Enter OTP" maxlength="6">
             </div>
-            <button class="btn-gradient btn-block" onclick="verifyOtp()"
-                style="padding: 1rem; border-radius: 8px;">Verify OTP</button>
-            <p id="fpError2" style="color: #ef4444; margin-top: 10px; font-size: 0.85rem; display: none;"></p>
+            <button class="btn-gradient btn-block" onclick="verifyOtp()">Verify OTP</button>
+            <p id="fpError2" class="error-msg"></p>
         </div>
 
         <!-- Step 3: Reset -->
         <div id="fp-step-3" style="display: none;">
-            <p style="margin-bottom: 1.2rem; font-size: 0.95rem;">Enter your new password.</p>
+            <p>Enter your new password.</p>
             <div class="form-group">
                 <input type="password" id="fpNewPwd" class="form-control" placeholder="New Password">
             </div>
             <div class="form-group">
                 <input type="password" id="fpConfirmPwd" class="form-control" placeholder="Confirm Password">
             </div>
-            <button class="btn-gradient btn-block" onclick="resetPassword()"
-                style="padding: 1rem; border-radius: 8px;">Reset Password</button>
-            <p id="fpError3" style="color: #ef4444; margin-top: 10px; font-size: 0.85rem; display: none;"></p>
-            <p id="fpSuccess"
-                style="color: #10b981; margin-top: 10px; font-size: 0.95rem; display: none; font-weight: 600; text-align: center;">
-            </p>
+            <button class="btn-gradient btn-block" onclick="resetPassword()">Reset Password</button>
+            <p id="fpError3" class="error-msg"></p>
+            <p id="fpSuccess" class="success-msg"></p>
         </div>
     </div>
 </div>
 
-<link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+<style>
+    /* Utility & Form Alert Classes */
+    .text-right { text-align: right; margin-bottom: 1.1rem; }
+    .text-right a { font-size: 0.8rem; font-weight: 600; text-decoration: none; color: #6366f1; }
+    .toggle-container { margin-top: -0.2rem; font-size: 1.05rem; color: #64748b; font-weight: 700; text-align: center; }
+    .toggle-container a { 
+        font-weight: 900; 
+        color: #4f46e5;
+        text-decoration: none;
+        margin-left: 5px;
+        display: inline-block;
+        transition: transform 0.3s ease;
+    }
+    .toggle-container a:hover { transform: scale(1.1); }
+    
+    .alert-success { color: #10b981; background: rgba(16, 185, 129, 0.1); padding: 0.8rem; border-radius: 12px; margin-bottom: 1.5rem; font-weight: 500; }
+    .alert-error { color: #ef4444; background: rgba(239, 68, 68, 0.1); padding: 0.8rem; border-radius: 12px; margin-bottom: 1.5rem; font-weight: 500; }
+    
+    .error-msg { color: #ef4444; margin-top: 10px; font-size: 0.85rem; display: none; }
+    .success-msg { color: #10b981; margin-top: 10px; font-size: 0.95rem; display: none; font-weight: 600; text-align: center; }
+    .demo-note { color: #10b981; font-size: 0.8rem; margin-top: 1rem; font-weight: 600; }
+    .fp-card p { margin-bottom: 1.2rem; font-size: 0.95rem; line-height: 1.4; }
+    .fp-card h3 { margin-bottom: 1.5rem; font-weight: 700; }
+</style>
 
+<link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
 <script src="{{ url_for('static', filename='js/login.js') }}"></script>
 {% endblock %}

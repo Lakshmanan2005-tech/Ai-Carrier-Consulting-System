@@ -33,7 +33,7 @@
     --sidebar-collapsed-width: 80px;
 }
 
-body.dark-theme {
+body.dark-mode {
     --bg-color: #121212;
     --sidebar-bg: #1e1e1e;
     --header-bg: #1e1e1e;
@@ -50,31 +50,31 @@ body.dark-theme {
 }
 
 /* Enforcing Strict Background Arrays */
-body.dark-theme .sidebar,
-body.dark-theme .app-header,
-body.dark-theme .grid-card-modern,
-body.dark-theme .glass-card,
-body.dark-theme .resource-row,
-body.dark-theme .profile-dropdown,
-body.dark-theme .chatbot-window,
-body.dark-theme .dashboard-hero-card,
-body.dark-theme .user-profile-header {
+body.dark-mode .sidebar,
+body.dark-mode .app-header,
+body.dark-mode .grid-card-modern,
+body.dark-mode .glass-card,
+body.dark-mode .resource-row,
+body.dark-mode .profile-dropdown,
+body.dark-mode .chatbot-window,
+body.dark-mode .dashboard-hero-card,
+body.dark-mode .user-profile-header {
     background: #1e1e1e !important;
     border-color: #333 !important;
     background-image: none !important;
 }
 
 /* Enforcing Strict Text Rendering Overrides */
-body.dark-theme h1,
-body.dark-theme h2,
-body.dark-theme h3,
-body.dark-theme h4,
-body.dark-theme h5,
-body.dark-theme h6,
-body.dark-theme .highlight-text,
-body.dark-theme .roadmap-title,
-body.dark-theme .logo-text,
-body.dark-theme .user-name-header {
+body.dark-mode h1,
+body.dark-mode h2,
+body.dark-mode h3,
+body.dark-mode h4,
+body.dark-mode h5,
+body.dark-mode h6,
+body.dark-mode .highlight-text,
+body.dark-mode .roadmap-title,
+body.dark-mode .logo-text,
+body.dark-mode .user-name-header {
     color: #ffffff !important;
 }
 
@@ -111,49 +111,49 @@ body.dark-theme .user-name-header {
     background: #ffffff !important;
 }
 
-body.dark-theme .trending-card-item {
+body.dark-mode .trending-card-item {
     background: #1e293b !important;
     border-color: #334155 !important;
 }
 
-body.dark-theme p,
-body.dark-theme span,
-body.dark-theme label,
-body.dark-theme li,
-body.dark-theme .nav-text,
-body.dark-theme div:not(.sidebar-logo, .avatar-header, .btn-gradient, .btn-primary, .card-icon-wrapper, .trending-rank),
-body.dark-theme .grid-card-content,
-body.dark-theme .interview-q-text {
+body.dark-mode p,
+body.dark-mode span,
+body.dark-mode label,
+body.dark-mode li,
+body.dark-mode .nav-text,
+body.dark-mode div:not(.sidebar-logo, .avatar-header, .btn-gradient, .btn-primary, .card-icon-wrapper, .trending-rank),
+body.dark-mode .grid-card-content,
+body.dark-mode .interview-q-text {
     color: #bbbbbb !important;
 }
 
-body.dark-theme .dropdown-divider {
+body.dark-mode .dropdown-divider {
     background: #333 !important;
 }
 
 /* Inputs & Forms */
-body.dark-theme input {
+body.dark-mode input {
     background: #1e1e1e !important;
     color: #ffffff !important;
     border: 1px solid #333 !important;
 }
 
-body.dark-theme input::placeholder {
+body.dark-mode input::placeholder {
     color: #888888 !important;
 }
 
-body.dark-theme input:focus {
+body.dark-mode input:focus {
     border-color: var(--primary-color) !important;
 }
 
 /* Buttons */
-body.dark-theme .btn-gradient,
-body.dark-theme .btn-primary,
-body.dark-theme button {
+body.dark-mode .btn-gradient,
+body.dark-mode .btn-primary,
+body.dark-mode button {
     color: #ffffff !important;
 }
 
-body.dark-theme .btn-secondary {
+body.dark-mode .btn-secondary {
     background: #1e1e1e !important;
     color: #ffffff !important;
     border-color: #333 !important;
@@ -273,7 +273,7 @@ body {
     transition: opacity 0.3s ease;
 }
 
-body.dark-theme .navbar-branding {
+body.dark-mode .navbar-branding {
     background: linear-gradient(135deg, #60A5FA 0%, #A78BFA 100%) !important;
     -webkit-background-clip: text !important;
     background-clip: text !important;
@@ -393,17 +393,17 @@ body.login-page-bg input {
 }
 
 /* Dark mode mapping (Optional, keep if user toggles dark mode, or make it hardcoded light) */
-body.dark-theme.login-page-bg .login-card {
+body.dark-mode.login-page-bg .login-card {
     background: #1f2937 !important;
     border-color: #374151 !important;
 }
 
-body.dark-theme.login-page-bg .login-card h2,
-body.dark-theme.login-page-bg .login-card a {
+body.dark-mode.login-page-bg .login-card h2,
+body.dark-mode.login-page-bg .login-card a {
     color: #f9fafb !important;
 }
 
-body.dark-theme.login-page-bg .login-card p {
+body.dark-mode.login-page-bg .login-card p {
     color: #9ca3af !important;
 }
 
@@ -1805,7 +1805,7 @@ a:hover {
     transition: opacity 0.3s ease;
 }
 
-body.dark-theme .navbar-branding {
+body.dark-mode .navbar-branding {
     background: linear-gradient(135deg, #60A5FA 0%, #A78BFA 100%) !important;
     -webkit-background-clip: text !important;
     background-clip: text !important;

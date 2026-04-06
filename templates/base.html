@@ -6,20 +6,38 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Career Consulting</title>
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@700&display=swap"
+        rel="stylesheet">
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Lenis Smooth Scroll (Optimized) -->
+    <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/lenis@1.1.13/dist/lenis.css">
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=26.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=29.0">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
-    
+
     <style>
+        /* Global: Hide side scrollbar while maintaining scrolling functionality */
+        ::-webkit-scrollbar {
+            display: none !important;
+        }
+
+        html {
+            scrollbar-width: none !important;
+            /* Firefox */
+            -ms-overflow-style: none !important;
+            /* IE and Edge */
+        }
+
         /* Shared Mobile Badge Styles */
         .mobile-nav-badge {
             display: none;
         }
 
         @media (max-width: 768px) {
+
             /* Nav Bar Badge */
             .mobile-nav-badge {
                 display: block !important;
@@ -27,7 +45,8 @@
                 left: 50% !important;
                 transform: translateX(-50%) !important;
                 background: transparent !important;
-                color: #00C853 !important; /* Emerald Green */
+                color: #00C853 !important;
+                /* Emerald Green */
                 padding: 4px 12px !important;
                 font-size: 0.85rem !important;
                 font-weight: 800 !important;
@@ -40,19 +59,43 @@
             }
 
             @keyframes navTextGlow {
-                0%, 100% { 
+
+                0%,
+                100% {
                     text-shadow: 0 0 8px rgba(0, 200, 83, 0.4);
                     transform: translateX(-50%) scale(1);
                     opacity: 0.9;
                 }
-                50% { 
+
+                50% {
                     text-shadow: 0 0 18px rgba(0, 200, 83, 0.8), 0 0 30px rgba(0, 200, 83, 0.3);
                     transform: translateX(-50%) scale(1.04);
                     opacity: 1;
                 }
             }
+
+            /* Profile Icon Mobile Flush Right */
+            .user-name-header,
+            .user-profile-header i.fa-chevron-down {
+                display: none !important;
+            }
+
+            .header-right {
+                padding-right: 0 !important;
+            }
+
+            .user-profile-header {
+                gap: 0 !important;
+                margin-right: 0 !important;
+            }
+        }
+        /* Non-intrusive Scroll Performance Optimization (90Hz Feel) */
+        body.is-scrolling {
+            pointer-events: none !important;
+            /* Disables hover recalcs during motion for maximum FPS */
         }
     </style>
+
 </head>
 
 <body class="{% if request.endpoint == 'login' %}login-page-bg{% endif %}">
@@ -60,7 +103,7 @@
         const dbTheme = "{{ session.get('theme', '') }}";
         const localTheme = localStorage.getItem('theme');
         if (dbTheme === 'dark' || (!dbTheme && localTheme === 'dark')) {
-            document.body.classList.add('dark-theme');
+            document.body.classList.add('dark-mode');
         }
     </script>
     {% if request.endpoint != 'login' %}
@@ -76,10 +119,9 @@
                     class="nav-item {% if request.endpoint == 'dashboard' %}active{% endif %}">
                     <i class="fa-solid fa-house"></i> <span class="nav-text">Home</span>
                 </a>
-                <a href="{{ url_for('history') }}"
-                    class="nav-item {% if request.endpoint == 'history' %}active{% endif %}"
-                    style="white-space: normal; line-height: 1.2;">
-                    <i class="fa-solid fa-clock-rotate-left"></i> <span class="nav-text">Last Viewed Roadmaps</span>
+                <a href="{{ url_for('my_learning') }}"
+                    class="nav-item {% if request.endpoint == 'my_learning' %}active{% endif %}">
+                    <i class="fa-solid fa-graduation-cap"></i> <span class="nav-text">Resume Learning</span>
                 </a>
                 <a href="{{ url_for('interview_home') }}"
                     class="nav-item {% if request.endpoint == 'interview_home' %}active{% endif %}">
@@ -88,6 +130,9 @@
                 <a href="{{ url_for('ats_test') }}"
                     class="nav-item {% if request.endpoint == 'ats_test' %}active{% endif %}">
                     <i class="fa-solid fa-file-lines"></i> <span class="nav-text">ATS Resume Test</span>
+                </a>
+                <a href="javascript:void(0)" class="nav-item" id="companyModeToggle">
+                    <i class="fa-solid fa-building"></i> <span class="nav-text">Company Mode</span>
                 </a>
                 <a href="{{ url_for('career_test') }}"
                     class="nav-item {% if request.endpoint == 'career_test' %}active{% endif %}">
@@ -112,11 +157,11 @@
                         <i class="fa-solid fa-bars"></i>
                     </button>
                 </div>
-                
+
                 <!-- Glowing Navbar Branding -->
                 <div class="navbar-branding">AI Career Consulting System</div>
                 <div class="mobile-nav-badge">CAREER GUIDANCE</div>
-                
+
                 <div class="header-right">
                     {% if session.get('user_id') or session.get('guest') %}
                     {% set display_name = session.get('name', 'Guest') %}
@@ -133,13 +178,22 @@
                             {% endif %}
                             <a href="{{ url_for('history') }}"><i class="fa-solid fa-clock-rotate-left"></i> History</a>
                             <div class="dropdown-divider"></div>
-                            <div
-                                style="padding: 0.5rem 1.4rem; color: var(--text-muted); font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">
-                                Settings</div>
-                            <a href="#" onclick="toggleTheme('light'); return false;"><i class="fa-solid fa-sun"></i>
-                                Light Mode</a>
-                            <a href="#" onclick="toggleTheme('dark'); return false;"><i class="fa-solid fa-moon"></i>
-                                Dark Mode</a>
+
+                            <!-- Theme Switcher Row -->
+                            <div class="theme-switcher-row" style="padding: 0.8rem 1.4rem;">
+                                <div
+                                    style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.6rem; font-weight: 700;">
+                                    Theme</div>
+                                <div class="theme-toggle-group">
+                                    <button onclick="toggleTheme('light')" id="theme-light-btn" class="theme-btn">
+                                        <i class="fa-solid fa-sun"></i> Light
+                                    </button>
+                                    <button onclick="toggleTheme('dark')" id="theme-dark-btn" class="theme-btn">
+                                        <i class="fa-solid fa-moon"></i> Dark
+                                    </button>
+                                </div>
+                            </div>
+
                             <div class="dropdown-divider"></div>
                             <a href="{{ url_for('logout') }}" class="text-danger"><i
                                     class="fa-solid fa-arrow-right-from-bracket"></i> Logout</a>
@@ -161,7 +215,7 @@
     </div>
     {% endif %}
 
-    {% if request.endpoint != 'login' %}
+    {% if request.endpoint not in ['login', 'roadmap'] %}
     <!-- Floating AI Chatbot -->
     <div class="floating-chatbot">
         <button class="chatbot-toggle" id="chatbotToggle" title="Career Assistant">
@@ -190,15 +244,732 @@
     <!-- Mobile Navigation Overlay -->
     <div class="mobile-overlay" id="mobileOverlay"></div>
 
+    <!-- Company Mode Modal -->
+    <div id="companyModeModal" class="cm-modal">
+        <div class="company-glow-wrapper">
+            <div class="cm-modal-content">
+                <div class="cm-modal-header">
+                    <h3>🏢 Target Company Preparation</h3>
+                    <span class="cm-close">&times;</span>
+                </div>
+                <div class="cm-modal-body">
+                    <div class="cm-experience-selector">
+                        <span>Select Status:</span>
+                        <div class="exp-toggle-group">
+                            <input type="radio" id="expFresher" name="experience" value="fresher" checked>
+                            <label for="expFresher">🎓 Fresher</label>
+
+                            <input type="radio" id="expExperienced" name="experience" value="experienced">
+                            <label for="expExperienced">🏢 Experienced</label>
+                        </div>
+                    </div>
+
+                    <div class="cm-search-container">
+                        <div class="cm-dropdown-wrapper">
+                            <input type="text" id="companySearchInput"
+                                placeholder="Enter Company Name (e.g. TCS, Google...)" autocomplete="off">
+                            <div id="companySuggestions" class="cm-suggestions"></div>
+                        </div>
+                        <button id="generateCompanyPlanBtn" class="btn-gradient">Generate Plan 🚀</button>
+                    </div>
+
+                    <div class="cm-motivation-box">
+                        <i class="fas fa-rocket"></i>
+                        <span>"Success is where preparation and opportunity meet. Let's make it happen!"</span>
+                    </div>
+
+                    <div id="companyPlanResult" class="cm-result-container" style="display: none;">
+                        <div id="cm-loading" class="cm-loading" style="display: none;">
+                            <i class="fa-solid fa-spinner fa-spin"></i> Analyzing company expectations...
+                        </div>
+                        <div id="cm-content" class="cm-content"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        /* Company Mode Modal Styles - Compact Modern UI */
+        .cm-modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(6px);
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .cm-modal.active {
+            display: flex;
+        }
+
+        .company-glow-wrapper {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2005;
+            overflow: visible;
+        }
+
+        /* 🔵 OPTIMIZED PREMIUM BREATHING BLUE AURA */
+        .company-glow-wrapper::before {
+            content: "";
+            position: absolute;
+            width: min(500px, 90vw);
+            height: min(500px, 90vw);
+            background: radial-gradient(circle,
+                    rgba(59, 130, 246, 0.25),
+                    rgba(37, 99, 235, 0.1) 45%,
+                    transparent 70%);
+            filter: blur(60px);
+            /* Optimized from 90px */
+            z-index: 0;
+            will-change: transform, opacity;
+            animation: auraBreath 6.5s ease-in-out infinite;
+        }
+
+        @keyframes auraBreath {
+
+            0%,
+            100% {
+                transform: scale(1) translate(0, 0);
+                opacity: 0.25;
+            }
+
+            50% {
+                transform: scale(1.1) translate(4px, -4px);
+                opacity: 0.45;
+            }
+        }
+
+        /* 💎 OPTIMIZED GLASSMORPHISM CARD WITH SMOOTH PERFORMANCE */
+        .cm-modal-content {
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(12px) saturate(160%);
+            -webkit-backdrop-filter: blur(12px) saturate(160%);
+            border-radius: 24px;
+
+            width: 500px !important;
+            max-width: 90% !important;
+            min-height: 250px !important;
+            max-height: 90vh !important;
+            overflow: hidden !important;
+            display: flex;
+            flex-direction: column;
+            margin: 0 auto !important;
+
+            position: relative;
+            z-index: 2;
+            padding: 24px;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.1);
+
+            will-change: transform, opacity;
+            transform: scale(1);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            animation: cmFadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+
+            scrollbar-width: thin;
+            scrollbar-color: rgba(59, 130, 246, 0.2) transparent;
+        }
+
+        /* GPU-Accelerated Dynamic Glow (Pseudo-element optimization) */
+        .cm-modal-content::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 24px;
+            box-shadow:
+                0 0 20px 2px rgba(59, 130, 246, 0.25),
+                0 0 60px 8px rgba(59, 130, 246, 0.1);
+            z-index: -1;
+            opacity: 0.6;
+            will-change: opacity;
+            animation: smoothGlowPulse 4s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes smoothGlowPulse {
+
+            0%,
+            100% {
+                opacity: 0.45;
+            }
+
+            50% {
+                opacity: 0.85;
+            }
+        }
+
+        .cm-modal-content:hover {
+            transform: translateY(-8px) scale(1.01);
+            border-color: rgba(59, 130, 246, 0.4);
+        }
+
+        @keyframes cmFadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.96) translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .cm-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid #f3f4f6;
+            padding-bottom: 0.7rem;
+        }
+
+        .cm-modal-header h3 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 700;
+            /* Increased weight */
+            color: #111827;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            letter-spacing: -0.02em;
+        }
+
+        .cm-close {
+            font-size: 1.4rem;
+            cursor: pointer;
+            color: #9ca3af;
+            transition: color 0.2s;
+        }
+
+        .cm-close:hover {
+            color: #ef4444;
+        }
+
+        .cm-modal-body {
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 8px;
+            padding-bottom: 20px;
+        }
+
+        /* Scrollbar Styling */
+        .cm-modal-body::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .cm-modal-body::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .cm-modal-body::-webkit-scrollbar-thumb {
+            background: rgba(59, 130, 246, 0.12);
+            border-radius: 10px;
+        }
+
+        .cm-search-container {
+            display: flex;
+            gap: 0.8rem;
+            margin-bottom: 1.2rem;
+            flex-wrap: nowrap;
+            /* Force one row */
+            align-items: center;
+        }
+
+        .cm-dropdown-wrapper {
+            flex: 1;
+            position: relative;
+            min-width: 180px;
+        }
+
+        .cm-motivation-box {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 1.2rem;
+            padding: 10px;
+            background: rgba(59, 130, 246, 0.05);
+            border-radius: 12px;
+            border: 1px dashed rgba(59, 130, 246, 0.2);
+            font-size: 13.5px;
+            color: #4b5563;
+            font-style: italic;
+            transition: all 0.3s ease;
+        }
+
+        .cm-motivation-box i {
+            color: #3b82f6;
+            font-size: 14px;
+        }
+
+        body.dark-mode .cm-motivation-box {
+            background: rgba(255, 255, 255, 0.03);
+            border-color: rgba(255, 255, 255, 0.1);
+            color: #9ca3af;
+        }
+
+        #companySearchInput {
+            width: 100%;
+            height: 46px;
+            /* Increased height */
+            padding: 0 16px;
+            border-radius: 12px;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            background: rgba(249, 250, 251, 0.8);
+            color: #111827;
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        #companySearchInput:focus {
+            outline: none;
+            border-color: #3b82f6;
+            background: #ffffff;
+            box-shadow:
+                0 0 0 4px rgba(59, 130, 246, 0.12),
+                inset 0 2px 4px rgba(0, 0, 0, 0.02);
+        }
+
+        #companySearchInput::placeholder {
+            color: #9ca3af;
+            opacity: 0.8;
+            font-weight: 400;
+        }
+
+        .cm-experience-selector {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding: 0 4px;
+        }
+
+        .cm-experience-selector span {
+            font-size: 14px;
+            font-weight: 600;
+            color: #4b5563;
+        }
+
+        .exp-toggle-group {
+            display: flex;
+            background: #f3f4f6;
+            padding: 4px;
+            border-radius: 12px;
+            gap: 4px;
+        }
+
+        .exp-toggle-group input {
+            display: none;
+        }
+
+        .exp-toggle-group label {
+            padding: 8px 16px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            color: #6b7280;
+            user-select: none;
+        }
+
+        .exp-toggle-group input:checked+label {
+            background: #ffffff;
+            color: #2563eb;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        /* 🌒 DARK MODE TOGGLE STYLE */
+        body.dark-mode .exp-toggle-group {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        body.dark-mode .cm-experience-selector span {
+            color: #d1d5db;
+        }
+
+        body.dark-mode .exp-toggle-group input:checked+label {
+            background: #374151;
+            color: #60a5fa;
+        }
+
+        #generateCompanyPlanBtn {
+            height: 46px;
+            /* Matched to input */
+            border-radius: 12px;
+            padding: 0 20px;
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 14px;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #generateCompanyPlanBtn:hover {
+            transform: translateY(-2px) scale(1.02);
+            filter: brightness(1.1);
+            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
+        }
+
+        #generateCompanyPlanBtn:active {
+            transform: translateY(0) scale(0.98);
+        }
+
+        .cm-suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 100%;
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-top: none;
+            border-radius: 0 0 12px 12px;
+            max-height: 200px;
+            overflow-y: auto;
+            display: none;
+            z-index: 101;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+        }
+
+        .cm-suggestion-item {
+            padding: 10px 14px;
+            cursor: pointer;
+            transition: background 0.2s;
+            color: #4b5563;
+            font-size: 14px;
+        }
+
+        .cm-suggestion-item:hover {
+            background: #f9fafb;
+            color: #6366f1;
+        }
+
+        .cm-result-container {
+            margin-top: 1.2rem;
+            padding-top: 1.2rem;
+            border-top: 1px solid #f3f4f6;
+        }
+
+        .cm-loading {
+            text-align: center;
+            padding: 1.5rem;
+            color: #6366f1;
+            font-size: 14px;
+        }
+
+        .cm-content {
+            color: #4b5563;
+            line-height: 1.8;
+            /* Improved readability for bullet-free text */
+            font-size: 14.5px;
+        }
+
+        .cm-content h4 {
+            color: #1f2937;
+            margin-top: 2rem;
+            margin-bottom: 0.8rem;
+            font-size: 16px;
+            font-weight: 700;
+            border-left: 4px solid #3b82f6;
+            padding-left: 12px;
+            letter-spacing: -0.01em;
+        }
+
+        .cm-content a {
+            color: #2563eb;
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-block;
+            margin: 2px 0;
+            transition: all 0.2s ease;
+        }
+
+        .cm-content a:hover {
+            color: #1d4ed8;
+            text-decoration: underline;
+            transform: translateX(2px);
+        }
+
+        /* 🌑 DARK MODE OVERRIDES */
+        body.dark-mode .cm-modal-content {
+            background: rgba(31, 41, 55, 0.9);
+            /* Dark translucent background */
+            backdrop-filter: blur(20px) saturate(180%);
+            border-color: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 30px 70px rgba(0, 0, 0, 0.4);
+        }
+
+        body.dark-mode .cm-modal-header h3 {
+            color: #f9fafb;
+        }
+
+        body.dark-mode .cm-modal-header {
+            border-bottom-color: #374151;
+        }
+
+        body.dark-mode #companySearchInput {
+            background: rgba(17, 24, 39, 0.8);
+            border-color: rgba(255, 255, 255, 0.1);
+            color: #f9fafb;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        body.dark-mode #companySearchInput::placeholder {
+            color: #9ca3af;
+        }
+
+        body.dark-mode .cm-suggestions {
+            background: #1f2937;
+            border-color: #374151;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        body.dark-mode .cm-suggestion-item {
+            color: #d1d5db;
+        }
+
+        body.dark-mode .cm-suggestion-item:hover {
+            background: #374151;
+            color: #60a5fa;
+        }
+
+        body.dark-mode .cm-content {
+            color: #d1d5db;
+        }
+
+        body.dark-mode .cm-content h4 {
+            color: #f9fafb;
+            border-left-color: #3b82f6;
+        }
+
+        body.dark-mode .cm-content a {
+            color: #60a5fa;
+        }
+
+        body.dark-mode .cm-content a:hover {
+            color: #93c5fd;
+        }
+
+        body.dark-mode .cm-result-container {
+            border-top-color: #374151;
+        }
+
+        body.dark-mode .cm-modal-body::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        /* 📱 MOBILE RESPONSIVE FIXES */
+        @media screen and (max-width: 768px) {
+            .cm-modal-content {
+                width: 85% !important;
+                /* Final compact width */
+                height: 65vh !important;
+                /* Final compact height */
+                padding: 15px !important;
+                border-radius: 20px !important;
+                margin: 0 auto !important;
+            }
+
+            .cm-modal-body {
+                padding-right: 4px !important;
+            }
+
+            .cm-search-container {
+                flex-direction: column;
+                gap: 10px !important;
+            }
+
+            .cm-dropdown-wrapper {
+                width: 100%;
+            }
+
+            #generateCompanyPlanBtn {
+                width: 100%;
+                height: 44px;
+            }
+
+            .cm-experience-selector {
+                flex-direction: column;
+                align-items: flex-start !important;
+                gap: 8px !important;
+            }
+        }
+    </style>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const modal = document.getElementById('companyModeModal');
+            const toggleBtn = document.getElementById('companyModeToggle');
+            const closeBtn = document.querySelector('.cm-close');
+            const searchInput = document.getElementById('companySearchInput');
+            const suggestionsBox = document.getElementById('companySuggestions');
+            const generateBtn = document.getElementById('generateCompanyPlanBtn');
+            const resultContainer = document.getElementById('companyPlanResult');
+            const loadingBox = document.getElementById('cm-loading');
+            const contentBox = document.getElementById('cm-content');
+
+            const companies = [
+                "Google", "Amazon", "Microsoft", "Meta", "Apple",
+                "TCS", "Infosys", "Wipro", "HCL",
+                "Zoho", "Freshworks", "Flipkart", "Accenture"
+            ];
+
+            // Sidebar Toggle
+            toggleBtn.addEventListener('click', () => {
+                modal.classList.add('active');
+                modal.querySelector('.company-glow-wrapper').classList.add('active');
+                document.body.style.overflow = 'hidden'; // Lock Background
+            });
+
+            // Close Modal
+            closeBtn.addEventListener('click', () => {
+                modal.classList.remove('active');
+                modal.querySelector('.company-glow-wrapper').classList.remove('active');
+                document.body.style.overflow = ''; // Unlock Background
+            });
+
+            window.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.classList.remove('active');
+                    modal.querySelector('.company-glow-wrapper').classList.remove('active');
+                    document.body.style.overflow = ''; // Unlock Background
+                }
+            });
+
+            // Search Logic
+            searchInput.addEventListener('input', function () {
+                const val = this.value.toLowerCase();
+                suggestionsBox.innerHTML = '';
+                if (!val) {
+                    suggestionsBox.style.display = 'none';
+                    return;
+                }
+
+                const filtered = companies.filter(c => c.toLowerCase().includes(val));
+                if (filtered.length > 0) {
+                    filtered.forEach(c => {
+                        const div = document.createElement('div');
+                        div.className = 'cm-suggestion-item';
+                        div.textContent = c;
+                        div.onclick = function () {
+                            searchInput.value = c;
+                            suggestionsBox.style.display = 'none';
+                        };
+                        suggestionsBox.appendChild(div);
+                    });
+                    suggestionsBox.style.display = 'block';
+                } else {
+                    suggestionsBox.style.display = 'none';
+                }
+            });
+
+            // Close suggestions on blur
+            document.addEventListener('click', (e) => {
+                if (e.target !== searchInput && e.target !== suggestionsBox) {
+                    suggestionsBox.style.display = 'none';
+                }
+            });
+
+            // Generate Logic
+            generateBtn.addEventListener('click', async () => {
+                const company = searchInput.value;
+                const experience = document.querySelector('input[name="experience"]:checked').value;
+
+                if (!company) {
+                    alert('Please select a company first.');
+                    return;
+                }
+
+                resultContainer.style.display = 'block';
+                loadingBox.style.display = 'block';
+                contentBox.innerHTML = '';
+
+                try {
+                    const response = await fetch('/api/company-mode', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            company,
+                            experience_level: experience
+                        })
+                    });
+
+                    const data = await response.json();
+                    loadingBox.style.display = 'none';
+
+                    if (data.strategy) {
+                        // Minimalist HTML-friendly formatter
+                        let html = data.strategy
+                            .replace(/^([^\x00-\x7F])\s(.*)/gm, '<h4>$1 $2</h4>') // Match emoji-led headers
+                            .replace(/\n/g, '<br>'); // Preserve all spacing and structure
+
+                        // 📁 PRE-FORMATTED MANDATORY FOOTER (Guaranteed Inclusion)
+                        const footerHtml = `
+                            <br><br>
+                            <h4>📁 Placement Preparation Materials</h4>
+                            General Placement Materials<br>
+                            <a href="https://drive.google.com/drive/folders/1Txer4_U8Q7NOeBCKLZyBLf5rhhwP-lt0" target="_blank">Complete Placement Drive Materials (Coding + Interview + Resources)</a><br><br>
+                            
+                            <h4>🧠 Aptitude Preparation Materials</h4>
+                            This material is specifically useful for aptitude rounds including quantitative, logical, and verbal preparation.<br>
+                            <a href="https://drive.google.com/file/d/1Eqq5Yvta0hzKMrx7o-XaiL6K09IMKENT/view?usp=drivesdk" target="_blank">Aptitude Preparation PDF (Quantitative, Logical, Verbal)</a><br>
+                        `;
+
+                        contentBox.innerHTML = html + footerHtml;
+                    } else {
+                        contentBox.innerHTML = `<p style="color:#ff4757;">${data.error || 'Something went wrong.'}</p>`;
+                    }
+                } catch (error) {
+                    loadingBox.style.display = 'none';
+                    contentBox.innerHTML = `<p style="color:#ff4757;">Failed to generate strategy. Please try again.</p>`;
+                    console.error('Error:', error);
+                }
+            });
+        });
+    </script>
     <script src="{{ url_for('static', filename='js/script.js') }}?v=1.1"></script>
     <script>
         function toggleTheme(themeType) {
             if (themeType === 'dark') {
-                document.body.classList.add('dark-theme');
+                document.body.classList.add('dark-mode');
             } else {
-                document.body.classList.remove('dark-theme');
+                document.body.classList.remove('dark-mode');
             }
             localStorage.setItem('theme', themeType);
+
+            // Update UI buttons if they exist
+            const lightBtn = document.getElementById('theme-light-btn');
+            const darkBtn = document.getElementById('theme-dark-btn');
+            if (lightBtn && darkBtn) {
+                if (themeType === 'dark') {
+                    darkBtn.classList.add('active');
+                    lightBtn.classList.remove('active');
+                } else {
+                    lightBtn.classList.add('active');
+                    darkBtn.classList.remove('active');
+                }
+            }
 
             // Notify Backend Session
             fetch('/update_theme', {
@@ -209,7 +980,87 @@
                 body: JSON.stringify({ theme: themeType })
             });
         }
+
+        // Initialize button states on load
+        document.addEventListener('DOMContentLoaded', () => {
+            const currentTheme = localStorage.getItem('theme') || (document.body.classList.contains('dark-mode') ? 'dark' : 'light');
+            toggleTheme(currentTheme);
+
+            // Performance-Aware Scrolling (Low-End Laptop Support)
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                let scrollTimeout;
+                let lastFrameTime = performance.now();
+                let frameCount = 0;
+                let lowFPSCount = 0;
+
+                const lenis = new Lenis({
+                    duration: 0.8,  // Faster duration for snappy mobile feel
+                    lerp: 0.15,     // More immediate response
+                    smoothWheel: true,
+                    smoothTouch: true, // Enable for "90Hz" feel on mobile
+                    syncTouch: true,  // Sync touch directly with animation loop
+                    wheelMultiplier: 1.1,
+                    touchMultiplier: 2.5, // Sensitive but controlled touch
+                    infinite: false,
+                });
+                window.lenis = lenis; // Expose globally for portal-modal scroll locking
+
+                // Dynamic CSS Throttling: Add class during scroll to disable expensive effects
+                lenis.on('scroll', () => {
+                    document.body.classList.add('is-scrolling');
+                    clearTimeout(scrollTimeout);
+                    scrollTimeout = setTimeout(() => {
+                        document.body.classList.remove('is-scrolling');
+                    }, 100); // Quick recovery for hover interactions
+                });
+
+                let isDestroyed = false;
+
+                function raf(time) {
+                    if (isDestroyed) return;
+                    
+                    try {
+                        // FPS Watchdog: Monitor performance and fallback if lagging
+                        frameCount++;
+                        if (time - lastFrameTime >= 1000) {
+                            const fps = frameCount;
+                            frameCount = 0;
+                            lastFrameTime = time;
+                            
+                            // Fallback threshold: if FPS is clearly struggling, disable smooth scroll
+                            if (fps < 35) { 
+                                lowFPSCount++;
+                                if (lowFPSCount >= 3) {
+                                    console.warn("Safety Fallback: Disabling smooth scroll for stability (FPS: " + fps + ")");
+                                    lenis.destroy();
+                                    isDestroyed = true;
+                                    document.body.classList.remove('is-scrolling');
+                                    // Remove the pointer-events safeguard if we hang here
+                                    document.body.classList.add('low-performance-fallback');
+                                    return; // Kill the loop
+                                }
+                            } else {
+                                lowFPSCount = Math.max(0, lowFPSCount - 1); // Graceful recovery
+                            }
+                        }
+
+                        lenis.raf(time);
+                        requestAnimationFrame(raf);
+                    } catch (e) {
+                        console.error("Scroll loop crashed, initiating fallback...", e);
+                        lenis.destroy();
+                        isDestroyed = true;
+                        document.body.classList.remove('is-scrolling');
+                    }
+                }
+
+                requestAnimationFrame(raf);
+            }
+        });
     </script>
+
+    {% block extra_body %}{% endblock %}
 </body>
+
 
 </html>

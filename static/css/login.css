@@ -1,110 +1,201 @@
-    .forgot-pwd-modal {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(10, 10, 20, 0.4);
-        backdrop-filter: blur(8px);
-        -webkit-backdrop-filter: blur(8px);
-        z-index: 9999;
-        display: none;
-        justify-content: center;
-        align-items: center;
+/* --- Glassmorphic Executive Login Card --- */
+.login-container {
+    min-height: calc(100vh - 120px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: transparent;
+    padding: 2rem;
+}
+
+.login-card {
+    background: rgba(255, 255, 255, 0.72);
+    backdrop-filter: blur(32px) saturate(180%);
+    -webkit-backdrop-filter: blur(32px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.45);
+    border-radius: 20px;
+    box-shadow: 0 15px 45px rgba(0, 0, 0, 0.08),
+        0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+    padding: 1rem 0.85rem;
+    /* Micro-padding */
+    width: 100%;
+    max-width: 210px;
+    /* Micro-card width reduced further */
+    text-align: center;
+    transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+    animation: loginIn 0.8s ease-out;
+}
+
+@keyframes loginIn {
+    from {
         opacity: 0;
-        transition: opacity 0.3s ease;
+        transform: translateY(20px) scale(0.98);
     }
 
-    .forgot-pwd-modal.show {
-        display: flex;
-    }
-
-    .forgot-pwd-modal.active {
+    to {
         opacity: 1;
+        transform: translateY(0) scale(1);
     }
+}
 
-    .fp-card {
-        background: #ffffff !important;
-        padding: 2.5rem;
-        border-radius: 32px;
-        width: 90%;
-        max-width: 440px;
-        position: relative;
-        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.06) !important;
-        border: 1px solid rgba(255, 255, 255, 0.8) !important;
-        transform: scale(0.95) translateY(20px);
-        transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        color: #6b7280 !important;
-        text-shadow: none !important;
-    }
+body.dark-mode .login-card {
+    background: rgba(15, 23, 42, 0.75);
+    border-color: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3),
+        0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+}
 
-    .fp-card h3 {
-        color: #111827 !important;
-        text-shadow: none !important;
-        font-size: 1.5rem;
-        font-weight: 700;
-    }
+/* --- Simplified Header --- */
+.login-header h2 {
+    font-size: 1.38rem;
+    /* Scaled down for ultra-compact card */
+    font-weight: 800;
+    margin-bottom: 0.3rem;
+    background: linear-gradient(135deg, #1e293b 0%, #6366f1 50%, #8b5cf6 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -0.02em;
+}
 
-    .fp-card p {
-        color: #6b7280 !important;
-        text-shadow: none !important;
-    }
+#authSubtitle {
+    color: #64748b;
+    font-size: 0.78rem;
+    /* Optimized for minimalist card */
+    font-weight: 500;
+    margin-bottom: 1.1rem;
+}
 
-    .fp-card .form-control {
-        background: #f3f4f6 !important;
-        border: 1px solid transparent !important;
-        border-radius: 12px !important;
-        color: #111827 !important;
-        box-shadow: none !important;
-        padding: 1.2rem 1rem !important;
-        font-size: 1rem !important;
-        transition: all 0.3s ease !important;
-        margin-bottom: 0.8rem;
-    }
+body.dark-mode #authSubtitle {
+    color: #94a3b8;
+}
 
-    .fp-card .form-control:focus {
-        background: #ffffff !important;
-        border-color: #d1d5db !important;
-        box-shadow: 0 0 0 4px rgba(229, 231, 235, 0.5) !important;
-        outline: none !important;
-    }
+/* --- Compact Form Groups --- */
+.form-group {
+    margin-bottom: 0.8rem;
+    /* Tighter margins */
+    width: 100%;
+}
 
-    .fp-card .form-control::placeholder {
-        color: #9ca3af !important;
-        font-weight: 500 !important;
-    }
+.form-control {
+    background: rgba(241, 245, 249, 0.6) !important;
+    border: 1px solid rgba(226, 232, 240, 0.8) !important;
+    border-radius: 12px !important;
+    padding: 0.9rem 1.2rem !important;
+    font-size: 0.95rem !important;
+    transition: all 0.3s ease !important;
+}
 
-    .forgot-pwd-modal.active .fp-card {
-        transform: scale(1) translateY(0);
-    }
+body.dark-mode .form-control {
+    background: rgba(30, 41, 59, 0.5) !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+}
 
-    .close-modal {
-        position: absolute;
-        top: 18px;
-        right: 22px;
-        background: none;
-        border: none;
-        font-size: 1.8rem;
-        color: #9ca3af;
-        cursor: pointer;
-        transition: color 0.2s ease;
-        text-shadow: none;
-    }
+.form-control:focus {
+    background: #ffffff !important;
+    border-color: #6366f1 !important;
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1) !important;
+}
 
-    .close-modal:hover {
-        color: #111827;
-    }
+body.dark-mode .form-control:focus {
+    background: #1e293b !important;
+}
 
-    /* Enforce dark layout inheritance safely inside modal if configured */
-    body.dark-theme.login-page-bg .fp-card {
-        background: #1f2937 !important;
-        border-color: #374151 !important;
-    }
+/* --- Shared Forgot Modal Styling --- */
+.forgot-pwd-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(15, 23, 42, 0.4);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    z-index: 10000;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    transition: all 0.4s ease;
+}
 
-    body.dark-theme.login-page-bg .fp-card h3 {
-        color: #f9fafb !important;
-    }
+.forgot-pwd-modal.show {
+    display: flex;
+}
 
-    body.dark-theme.login-page-bg .fp-card p {
-        color: #d1d5db !important;
-    }
+.forgot-pwd-modal.active {
+    opacity: 1;
+}
+
+.fp-card {
+    background: #ffffff;
+    padding: 3rem;
+    border-radius: 28px;
+    width: 90%;
+    max-width: 420px;
+    position: relative;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.12);
+    transform: translateY(20px) scale(0.95);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.forgot-pwd-modal.active .fp-card {
+    transform: translateY(0) scale(1);
+}
+
+body.dark-mode .fp-card {
+    background: #1e293b;
+    color: #f9fafb;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.close-modal {
+    position: absolute;
+    top: 20px;
+    right: 24px;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: #94a3b8;
+    cursor: pointer;
+}
+
+.close-modal:hover {
+    color: #1e293b;
+}
+
+body.dark-mode .close-modal:hover {
+    color: #fff;
+}
+
+/* --- Special 'Upped' Guest Button --- */
+.guest-btn-premium {
+    background: rgba(255, 255, 255, 0.4) !important;
+    border: 1.5px solid rgba(0, 0, 0, 0.05) !important;
+    color: #475569 !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.3px;
+    margin-top: 15px !important;
+    padding: 1.1rem !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03) !important;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+}
+
+body.dark-mode .guest-btn-premium {
+    background: rgba(255, 255, 255, 0.04) !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+    color: #e2e8f0 !important;
+}
+
+.guest-btn-premium:hover {
+    background: #ffffff !important;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06) !important;
+    color: #6366f1 !important;
+    border-color: rgba(99, 102, 241, 0.3) !important;
+}
+
+body.dark-mode .guest-btn-premium:hover {
+    background: rgba(255, 255, 255, 0.08) !important;
+    color: #fff !important;
+}

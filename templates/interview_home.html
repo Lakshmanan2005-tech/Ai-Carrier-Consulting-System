@@ -2,6 +2,29 @@
 
 {% block content %}
 <div class="interview-home-container" style="max-width: 900px; margin: 0 auto; padding-top: 2rem; animation: fadeIn 0.6s ease;">
+    <style>
+        @media (max-width: 768px) {
+            .interview-home-container {
+                padding-top: 10rem !important;
+                padding-left: 10px !important;
+                padding-right: 10px !important;
+            }
+            .interview-home-container .dashboard-hero-card {
+                padding: 2rem 1.25rem !important;
+                border-radius: 20px !important;
+            }
+            .interview-home-container h2 {
+                font-size: 1.6rem !important;
+            }
+            .interview-home-container p {
+                font-size: 1rem !important;
+                margin-bottom: 1.5rem !important;
+            }
+            .interview-home-container .search-form {
+                border-radius: 24px !important;
+            }
+        }
+    </style>
     <!-- AI Interview Practice Simulator -->
     <div class="dashboard-hero-card" style="padding: 3rem 2.5rem; background: linear-gradient(135deg, rgba(108, 99, 255, 0.08) 0%, rgba(74, 144, 226, 0.08) 100%); border: 1px solid rgba(108, 99, 255, 0.2);">
         <h2 style="font-size: 2.2rem; margin-bottom: 1rem; color: var(--text-primary); text-align: center;"><i class="fa-solid fa-microphone" style="color: var(--primary-color);"></i> AI Interview Practice Simulator</h2>

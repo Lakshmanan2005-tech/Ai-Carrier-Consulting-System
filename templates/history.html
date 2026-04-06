@@ -17,7 +17,7 @@
                 </a>
                 {% endfor %}
             {% else %}
-                <div style="grid-column: 1 / -1; text-align: center; padding: 4rem; background: white; border-radius: 20px; border: 1px dashed rgba(108, 99, 255, 0.4);">
+                <div style="grid-column: 1 / -1; text-align: center; padding: 4rem; background: var(--card-bg); border-radius: 20px; border: 1px dashed var(--border-color);">
                     <i class="fa-solid fa-folder-open" style="font-size: 3rem; color: var(--text-muted); margin-bottom: 1rem;"></i>
                     <p style="color: var(--text-secondary); font-size: 1.15rem; font-weight: 500;">No recently viewed roadmaps</p>
                 </div>
@@ -43,7 +43,7 @@
                 `).join('');
             } else {
                 container.innerHTML = `
-                    <div style="grid-column: 1 / -1; text-align: center; padding: 4rem; background: white; border-radius: 20px; border: 1px dashed rgba(108, 99, 255, 0.4);">
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 4rem; background: var(--card-bg); border: 1px dashed var(--border-color); border-radius: 20px;">
                         <i class="fa-solid fa-folder-open" style="font-size: 3rem; color: var(--text-muted); margin-bottom: 1rem;"></i>
                         <p style="color: var(--text-secondary); font-size: 1.15rem; font-weight: 500;">No recently viewed roadmaps</p>
                     </div>

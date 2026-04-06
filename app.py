@@ -13,10 +13,11 @@ import docx
 import io
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
-from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, ListFlowable, ListItem, HRFlowable
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch
-from flask import Flask, render_template, request, redirect, url_for, session, jsonify, abort, send_file
+# Trigger reload...
+from flask import Flask, render_template, request, redirect, url_for, session, jsonify, abort, send_file, make_response
 from werkzeug.security import generate_password_hash, check_password_hash
 from dotenv import load_dotenv
 import urllib.parse
@@ -26,8 +27,17 @@ from roadmap_data import ROADMAPS,SKILL_ALIASES, RESOURCES_MAP, JOBS_MAP, INTERV
 # Force override to prevent old keys getting stuck in memory caching
 load_dotenv(override=True)
 
-app = Flask(__name__)
+app = Flask(__name__, 
+            template_folder=os.path.join(os.path.abspath(os.path.dirname(__file__)), 'templates'),
+            static_folder=os.path.join(os.path.abspath(os.path.dirname(__file__)), 'static'))
 app.secret_key = os.getenv('SECRET_KEY', 'your_secret_key')
+
+@app.after_request
+def add_header(response):
+    response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0, max-age=0'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '-1'
+    return response
 
 GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
 
@@ -40,6 +50,58 @@ except Exception as e:
     print(f"GenAI Config Error: {str(e)}")
 
 NVIDIA_API_KEY = os.getenv('NVIDIA_API_KEY')
+GROQ_API_KEY = os.getenv('GROQ_API_KEY')
+GROQ_API_KEY_2 = os.getenv('GROQ_API_KEY_2.0')
+
+def get_groq_market_demand():
+    """Fetches real-time IT market demand data using Groq Llama-3."""
+    if not GROQ_API_KEY:
+        # High-quality Mock Data if API key is missing
+        return {
+            "skills": [
+                {"name": "AI & Machine Learning", "demand": 94, "growth": 15, "color": "#6366f1"},
+                {"name": "Cloud Computing", "demand": 89, "growth": 10, "color": "#0ea5e9"},
+                {"name": "Full Stack Dev", "demand": 86, "growth": 8, "color": "#10b981"},
+                {"name": "Cyber Security", "demand": 82, "growth": 12, "color": "#f43f5e"},
+                {"name": "Data Engineering", "demand": 78, "growth": 14, "color": "#f59e0b"},
+                {"name": "DevOps & SRE", "demand": 75, "growth": 9, "color": "#8b5cf6"}
+            ]
+        }
+    
+    url = "https://api.groq.com/openai/v1/chat/completions"
+    headers = {
+        "Authorization": f"Bearer {GROQ_API_KEY}",
+        "Content-Type": "application/json"
+    }
+    
+    prompt = """
+    Analyze the current (2024-2025) global IT job market. 
+    Return exactly 6 of the most in-demand skills and their current market demand percentage (0-100).
+    Provide an estimated year-over-year growth percentage for each.
+    
+    Strict Output Format (JSON only):
+    {
+        "skills": [
+            {"name": "Skill Name", "demand": 95, "growth": 12, "color": "#HEX_CODE"},
+            ...
+        ]
+    }
+    Use vibrant, modern colors (Indigo, Emerald, Sky Blue, Rose, Amber, Violet).
+    """
+
+    payload = {
+        "model": "llama-3.3-70b-versatile",
+        "messages": [{"role": "user", "content": prompt}],
+        "temperature": 0.1,
+        "response_format": {"type": "json_object"}
+    }
+    
+    try:
+        response = requests.post(url, headers=headers, json=payload, timeout=15)
+        return response.json()['choices'][0]['message']['content']
+    except Exception as e:
+        print(f"Groq API Error: {e}")
+        return None
 
 def generate_nvidia_roadmap(skill):
     """Generates an in-depth, expert-level 12-point roadmap using NVIDIA AI."""
@@ -116,6 +178,321 @@ def generate_nvidia_roadmap(skill):
     except Exception as e:
         print(f"NVIDIA API Error: {e}")
         return None
+
+def get_nvidia_interview_questions(skill):
+    """Generates the top 5 interview questions for a given skill using NVIDIA AI."""
+    if not NVIDIA_API_KEY:
+        return None
+        
+    url = "https://integrate.api.nvidia.com/v1/chat/completions"
+    headers = {
+        "Authorization": f"Bearer {NVIDIA_API_KEY}",
+        "Content-Type": "application/json"
+    }
+    
+    prompt = f"""
+    Generate exactly 5 highly relevant and popular technical interview questions for the skill: {skill}.
+    
+    For each item:
+    1. A sophisticated technical question.
+    2. A concise, expert-level answer (max 3 sentences).
+    3. Identify 1-3 most important technical keywords in both the question and the answer.
+    4. Wrap these keywords in a <span class="iq-keyword">...</span> tag.
+    
+    Example:
+    Question: "What is the difference between <span class="iq-keyword">Machine Learning</span> and <span class="iq-keyword">Deep Learning</span>?"
+    Answer: "<span class="iq-keyword">Machine Learning</span> uses algorithms to parse data, whereas <span class="iq-keyword">Deep Learning</span> uses neural networks to simulate human intelligence."
+    
+    STRICT REQUIREMENTS:
+    1. Return ONLY a valid JSON object with a single root key 'items'.
+    2. 'items' must be a list of objects, each with 'q' (question) and 'a' (answer) keys.
+    3. Use standard HTML tags sparingly.
+    4. Provide the result as:
+    {{
+        "items": [
+            {{ "q": "Question text...", "a": "Answer text..." }},
+            ...
+        ]
+    }}
+    """
+
+    payload = {
+        "model": "meta/llama-3.1-70b-instruct",
+        "messages": [{"role": "user", "content": prompt}],
+        "temperature": 0.5,
+        "max_tokens": 2048,
+        "stream": False
+    }
+
+    try:
+        response = requests.post(url, headers=headers, json=payload, timeout=45)
+        res_json = response.json()
+        content = res_json['choices'][0]['message']['content']
+        # Extract JSON from markdown if needed
+        if '```json' in content:
+            content = content.split('```json')[1].split('```')[0].strip()
+        elif '```' in content:
+            content = content.split('```')[1].split('```')[0].strip()
+        return json.loads(content)
+    except Exception as e:
+        print(f"NVIDIA Interview questions Error: {e}")
+        return None
+
+@app.route('/api/interview-questions')
+def api_interview_questions():
+    skill = request.args.get('skill', 'Software Engineering')
+    questions = get_nvidia_interview_questions(skill)
+    if questions:
+        return jsonify(questions)
+    return jsonify({"questions": []}), 500
+
+# Official Career Portals Mapping (Strict)
+OFFICIAL_CAREERS = {
+    "google": "https://www.google.com/about/careers/applications/jobs/results/",
+    "microsoft": "https://careers.microsoft.com/us/en/search-results",
+    "amazon": "https://amazon.jobs/en/search?offset=0&result_limit=10&sort=recent",
+    "apple": "https://www.apple.com/jobs/in/",
+    "meta": "https://www.metacareers.com/jobs/",
+    "tcs": "https://www.tcs.com/careers/india",
+    "infosys": "https://www.infosys.com/careers/",
+    "wipro": "https://careers.wipro.com/global-india/",
+    "hcl": "https://www.hcltech.com/careers",
+    "accenture": "https://www.accenture.com/in-en/careers",
+    "adobe": "https://www.adobe.com/careers.html",
+    "netflix": "https://jobs.netflix.com/search",
+    "uber": "https://www.uber.com/about/careers/",
+    "zomato": "https://www.zomato.com/careers",
+    "swiggy": "https://www.swiggy.com/careers/",
+    "ola": "https://ola.recruitee.com/",
+    "flipkart": "https://www.flipkartcareers.com/",
+    "paytm": "https://paytm.com/careers/",
+    "atlassian": "https://www.atlassian.com/company/careers",
+    "ibm": "https://www.ibm.com/careers/in-en/search",
+    "oracle": "https://eeho.fa.us2.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX_1/requisitions"
+}
+
+
+def get_live_jobs():
+    """Fetches trending IT jobs with DIRECT DEEP LINKS to official career portals using Groq AI."""
+    fallback_jobs = [
+        {"company": "Zoho", "role": "Software Developer", "location": "Chennai", "salary": "₹7 - ₹12 LPA", "type": "Full-Time", "logo": "fa-solid fa-z", "logo_url": "https://www.google.com/s2/favicons?domain=zoho.com&sz=128", "url": "https://www.zoho.com/careers/search.html"}, 
+        {"company": "Freshworks", "role": "Product Engineer", "location": "Chennai", "salary": "₹8 - ₹10 LPA", "type": "Full-Time", "logo": "fa-solid fa-leaf", "logo_url": "https://www.google.com/s2/favicons?domain=www.freshworks.com&sz=128", "url": "https://www.freshworks.com/company/careers/"},
+        {"company": "TCS", "role": "Ninja Developer", "location": "Chennai", "salary": "₹3.5 - ₹7 LPA", "type": "Full-Time", "logo": "fa-solid fa-building-columns", "logo_url": "https://www.google.com/s2/favicons?domain=www.tcs.com&sz=128", "url": "https://www.tcs.com/careers/india"},
+        {"company": "Accenture", "role": "Associate Software Engineer", "location": "Chennai", "salary": "₹4.5 - ₹6.5 LPA", "type": "Full-Time", "logo": "fa-solid fa-a", "logo_url": "https://www.google.com/s2/favicons?domain=www.accenture.com&sz=128", "url": "https://www.accenture.com/in-en/careers/jobsearch?jk=&location=India"},
+        {"company": "Amazon", "role": "Software Dev Engineer I", "location": "Chennai", "salary": "₹18 - ₹24 LPA", "type": "Full-Time", "logo": "fa-brands fa-amazon", "logo_url": "https://www.google.com/s2/favicons?domain=www.amazon.com&sz=128", "url": "https://amazon.jobs/en/search?loc_query=India"},
+        {"company": "HCLTech", "role": "Graduate Engineer Trainee", "location": "Chennai", "salary": "₹3.5 - ₹5 LPA", "type": "Full-Time", "logo": "fa-solid fa-h", "logo_url": "https://www.google.com/s2/favicons?domain=www.hcltech.com&sz=128", "url": "https://www.hcltech.com/careers/careers-in-india"}
+    ]
+
+    import random
+    random.shuffle(fallback_jobs)
+
+    if not GROQ_API_KEY:
+        return fallback_jobs
+    
+    url = "https://api.groq.com/openai/v1/chat/completions"
+    headers = {
+        "Authorization": f"Bearer {GROQ_API_KEY}",
+        "Content-Type": "application/json"
+    }
+    
+    prompt = f"""
+    Identify exactly 6 IT jobs (SDE, DevOps, Interns) CURRENTLY LIVE (2024-2025) strictly within TAMIL NADU, India (Chennai, Coimbatore, Madurai, Trichy, etc.).
+    Do NOT include jobs outside of Tamil Nadu.
+    Provide a RANDOM selection of 6 DIFFERENT companies from a pool of top tech giants and high-growth startups (TCS, Zoho, Freshworks, Google, Microsoft, Amazon, Zomato, Swiggy, Paytm, Ola, etc.).
+    VARY the roles and companies on each request.
+    
+    Return EXACTLY a JSON array:
+    - company: (e.g. 'Zoho')
+    - role: (e.g. 'Software Developer')
+    - location: (e.g. 'Chennai, TN' or 'Coimbatore, TN')
+    - salary: (e.g. '₹6 - ₹10 LPA')
+    - type: (e.g. 'Full-Time')
+    - logo: (FontAwesome icon class)
+    
+    Return ONLY JSON.
+    """
+
+    payload = {
+        "model": "llama-3.1-70b-versatile",
+        "messages": [{"role": "user", "content": prompt}],
+        "temperature": 0.8,
+        "max_tokens": 1024,
+        "response_format": {"type": "json_object"}
+    }
+    
+    try:
+        response = requests.post(url, headers=headers, json=payload, timeout=20)
+        res_data = response.json()
+        content = res_data['choices'][0]['message']['content']
+        
+        # Parse the JSON from the model content
+        jobs_data = json.loads(content)
+        if isinstance(jobs_data, dict):
+            for key in jobs_data:
+                if isinstance(jobs_data[key], list):
+                    jobs = jobs_data[key]
+                    break
+        else:
+            jobs = jobs_data
+
+        # Inject PRECISION OFFICIAL SEARCH LINKS
+        for job in jobs:
+            comp_name = job['company'].lower()
+            comp_slug = comp_name.replace(' ', '-')
+            role_param = job['role'] .replace(' ', '+')
+            
+            # Map common companies to domains for Logos
+            domain_map = {
+                "zoho": "zoho.com", "freshworks": "www.freshworks.com", "tcs": "www.tcs.com",
+                "infosys": "www.infosys.com", "wipro": "www.wipro.com", "hcl": "www.hcltech.com",
+                "accenture": "www.accenture.com", "google": "www.google.com", "microsoft": "www.microsoft.com",
+                "amazon": "www.amazon.com", "adobe": "www.adobe.com", "cognizant": "www.cognizant.com",
+                "zomato": "www.zomato.com", "swiggy": "www.swiggy.com", "flipkart": "www.flipkart.com",
+                "ola": "www.olacabs.com", "paytm": "www.paytm.com", "uber": "www.uber.com"
+            }
+            
+            matched_domain = None
+            comp_name_clean = comp_name.strip()
+            for key in domain_map:
+                if key in comp_name_clean:
+                    matched_domain = domain_map[key]
+                    break
+            
+            job['logo_url'] = f"https://www.google.com/s2/favicons?domain={matched_domain}&sz=128" if matched_domain else None
+            
+            # Precision Official Site Search URLs
+            if "accenture" in comp_name:
+                job['url'] = "https://www.accenture.com/in-en/careers/jobsearch?jk=&location=India"
+            elif "zoho" in comp_name:
+                job['url'] = f"https://www.zoho.com/careers/search.html?q={role_param}"
+            elif "freshworks" in comp_name:
+                job['url'] = f"https://www.freshworks.com/company/careers/?q={role_param}"
+            elif "tcs" in comp_name:
+                job['url'] = "https://www.tcs.com/careers/india/entry-level-hiring-2024"
+            elif "infosys" in comp_name:
+                job['url'] = f"https://www.infosys.com/careers/apply/?q={role_param}"
+            elif "hcl" in comp_name:
+                job['url'] = f"https://www.hcltech.com/careers/careers-in-india?q={role_param}"
+            elif "google" in comp_name:
+                job['url'] = f"https://www.google.com/about/careers/applications/jobs/results/?q={role_param}&location=India"
+            elif "microsoft" in comp_name:
+                job['url'] = f"https://careers.microsoft.com/us/en/search-results?q={role_param}&location=India"
+            elif "amazon" in comp_name:
+                job['url'] = f"https://amazon.jobs/en/search?base_query={role_param}&loc_query=India"
+            elif "cognizant" in comp_name:
+                job['url'] = f"https://careers.cognizant.com/global/en/search-results?q={role_param}"
+            else:
+                job['url'] = f"https://www.google.com/search?q=site:careers.{comp_slug}.com+{role_param}&btnI=1"
+        
+        return jobs[:6]
+    except Exception as e:
+        print(f"Groq API Error (Live Jobs): {e}")
+        return fallback_jobs
+
+@app.route('/api/live-jobs')
+def api_live_jobs():
+    jobs = get_live_jobs()
+    return jsonify(jobs)
+
+@app.route('/api/topic-explanation')
+def api_topic_explanation():
+    topic = request.args.get('topic')
+    if not topic:
+        return jsonify({"error": "No topic provided"}), 400
+        
+    if not GROQ_API_KEY:
+        return jsonify({"error": "Groq API Key missing"}), 500
+        
+    url = "https://api.groq.com/openai/v1/chat/completions"
+    headers = {
+        "Authorization": f"Bearer {GROQ_API_KEY}",
+        "Content-Type": "application/json"
+    }
+    
+    prompt = f"""
+    Explain the topic: {topic}
+
+    Provide:
+    1. Short explanation (3–5 lines)
+    2. FREE RESOURCES ONLY:
+    - Exactly 2 Official Docs or Website links
+    - Exactly 2 YouTube video links
+
+    Rules:
+    - Beginner friendly
+    - Short and clear
+    - No long paragraphs
+    - Real links only (https://...)
+
+    Return ONLY a valid JSON object with this exact structure:
+    {{
+        "title": "{topic}",
+        "explanation": "A short 3-5 line beginner-friendly explanation.",
+        "resources": [
+            {{"type": "Docs", "title": "First Docs/Website Title", "link": "https://..."}},
+            {{"type": "Docs", "title": "Second Docs/Website Title", "link": "https://..."}},
+            {{"type": "Video", "title": "First YouTube Video Title", "link": "https://www.youtube.com/..."}},
+            {{"type": "Video", "title": "Second YouTube Video Title", "link": "https://www.youtube.com/..."}}
+        ],
+        "ai_tutor_article": "A detailed, structured guide explaining {topic} from scratch, suitable for a personalized AI tutor section."
+    }}
+    """
+
+    payload = {
+        "model": "llama-3.3-70b-versatile",
+        "messages": [{"role": "user", "content": prompt}],
+        "temperature": 0.3,
+        "max_tokens": 400,
+        "response_format": {"type": "json_object"}
+    }
+    
+    try:
+        response = requests.post(url, headers=headers, json=payload, timeout=15)
+        response.raise_for_status()
+        res_data = response.json()
+        content = res_data['choices'][0]['message']['content']
+        return content # Already a JSON string from Groq
+    except Exception as e:
+        print(f"Groq API Error (Topic Explanation): {e}")
+        return jsonify({"error": "Failed to fetch explanation"}), 500
+
+@app.route('/api/explain_skill')
+def api_explain_skill():
+    skill = request.args.get('skill')
+    if not skill:
+        return jsonify({"error": "No skill provided"}), 400
+        
+    if not GROQ_API_KEY:
+        return jsonify({"error": "Groq API Key missing"}), 500
+        
+    url = "https://api.groq.com/openai/v1/chat/completions"
+    headers = {
+        "Authorization": f"Bearer {GROQ_API_KEY}",
+        "Content-Type": "application/json"
+    }
+    
+    prompt = f"""
+    Explain the skill '{skill}' to a university student or fresher in a very simple, easy-to-understand way.
+    Focus strictly on WHY real tech companies actually expect this skill and what it is used to build or solve in the real world.
+    Keep it strictly 2-3 sentences. Make it engaging but professional. No markdown, no bullet points.
+    """
+
+    payload = {
+        "model": "llama-3.3-70b-versatile",
+        "messages": [{"role": "user", "content": prompt}],
+        "temperature": 0.3,
+        "max_tokens": 150
+    }
+    
+    try:
+        response = requests.post(url, headers=headers, json=payload, timeout=10)
+        response.raise_for_status()
+        res_data = response.json()
+        explanation = res_data['choices'][0]['message']['content'].strip()
+        return jsonify({"explanation": explanation})
+    except Exception as e:
+        print(f"Groq API Error (Explain Skill): {e}")
+        return jsonify({"error": "Failed to fetch explanation"}), 500
 
 DATABASE = 'database.db'
 
@@ -344,39 +721,49 @@ TOPIC_LINKS = {
 }
 
 def get_db_connection():
-    conn = sqlite3.connect(DATABASE)
+    conn = sqlite3.connect(DATABASE, timeout=20)
     conn.row_factory = sqlite3.Row
     return conn
 
 def init_db():
     conn = get_db_connection()
-    # Users Table
-    conn.execute('''
-        CREATE TABLE IF NOT EXISTS users (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL,
-            email TEXT UNIQUE NOT NULL,
-            password TEXT NOT NULL,
-            theme TEXT DEFAULT 'light'
-        )
-    ''')
     try:
-        conn.execute('ALTER TABLE users ADD COLUMN theme TEXT DEFAULT "light"')
-    except sqlite3.OperationalError:
-        pass
-    
-    # History Table
-    conn.execute('''
-        CREATE TABLE IF NOT EXISTS history (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            username TEXT NOT NULL,
-            skill TEXT NOT NULL,
-            viewed_time DATETIME DEFAULT CURRENT_TIMESTAMP
-        )
-    ''')
-    
-    conn.commit()
-    conn.close()
+        # Users Table
+        conn.execute('''
+            CREATE TABLE IF NOT EXISTS users (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL,
+                email TEXT UNIQUE NOT NULL,
+                password TEXT NOT NULL,
+                theme TEXT DEFAULT 'light'
+            )
+        ''')
+        try:
+            conn.execute('ALTER TABLE users ADD COLUMN theme TEXT DEFAULT "light"')
+        except sqlite3.OperationalError:
+            pass
+        
+        # Roadmap Progress Table
+        conn.execute('''
+            CREATE TABLE IF NOT EXISTS roadmap_progress (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER NOT NULL,
+                skill TEXT NOT NULL,
+                progress_json TEXT DEFAULT '{}',
+                passed_sections TEXT DEFAULT '[]',
+                percentage INTEGER DEFAULT 0,
+                last_updated DATETIME DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (user_id) REFERENCES users (id)
+            )
+        ''')
+        try:
+            conn.execute('ALTER TABLE roadmap_progress ADD COLUMN passed_sections TEXT DEFAULT "[]"')
+        except sqlite3.OperationalError:
+            pass
+        
+        conn.commit()
+    finally:
+        conn.close()
 
 
 @app.route('/ats')
@@ -449,6 +836,85 @@ IMPORTANT: Return ONLY valid JSON, no markdown formatting."""
         print("ATS API Error:", str(e))
         return jsonify({"error": "Error during AI analysis."}), 500
 
+@app.route('/api/company-mode', methods=['POST'])
+def company_mode():
+    if 'user_id' not in session and not session.get('guest'):
+        return jsonify({"error": "Unauthorized"}), 401
+    
+    data = request.json
+    company = data.get('company', '')
+    experience_level = data.get('experience_level', 'fresher')
+    
+    if not company:
+        return jsonify({"error": "No company selected"}), 400
+        
+    api_key = os.getenv('GROQ_API_KEY')
+    if not api_key:
+        return jsonify({"error": "Groq API key missing from .env"}), 500
+        
+    try:
+        url = "https://api.groq.com/openai/v1/chat/completions"
+        headers = {
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json"
+        }
+        
+        prompt = f"""You are a top FAANG career mentor and interview expert.
+User goal: Get selected in {company} as a Software Engineer.
+Candidate Status: {experience_level.capitalize()}
+
+STRICT FORMATTING RULES (MANDATORY):
+1. NO MARKDOWN: Do NOT use symbols like -, *, **, ###, ##, #, or any bullet characters.
+2. NO BULLETS: Use clean plain text with proper spacing. Do not use lists.
+3. INTEGRATED RESOURCES: 
+   - Under EACH main section, provide a sub-section called "Resources:".
+   - Each resource MUST be an HTML anchor tag: <a href="URL" target="_blank">Name</a>
+   - Place each resource link on its own new line.
+   - Include 2-3 specific, high-quality links per major section.
+4. NO GLOBAL RESOURCES: Do NOT include a "Free Resources" section at the end.
+5. CLEAN HEADINGS: Use emojis as section prefixes (🎯, 📌, 💻, 🧠, 🛠, 📊, 🗺, 🚀, 🔥, 🏁).
+6. NO META-TEXT: Do not use labels like "[Optional Section]". Omit sections completely if they don't apply.
+7. DEPTH & LENGTH: 
+   - Total length MUST be between 800-1000 words.
+   - Each section must be deeply detailed, providing step-by-step guidance.
+   - Provide SPECIFIC context for {company} (e.g., its core values, typical OA pattern, or recent interview trends).
+
+Aptitude Logic: 
+- Include "🧠 Aptitude Round Preparation (For Freshers)" ONLY if {company} is a service-based company (TCS, Wipro, Infosys, etc.) AND candidate is a 'Fresher'.
+- Omit it completely otherwise.
+
+SECTIONS TO INCLUDE:
+🎯 {company} Overview (+ Resources)
+📌 Role Expectations (+ Resources)
+🧠 Required Skills (+ Resources)
+💻 DSA & Coding Level (+ Resources)
+🛠 Tools & Technologies (+ Resources)
+🧠 Aptitude Round Preparation (For Freshers) (+ Resources)
+(Provide a complete breakdown: Explain the 'Elimination Factor', list topics like Percentages, Puzzles, and Grammar, and suggest specific mock test frequencies. Mention that this is often the most critical gatekeeper.)
+📊 Interview Process (+ Resources)
+🗺 Preparation Roadmap (+ Resources)
+🔥 Tips & Final Conclusion"""
+
+        payload = {
+            "model": "llama-3.1-8b-instant",
+            "messages": [
+                {"role": "system", "content": f"You are a specialized career mentor for {company}. You provide deep, bullet-free, HTML-ready roadmaps for {experience_level} candidates. Follow the strict logic: only include the Aptitude section for Freshers in service-based companies. NEVER use markdown symbols like -, *, or **."},
+                {"role": "user", "content": prompt}
+            ],
+            "temperature": 0.4,
+            "max_tokens": 2000
+        }
+        
+        response = requests.post(url, headers=headers, json=payload, timeout=60)
+        response.raise_for_status()
+        res_data = response.json()
+        strategy = res_data["choices"][0]["message"]["content"]
+        
+        return jsonify({"strategy": strategy})
+    except Exception as e:
+        print("Company Mode API Error:", str(e))
+        return jsonify({"error": "Error during AI generation with Groq API."}), 500
+
  
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -465,38 +931,36 @@ def login():
         auth_mode = request.form.get('auth_mode', 'login')
         
         conn = get_db_connection()
-        user = conn.execute('SELECT * FROM users WHERE email = ?', (email,)).fetchone()
-        
-        if auth_mode == 'signup':
-            if user:
-                conn.close()
-                return render_template('login.html', error="Account already registered! Please login.")
-            else:
-                if not name:
-                    name = email.split('@')[0]
-                hashed_pw = generate_password_hash(password)
-                cur = conn.cursor()
-                cur.execute('INSERT INTO users (name, email, password, theme) VALUES (?, ?, ?, ?)', (name, email, hashed_pw, 'light'))
-                conn.commit()
-                conn.close()
-                return render_template('login.html', success="Account successfully created! Please log in.")
-                
-        else: # login mode
-            if user:
-                if check_password_hash(user['password'], password):
-                    session['guest'] = False
-                    session['user_id'] = user['id']
-                    session['name'] = user['name']
-                    session['email'] = user['email']
-                    session['theme'] = user['theme'] if user['theme'] else 'light'
-                    conn.close()
-                    return redirect(url_for('dashboard'))
+        try:
+            user = conn.execute('SELECT * FROM users WHERE email = ?', (email,)).fetchone()
+            
+            if auth_mode == 'signup':
+                if user:
+                    return render_template('login.html', error="Account already registered! Please login.")
                 else:
-                    conn.close()
-                    return render_template('login.html', error="Invalid email or password.")
-            else:
-                conn.close()
-                return render_template('login.html', error="Account does not exist! Please sign up.")
+                    if not name:
+                        name = email.split('@')[0]
+                    hashed_pw = generate_password_hash(password)
+                    cur = conn.cursor()
+                    cur.execute('INSERT INTO users (name, email, password, theme) VALUES (?, ?, ?, ?)', (name, email, hashed_pw, 'light'))
+                    conn.commit()
+                    return render_template('login.html', success="Account successfully created! Please log in.")
+                    
+            else: # login mode
+                if user:
+                    if check_password_hash(user['password'], password):
+                        session['guest'] = False
+                        session['user_id'] = user['id']
+                        session['name'] = user['name']
+                        session['email'] = user['email']
+                        session['theme'] = user['theme'] if user['theme'] else 'light'
+                        return redirect(url_for('dashboard'))
+                    else:
+                        return render_template('login.html', error="Invalid email or password.")
+                else:
+                    return render_template('login.html', error="Account does not exist! Please sign up.")
+        finally:
+            conn.close()
             
     return render_template('login.html')
 
@@ -511,48 +975,48 @@ def profile():
         return redirect(url_for('login'))
         
     conn = get_db_connection()
-    user = conn.execute('SELECT * FROM users WHERE id = ?', (session['user_id'],)).fetchone()
-    
-    if request.method == 'POST':
-        name = request.form.get('name')
-        email = request.form.get('email')
-        new_password = request.form.get('new_password')
-        current_password = request.form.get('current_password')
+    try:
+        user = conn.execute('SELECT * FROM users WHERE id = ?', (session['user_id'],)).fetchone()
         
-        if not check_password_hash(user['password'], current_password):
-            conn.close()
-            return render_template('profile.html', user=user, error="Incorrect current password. Profile not updated.")
+        if request.method == 'POST':
+            name = request.form.get('name')
+            email = request.form.get('email')
+            new_password = request.form.get('new_password')
+            current_password = request.form.get('current_password')
             
-        try:
-            if new_password:
-                hashed_pw = generate_password_hash(new_password)
-                conn.execute('UPDATE users SET name = ?, email = ?, password = ? WHERE id = ?', (name, email, hashed_pw, session['user_id']))
-            else:
-                conn.execute('UPDATE users SET name = ?, email = ? WHERE id = ?', (name, email, session['user_id']))
+            if not check_password_hash(user['password'], current_password):
+                return render_template('profile.html', user=user, error="Incorrect current password. Profile not updated.")
                 
-            conn.commit()
-            session['name'] = name
-            session['email'] = email
-            
-            updated_user = conn.execute('SELECT * FROM users WHERE id = ?', (session['user_id'],)).fetchone()
-            conn.close()
-            
-            return render_template('profile.html', user=updated_user, success="Profile updated successfully!")
-            
-        except sqlite3.IntegrityError:
-            conn.close()
-            return render_template('profile.html', user=user, error="Email already exists.")
-            
-    conn.close()
-    return render_template('profile.html', user=user)
+            try:
+                if new_password:
+                    hashed_pw = generate_password_hash(new_password)
+                    conn.execute('UPDATE users SET name = ?, email = ?, password = ? WHERE id = ?', (name, email, hashed_pw, session['user_id']))
+                else:
+                    conn.execute('UPDATE users SET name = ?, email = ? WHERE id = ?', (name, email, session['user_id']))
+                    
+                conn.commit()
+                session['name'] = name
+                session['email'] = email
+                
+                updated_user = conn.execute('SELECT * FROM users WHERE id = ?', (session['user_id'],)).fetchone()
+                return render_template('profile.html', user=updated_user, success="Profile updated successfully!")
+                
+            except sqlite3.IntegrityError:
+                return render_template('profile.html', user=user, error="Email already exists.")
+                
+        return render_template('profile.html', user=user)
+    finally:
+        conn.close()
 
 @app.route('/api/forgot-password/send-otp', methods=['POST'])
 def send_otp():
     data = request.json
     email = data.get('email', '')
     conn = get_db_connection()
-    user = conn.execute('SELECT * FROM users WHERE email = ?', (email,)).fetchone()
-    conn.close()
+    try:
+        user = conn.execute('SELECT * FROM users WHERE email = ?', (email,)).fetchone()
+    finally:
+        conn.close()
     
     if user:
         otp = "944588"
@@ -604,9 +1068,11 @@ def reset_password():
     if email and new_password:
         hashed_pw = generate_password_hash(new_password)
         conn = get_db_connection()
-        conn.execute('UPDATE users SET password = ? WHERE email = ?', (hashed_pw, email))
-        conn.commit()
-        conn.close()
+        try:
+            conn.execute('UPDATE users SET password = ? WHERE email = ?', (hashed_pw, email))
+            conn.commit()
+        finally:
+            conn.close()
         session.pop('reset_email', None)
         session.pop('reset_otp', None)
         return jsonify({"status": "success", "message": "Password successfully replaced!"})
@@ -630,6 +1096,136 @@ def topic_redirect(topic_name):
     # 3. Ultimate Fallback: Redirect to YouTube Search for the specific topic
     search_query = urllib.parse.quote(f"{clean_topic} tutorial")
     return redirect(f"https://www.youtube.com/results?search_query={search_query}")
+
+@app.route('/api/save-progress', methods=['POST'])
+def save_progress():
+    # Only for temporary logging or future features—checklists are no longer stored in cloud by request.
+    # We maintain this route for backwards compatibility but it doesn't affect dashboard progress now.
+    return jsonify({"success": True, "message": "Checklist state is local-only by user preference."})
+
+def get_canonical_skill(skill):
+    sk = skill.lower().strip()
+    if sk in SKILL_ALIASES: return SKILL_ALIASES[sk]
+    
+    # Try removing common suffixes to find base roadmap
+    for suffix in [" developer", " engineer", " development", " designer", " design"]:
+        if sk.endswith(suffix):
+            base = sk.replace(suffix, "").strip()
+            if base in ROADMAPS: return base
+            if base in SKILL_ALIASES: return SKILL_ALIASES[base]
+    return sk
+
+@app.route('/api/submit-section-test', methods=['POST'])
+def submit_section_test():
+    if 'user_id' not in session:
+        return jsonify({"success": False, "error": "Login required"}), 401
+    
+    data = request.json
+    skill = get_canonical_skill(data.get('skill', ''))
+    section_name = data.get('section', '')
+    total_sections = data.get('total_sections', 1)
+    
+    if not skill or not section_name:
+        return jsonify({"success": False, "error": "Missing skill or section"}), 400
+
+    conn = get_db_connection()
+    try:
+        existing = conn.execute('SELECT * FROM roadmap_progress WHERE user_id = ? AND skill = ?', (session['user_id'], skill)).fetchone()
+        
+        passed_list = []
+        if existing:
+            try:
+                passed_list = json.loads(existing['passed_sections'] or "[]")
+            except: passed_list = []
+            
+        if section_name not in passed_list:
+            passed_list.append(section_name)
+        
+        # Calculate percentage based on passed tests / testable sections
+        testable_total = int(total_sections) if total_sections else 1
+        if testable_total == 0: testable_total = 1
+         
+        percentage = int((len(passed_list) / testable_total) * 100)
+        if percentage > 100: percentage = 100
+
+        if existing:
+            conn.execute('UPDATE roadmap_progress SET passed_sections = ?, percentage = ?, last_updated = CURRENT_TIMESTAMP WHERE id = ?', 
+                         (json.dumps(passed_list), percentage, existing['id']))
+        else:
+            conn.execute('INSERT INTO roadmap_progress (user_id, skill, passed_sections, percentage) VALUES (?, ?, ?, ?)', 
+                         (session['user_id'], skill, json.dumps(passed_list), percentage))
+        
+        conn.commit()
+    finally:
+        conn.close()
+    return jsonify({"success": True, "percentage": percentage, "total_passed": len(passed_list)})
+
+@app.route('/api/delete-progress', methods=['POST'])
+def delete_progress():
+    if 'user_id' not in session:
+        return jsonify({"success": False, "error": "Login required"}), 401
+    
+    data = request.json
+    skill = get_canonical_skill(data.get('skill', ''))
+    
+    if not skill:
+        return jsonify({"success": False, "error": "Skill name missing"}), 400
+
+    conn = get_db_connection()
+    try:
+        conn.execute('DELETE FROM roadmap_progress WHERE user_id = ? AND skill = ?', (session['user_id'], skill))
+        conn.commit()
+    finally:
+        conn.close()
+    
+    return jsonify({"success": True})
+
+@app.route('/api/user-progress')
+def get_user_progress():
+    if 'user_id' not in session:
+        return jsonify({"success": False, "error": "Login required"}), 401
+        
+    conn = get_db_connection()
+    try:
+        progress_rows = conn.execute('SELECT skill, percentage, last_updated FROM roadmap_progress WHERE user_id = ? AND percentage > 0 ORDER BY last_updated DESC', (session['user_id'],)).fetchall()
+    finally:
+        conn.close()
+    
+    result = []
+    for row in progress_rows:
+        result.append({
+            "skill": row['skill'].title(),
+            "percentage": row['percentage'],
+            "last_updated": row['last_updated']
+        })
+    return jsonify({"success": True, "progress": result})
+
+@app.route('/api/get-progress/<skill>')
+def get_skill_progress(skill):
+    if 'user_id' not in session:
+        return jsonify({"success": False, "error": "Login required"}), 401
+        
+    skill = get_canonical_skill(skill)
+        
+    conn = get_db_connection()
+    try:
+        row = conn.execute('SELECT passed_sections FROM roadmap_progress WHERE user_id = ? AND skill = ?', (session['user_id'], skill)).fetchone()
+    finally:
+        conn.close()
+    
+    # We return the passed_sections array directly. Front-end will check if current section is in it.
+    if row:
+        try:
+            passed = json.loads(row['passed_sections'] or "[]")
+            return jsonify({"success": True, "passed_sections": passed})
+        except: return jsonify({"success": True, "passed_sections": []})
+    return jsonify({"success": True, "passed_sections": []})
+
+@app.route('/my-learning')
+def my_learning():
+    if 'user_id' not in session and not session.get('guest'):
+        return redirect(url_for('login'))
+    return render_template('my_learning.html')
 
 @app.route('/answer/<path:question>')
 def answer_redirect(question):
@@ -680,6 +1276,21 @@ def answer_redirect(question):
     search_query = urllib.parse.quote(fallback_clean.strip()[:60])
     return redirect(f"https://www.youtube.com/results?search_query={search_query}")
 
+@app.route('/api/check-skill')
+def check_skill():
+    skill = request.args.get('skill', '').strip().lower()
+    if not skill:
+        return jsonify({"exists": False})
+    
+    # Strict Exact Matching
+    matched_key = None
+    if skill in ROADMAPS:
+        matched_key = skill
+    elif skill in SKILL_ALIASES:
+        matched_key = SKILL_ALIASES[skill]
+    
+    return jsonify({"exists": matched_key is not None})
+
 @app.route('/roadmap')
 def roadmap():
     if 'user_id' not in session and not session.get('guest'):
@@ -690,17 +1301,12 @@ def roadmap():
     if not skill_query:
         return render_template('roadmap.html', skill_query='', data=None)
     
+    # Strict Exact Matching
     matched_key = None
-    for key in ROADMAPS.keys():
-        if key in skill_query or skill_query in key:
-            matched_key = key
-            break
-            
-    if not matched_key:
-        for alias, actual in SKILL_ALIASES.items():
-            if alias in skill_query or skill_query in alias:
-                matched_key = actual
-                break
+    if skill_query in ROADMAPS:
+        matched_key = skill_query
+    elif skill_query in SKILL_ALIASES:
+        matched_key = SKILL_ALIASES[skill_query]
                 
     if matched_key:
         roadmap_data = ROADMAPS.get(matched_key).copy()
@@ -711,10 +1317,15 @@ def roadmap():
         roadmap_data = None
     
     if not roadmap_data:
-        if GEMINI_API_KEY:
+        groq_api_key = os.getenv("GROQ_API_KEY")
+        if groq_api_key:
             response_text = ""
             try:
-                model = genai.GenerativeModel("gemini-2.5-flash")
+                url = "https://api.groq.com/openai/v1/chat/completions"
+                headers = {
+                    "Authorization": f"Bearer {groq_api_key}",
+                    "Content-Type": "application/json"
+                }
                 prompt = f"""You are an expert software architect and educator.
 
 Generate a COMPLETE A-Z learning roadmap for the skill: {skill_query.title()}.
@@ -755,9 +1366,19 @@ REQUIREMENTS:
   }}
 }}
 Return ONLY JSON."""
+
+                payload = {
+                    "model": "llama-3.3-70b-versatile",
+                    "messages": [{"role": "system", "content": "You are a professional educational consultant."}, {"role": "user", "content": prompt}],
+                    "temperature": 0.2,
+                    "max_tokens": 4096,
+                    "response_format": {"type": "json_object"}
+                }
                 
-                response = model.generate_content(prompt)
-                ai_text = response.text.replace('```json', '').replace('```', '').strip()
+                response = requests.post(url, headers=headers, json=payload, timeout=60)
+                response.raise_for_status()
+                res_data = response.json()
+                ai_text = res_data["choices"][0]["message"]["content"].strip()
                 response_text = ai_text
                 ai_data = json.loads(ai_text)
                 
@@ -795,18 +1416,24 @@ Return ONLY JSON."""
                     "title": skill_query.title(),
                     "is_ai_generated": True,
                     "sections": sections,
-                    "resources": [],
-                    "jobs": [],
-                    "interview_qs": ai_data.get("interview_questions", ai_data.get("interview_qs", [])),
+                    "interview_qs": ai_data.get("interview_questions", ai_data.get("interview_qs", [])) or [],
+                    "resources": ai_data.get("resources", []) or [],
+                    "career_paths": ai_data.get("career_paths", []) or [],
                     "job_url": f"https://www.naukri.com/{skill_query.replace(' ', '-')}-jobs",
                     "prefetched_workflow": workflow_list
                 }
             except Exception as e:
-                print(f"Error generating AI roadmap: {str(e)}")
+                print(f"Error generating AI roadmap with Groq: {str(e)}")
                 roadmap_data = {
                     "title": skill_query.title() + " (AI Error)",
                     "is_ai_generated": True,
-                    "sections": [{"title": "API Exception", "content": f"Failed to connect or parse: {str(e)}<br><div style='padding: 1rem; background: #eee; color: #333; font-family: monospace; font-size: 0.9em; overflow-x: auto; border-radius: 5px; margin-top: 1rem;'>Raw Text: {response_text.replace('<', '&lt;')}</div>"}],
+                    "sections": [{"title": "API Exception", "content": f"Failed to generate with Groq: {str(e)}<br><div style='padding: 1rem; background: #eee; color: #333; font-family: monospace; font-size: 0.9em; overflow-x: auto; border-radius: 5px; margin-top: 1rem;'>Raw Text: {response_text.replace('<', '&lt;')}</div>"}],
+                    "interview_qs": [
+                        "What are the core concepts of " + skill_query.title() + "?",
+                        "Can you explain the basic architecture of " + skill_query.title() + "?",
+                        "What are the best practices when working with " + skill_query.title() + "?"
+                    ],
+                    "resources": [],
                     "job_url": "#"
                 }
 
@@ -814,7 +1441,8 @@ Return ONLY JSON."""
         # 1. Inject Mandatory DSA Section (First Card)
         dsa_section = {
             "title": "Data Structures & Algorithms (Core Requirement 🔥)",
-            "content": "• Arrays, Strings<br>• Linked List<br>• Stack & Queue<br>• Trees & Graphs<br>• Sorting & Searching<br>• Recursion<br>• Problem Solving (LeetCode / HackerRank)<br><br>👉 <b>DSA is mandatory for cracking IT interviews</b>"
+            "content": ["Arrays, Strings", "Linked List", "Stack & Queue", "Trees & Graphs", "Sorting & Searching", "Recursion", "Problem Solving (LeetCode / HackerRank)"],
+            "note": "👉 <b>DSA is mandatory for cracking IT interviews</b>"
         }
         
         # Ensure sections list exists and is a list
@@ -829,8 +1457,7 @@ Return ONLY JSON."""
             "database": 6, "sql": 6,
             "frameworks": 7, "framework": 7,
             "projects": 8, "project": 8,
-            "data structures": 9, "dsa": 9,
-            "career": 11, "job": 11
+            "data structures": 9, "dsa": 9, "algorithm": 9
         }
 
         # Inject DSA if missing
@@ -838,7 +1465,8 @@ Return ONLY JSON."""
         if not has_dsa:
             roadmap_data['sections'].append({
                 "title": "Data Structures & Algorithms (Core Requirement 🔥)",
-                "content": "• Arrays, Strings\n• Linked List\n• Stack & Queue\n• Trees & Graphs\n• Sorting & Searching\n• Recursion\n• Problem Solving (LeetCode / HackerRank)\n\n👉 <b>DSA is mandatory for cracking IT interviews</b>"
+                "content": ["Arrays, Strings", "Linked List", "Stack & Queue", "Trees & Graphs", "Sorting & Searching", "Recursion", "Problem Solving (LeetCode / HackerRank)"],
+                "note": "👉 <b>DSA is mandatory for cracking IT interviews</b>"
             })
 
         def get_order(title):
@@ -853,21 +1481,25 @@ Return ONLY JSON."""
 
         # 2. Inject Final Advice (Context data for template)
         roadmap_data['final_advice'] = [
-            "Practice coding daily (1–2 hrs)",
+            "Practice coding daily (1-2 hrs)",
             "Focus on DSA + core concepts",
             "Build real-world projects",
             "Learn frameworks relevant to " + str(roadmap_data.get('title', 'this role')),
-            "Stay consistent for 3–6 months",
+            "Stay consistent for 3-6 months",
             "Don't just watch tutorials, implement everything"
         ]
 
-    if roadmap_data and 'user_id' in session and not session.get('guest'):
+    if roadmap_data:
         conn = get_db_connection()
-        conn.execute('INSERT INTO history (username, skill) VALUES (?, ?)', (session['name'], roadmap_data['title']))
-        conn.commit()
-        conn.close()
+        try:
+            conn.execute('INSERT INTO history (username, skill) VALUES (?, ?)', (session['name'], roadmap_data['title']))
+            conn.commit()
+        finally:
+            conn.close()
 
-    return render_template('roadmap.html', skill_query=request.args.get('skill', ''), data=roadmap_data, nvidia_api_key=os.getenv('NVIDIA_API_KEY'))
+    resp = make_response(render_template('roadmap.html', skill_query=request.args.get('skill', ''), data=roadmap_data, nvidia_api_key=os.getenv('NVIDIA_API_KEY'), groq_key=os.getenv('GROQ_API_KEY', '')))
+    resp.headers['Content-Type'] = 'text/html; charset=utf-8'
+    return resp
 
 def get_salary_fallback(skill):
     sq = skill.lower()
@@ -944,13 +1576,55 @@ def suggest():
     suggestions = []
     if query:
         for sk in ROADMAPS.keys():
-            if query in sk:
-                suggestions.append(ROADMAPS[sk]['title'])
-        for alias, actual in SKILL_ALIASES.items():
-            if query in alias and ROADMAPS[actual]['title'] not in suggestions:
-                suggestions.append(ROADMAPS[actual]['title'])
+            if query in sk.lower():
+                suggestions.append(sk)
     return jsonify(suggestions)
 
+@app.route('/api/ai_suggest', methods=['GET'])
+def ai_suggest():
+    query = request.args.get('q', '').strip()
+    if not query or len(query) < 2:
+        return jsonify([])
+
+    api_key = os.getenv('GROQ_API_KEY')
+    if not api_key:
+        return jsonify([])
+
+    try:
+        url = "https://api.groq.com/openai/v1/chat/completions"
+        headers = {
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json"
+        }
+        
+        prompt = f"Suggest exactly 3 unique IT career roles related to: '{query}'. Return ONLY the names, one per line. No numbers, no bullets, no markdown."
+        
+        payload = {
+            "model": "llama-3.1-8b-instant",
+            "messages": [
+                {"role": "system", "content": "You are a concise IT career assistant. Provide ONLY role titles, one per line."},
+                {"role": "user", "content": prompt}
+            ],
+            "temperature": 0.3,
+            "max_tokens": 100
+        }
+        
+        response = requests.post(url, headers=headers, json=payload, timeout=8)
+        response.raise_for_status()
+        res_data = response.json()
+        raw_text = res_data["choices"][0]["message"]["content"].strip()
+        
+        lines = raw_text.split('\n')
+        suggestions = []
+        for line in lines:
+            clean = line.replace('-', '').replace('*', '').replace('•', '').replace('1.', '').replace('2.', '').replace('3.', '').strip()
+            if clean and len(clean) > 2:
+                suggestions.append(clean)
+        
+        return jsonify(suggestions[:3])
+    except Exception as e:
+        print(f"AI Suggestion Error: {e}")
+        return jsonify([])
 
 @app.route('/chat', methods=['POST'])
 def chat():
@@ -967,15 +1641,22 @@ def chat():
         "Authorization": f"Bearer {api_key}",
         "Content-Type": "application/json"
     }
+    system_prompt = (
+        "You are an AI Career Assistant. PRIMARY KEY RULES:\n"
+        "1. If the question is related to Education, Career, Skills, Programming, Jobs, or Learning: Give a normal, clear, and direct helpful answer. Do NOT add any extra motivational line.\n"
+        "2. If the user's question is NOT related to education/career (e.g., movies, celebrities, random topics, personal chat): Give a SHORT answer (1-3 lines max) AND ALWAYS ADD THIS EXACT HTML TAG AT THE VERY END: '<span class=\"dark-study-badge\">👉 focus on studies bro 🚀</span>'\n"
+        "3. STYLE: Friendly and simple English, no long paragraphs, always answer the question.\n"
+        "IMPORTANT: NEVER add the 'dark-study-badge' to study/career questions. ONLY add it for OUT-OF-SCOPE questions."
+    )
     payload = {
         "model": "meta/llama-3.1-70b-instruct",
         "messages": [
-            {"role": "system", "content": "You are a professional AI Career Assistant. Help users with skills, roadmaps, career paths, and interview preparation. Be concise, encouraging, and helpful."},
+            {"role": "system", "content": system_prompt},
             {"role": "user", "content": message}
         ],
         "temperature": 0.5,
         "top_p": 1,
-        "max_tokens": 1024
+        "max_tokens": 300
     }
 
     try:
@@ -986,7 +1667,7 @@ def chat():
         return jsonify({"reply": reply})
     except Exception as e:
         print(f"NVIDIA API Error: {str(e)}")
-        return jsonify({"reply": "I am busy now. Please try again in a moment."})
+        return jsonify({"reply": "Sorry, I couldn't connect right now. Please ask your question again in a few seconds!"})
 
 
 @app.route('/interview')
@@ -1000,54 +1681,72 @@ def interview_practice():
     if 'user_id' not in session and not session.get('guest'):
         return redirect(url_for('login'))
         
-    skill_query = request.args.get('skill', '').strip().lower()
-    
-    matched_key = None
-    for key in ROADMAPS.keys():
-        if key in skill_query or skill_query in key:
-            matched_key = key
-            break
-            
-    if not matched_key:
-        for alias, actual in SKILL_ALIASES.items():
-            if alias in skill_query or skill_query in alias:
-                matched_key = actual
-                break
-                
-    questions = []
+    skill_query = request.args.get('skill', '').strip()
     skill_title = skill_query.title()
+    questions = []
     
-    if matched_key:
-        questions = INTERVIEW_MAP.get(matched_key, [])
-        skill_title = ROADMAPS[matched_key]['title']
-        
-    if not questions and GEMINI_API_KEY:
+    api_key = os.getenv('NVIDIA_API_KEY')
+    if api_key and skill_title:
         try:
-            model = genai.GenerativeModel("gemini-2.5-flash")
+            url = "https://integrate.api.nvidia.com/v1/chat/completions"
+            headers = {
+                "Authorization": f"Bearer {api_key}",
+                "Content-Type": "application/json"
+            }
             prompt = f"Generate exactly 5 core interview questions for a {skill_title} interview. Return ONLY a JSON array of 5 plain string questions. Example: [\"question 1\", \"question 2\"]"
-            response = model.generate_content(prompt)
-            questions = json.loads(response.text.replace('```json', '').replace('```', '').strip())
-        except Exception:
-            pass
+            
+            payload = {
+                "model": "meta/llama-3.1-70b-instruct",
+                "messages": [{"role": "user", "content": prompt}],
+                "temperature": 0.2,
+                "max_tokens": 1000
+            }
+            
+            response = requests.post(url, headers=headers, json=payload, timeout=20)
+            response.raise_for_status()
+            res_data = response.json()
+            ai_text = res_data["choices"][0]["message"]["content"]
+            
+            ai_text = ai_text.replace('```json', '').replace('```', '').strip()
+            questions = json.loads(ai_text)
+        except Exception as e:
+            print(f"Interview Practice Generation Error: {str(e)}")
+            
+    if not questions:
+        questions = [
+            f"What is {skill_title} and why is it used?",
+            "Can you explain the core concepts of this technology?",
+            "What are the best practices when working with this?",
+            "How do you handle errors and debugging in this skill?",
+            "Can you describe a challenging project where you used this?"
+        ]
             
     return render_template('interview_practice.html', skill_title=skill_title, questions=questions, skill_query=skill_query)
 
 @app.route('/api/evaluate_answer', methods=['POST'])
 def evaluate_answer():
+    if 'user_id' not in session and not session.get('guest'):
+        return jsonify({"error": "Unauthorized"}), 401
+
     data = request.json
     question = data.get('question', '')
     answer = data.get('answer', '')
     skill = data.get('skill', '')
     
-    if not GEMINI_API_KEY:
+    api_key = os.getenv('NVIDIA_API_KEY')
+    if not api_key:
         return jsonify({
-            "feedback": "Gemini API key not configured. Cannot evaluate mathematically.",
+            "feedback": "API key not configured. Cannot evaluate answer.",
             "correct_answer": "API Key Required",
             "difficulty": "Unknown"
         })
         
     try:
-        model = genai.GenerativeModel("gemini-2.5-flash")
+        url = "https://integrate.api.nvidia.com/v1/chat/completions"
+        headers = {
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json"
+        }
         prompt = f"""You are an expert technical interviewer for {skill}.
 Evaluate the candidate's answer to the following question. Provide constructive feedback, the ideal correct answer, and an estimated difficulty level (Easy/Medium/Hard).
 
@@ -1062,19 +1761,32 @@ Return the response strictly as a JSON object:
 }}
 Return ONLY the JSON. No markdown ticks."""
         
-        response = model.generate_content(prompt)
-        result = json.loads(response.text.replace('```json', '').replace('```', '').strip())
+        payload = {
+            "model": "meta/llama-3.1-70b-instruct",
+            "messages": [{"role": "user", "content": prompt}],
+            "temperature": 0.2,
+            "max_tokens": 1000
+        }
+        
+        response = requests.post(url, headers=headers, json=payload, timeout=20)
+        response.raise_for_status()
+        res_data = response.json()
+        ai_text = res_data["choices"][0]["message"]["content"]
+        
+        ai_text = ai_text.replace('```json', '').replace('```', '').strip()
+        result = json.loads(ai_text)
         return jsonify(result)
     except Exception as e:
+        print(f"Evaluate API Error: {str(e)}")
         return jsonify({
-            "feedback": f"Error connecting to AI for evaluation.",
+            "feedback": "Error connecting to AI for evaluation.",
             "correct_answer": "Evaluation failed.",
             "difficulty": "Unknown"
         }), 500
 
 @app.route('/')
 def index():
-    return redirect(url_for('login'))
+    return render_template('index.html', groq_key=os.getenv('GROQ_API_KEY', ''))
 
 @app.route('/dashboard')
 def dashboard():
@@ -1082,7 +1794,25 @@ def dashboard():
         return redirect(url_for('login'))
     
     name = session.get('name', 'Guest')
-    return render_template('index.html', name=name)
+    
+    # Fetch recently viewed roadmaps for the user
+    recent_history = []
+    if not session.get('guest') and 'name' in session:
+        conn = get_db_connection()
+        try:
+            rows = conn.execute('SELECT skill FROM history WHERE username = ? ORDER BY viewed_time DESC, id DESC', (session['name'],)).fetchall()
+            # Filter to get unique skills (last 4)
+            for row in rows:
+                if row['skill'] not in recent_history:
+                    recent_history.append(row['skill'])
+                if len(recent_history) >= 4:
+                    break
+        except Exception as e:
+            print(f"Error fetching recently viewed: {e}")
+        finally:
+            conn.close()
+
+    return render_template('index.html', name=name, recent_history=recent_history, groq_key=os.getenv('GROQ_API_KEY', ''))
 
 @app.route('/update_theme', methods=['POST'])
 def update_theme():
@@ -1092,9 +1822,11 @@ def update_theme():
         session['theme'] = theme
         if 'user_id' in session and not session.get('guest'):
             conn = get_db_connection()
-            conn.execute('UPDATE users SET theme = ? WHERE id = ?', (theme, session['user_id']))
-            conn.commit()
-            conn.close()
+            try:
+                conn.execute('UPDATE users SET theme = ? WHERE id = ?', (theme, session['user_id']))
+                conn.commit()
+            finally:
+                conn.close()
         return jsonify({"status": "success"})
     return jsonify({"status": "error"}), 400
 
@@ -1102,15 +1834,16 @@ def update_theme():
 def history():
     is_guest = session.get('guest', False)
     
-    if is_guest:
-        return render_template('history.html', is_guest=True, history=[])
+    
     
     if 'user_id' not in session:
         return redirect(url_for('login'))
         
     conn = get_db_connection()
-    history_db = conn.execute('SELECT skill FROM history WHERE username = ? ORDER BY viewed_time DESC', (session['name'],)).fetchall()
-    conn.close()
+    try:
+        history_db = conn.execute('SELECT skill FROM history WHERE username = ? ORDER BY viewed_time DESC, id DESC', (session['name'],)).fetchall()
+    finally:
+        conn.close()
     
     unique_history = []
     for row in history_db:
@@ -1181,10 +1914,14 @@ DEFAULT_WORKFLOW = [
      {"role": "Engineering Manager", "skills": ["People Management", "Budgeting", "Project Planning", "Strategic Delivery"], "goal": "Ensure team health and manage product delivery"}
 ]
 
-@app.route('/api/industrial_workflow', methods=['POST'])
+@app.route('/api/industrial-workflow', methods=['GET', 'POST'])
+@app.route('/api/industrial_workflow', methods=['GET', 'POST'])
 def get_industrial_workflow():
-    data = request.json
-    skill = data.get('skill', '').lower().strip()
+    if request.method == 'POST':
+        data = request.json or {}
+        skill = data.get('skill', '').lower().strip()
+    else:
+        skill = request.args.get('skill', '').lower().strip()
     
     # 1. Hardcoded Fetch (Lightning Fast)
     if skill in INDUSTRIAL_WORKFLOW_DATA:
@@ -1194,106 +1931,149 @@ def get_industrial_workflow():
         if key in skill:
             return jsonify({"status": "success", "data": workflow})
 
-    if not GEMINI_API_KEY:
+    groq_api_key = os.getenv('GROQ_API_KEY_2.0') or os.getenv('GROQ_API_KEY')
+    if not groq_api_key:
         return jsonify({"status": "success", "data": DEFAULT_WORKFLOW})
 
-    # 2. Dynamic Gemini Fallback Generation
+    # 2. Dynamic Groq Fallback Generation
     try:
-        model = genai.GenerativeModel("gemini-2.5-flash")
+        url = "https://api.groq.com/openai/v1/chat/completions"
+        headers = {
+            "Authorization": f"Bearer {groq_api_key}",
+            "Content-Type": "application/json"
+        }
         prompt = f"""
-        Generate complete IT Industrial Workflow for '{skill}'.
-        Include roles strictly in this exact order: Intern / Trainee, Junior Developer, Software Developer (Mid-Level), Senior Developer, Tech Lead, Solution Architect, Engineering Manager.
+        You are an elite Industry Expert AI system. Your task is to generate a REALISTIC and PRACTICAL "Industrial Workflow" roadmap for the skill: '{skill}'.
+
+        ⚠️ STRICT RULES:
+        1. NO textbook or generic answers.
+        2. NO definitions, theory, or academic explanations.
+        3. Explain ONLY how things work in REAL leading companies.
+        4. Content must feel like "Insider Industry Knowledge" (e.g., mention Sprint reviews, specific CI/CD triggers, real-world bug prioritization, etc.).
+        5. Keep it structured, detailed, and truthful.
+
+        Roles to include strictly in this order: Intern / Trainee, Junior Developer, Software Developer (Mid-Level), Senior Developer, Tech Lead, Solution Architect, Engineering Manager.
+        
         For EACH role return exactly:
         - "role": string
-        - "skills": list of strings (max 4 core technical skills)
-        - "goal": one line string describing their business goal
-        
-        Return ONLY a valid JSON array matching this structure. No markdown, no explanation blocks.
+        - "skills": list of strings (max 4 core technical skills actually used in production)
+        - "goal": one line string describing their practical business goal
+
+        Return ONLY a valid JSON object with a root key "workflow" containing the list. No markdown.
         """
-        response = model.generate_content(prompt)
-        raw_json = response.text.replace('```json', '').replace('```', '').strip()
+        payload = {
+            "model": "llama-3.3-70b-versatile",
+            "messages": [{"role": "user", "content": prompt}],
+            "temperature": 0.2,
+            "max_tokens": 1500,
+            "response_format": {"type": "json_object"}
+        }
+        response = requests.post(url, headers=headers, json=payload, timeout=30)
+        response.raise_for_status()
+        res_data = response.json()
+        raw_json = res_data["choices"][0]["message"]["content"].strip()
         workflow_data = json.loads(raw_json)
-        return jsonify({"status": "success", "data": workflow_data})
+        # Handle case where AI might wrap it in a root key
+        if isinstance(workflow_data, dict):
+            for k in workflow_data:
+                if isinstance(workflow_data[k], list):
+                    workflow_data = workflow_data[k]
+                    break
+        return jsonify({"status": "success", "workflow": workflow_data})
     except Exception as e:
-        print(f"Workflow Generation Error: {str(e)}")
+        print(f"Workflow Generation Error with Groq: {str(e)}")
         # 3. Always strictly guarantee a fallback array
-        return jsonify({"status": "error", "data": DEFAULT_WORKFLOW})
+        return jsonify({"status": "success", "data": DEFAULT_WORKFLOW})
 
 def fetch_roadmap_json(skill):
-    prompt = f"""Generate an IN-DEPTH, COMPLETE A-Z roadmap for the skill: {skill}.
-Must include:
-1. Beginner Level (ALL concepts)
-2. Intermediate Level
-3. Advanced Level
-4. Frameworks & Tools
-5. Real-world Projects (Beginner → Advanced)
-6. Interview Questions
-7. Industrial Workflow (Intern → Manager roles)
+    # Build prompt using string concatenation to avoid f-string brace issues
+    prompt = (
+        "You are a Senior Career Mentor and Industry Architect.\n"
+        "Generate a PREMIUM, EXECUTIVE-LEVEL career roadmap and guidance document for: " + skill + "\n\n"
+        "GOAL: Create the definitive A-Z guide for this career path, including technical mastery, aptitude, DSA, and professional mentorship.\n\n"
+        "STRICT INSTRUCTIONS:\n"
+        "- Act as an elite mentor who cares about the student's success\n"
+        "- Provide deep, structured, step-by-step technical guidance\n"
+        "- Include REAL tools and technologies used in the industry today\n"
+        "- Include HIGH-QUALITY learning resources with REAL clickable links (https://...)\n"
+        "- NEW: Include a dedicated Aptitude section (Logical/Quant) relevant to this role\n"
+        "- NEW: Include a dedicated DSA section (Data Structures & Algorithms) with high-frequency patterns\n"
+        "- NEW: Include 'Mentor Wisdom' with 3-4 powerful career secrets/preparation strategies\n"
+        "- Return ONLY valid JSON, no markdown, no explanation\n\n"
+        "Return this EXACT JSON structure:\n"
+        '{\n'
+        '  "title": "' + skill.title() + ' Elite Career Guidance",\n'
+        '  "introduction": "Strategic overview of ' + skill + ', its industrial impact, and why it is a top-tier career choice - 4 detailed lines",\n'
+        '  "beginner": [\n'
+        '    {"topic":"Concept","description":"Reason to learn and industry use","free_resource_link":"https://..."}\n'
+        '  ],\n'
+        '  "intermediate": [\n'
+        '    {"topic":"Topic","description":"Mastery details and practical application","free_resource_link":"https://..."}\n'
+        '  ],\n'
+        '  "advanced": [\n'
+        '    {"topic":"Architectural Concept","description":"System design and performance details","free_resource_link":"https://..."}\n'
+        '  ],\n'
+        '  "aptitude": [\n'
+        '    {"topic":"Aptitude Area","reason":"Why this is tested in companies like Google/TCS/Zoho","preparation_tip":"Specific shortcut or strategy","free_resource_link":"https://..."}\n'
+        '  ],\n'
+        '  "dsa": [\n'
+        '    {"pattern":"DSA Pattern/Topic","importance":"Why it matters for ' + skill + ' interviews","practice_problem":"One classic problem name","free_resource_link":"https://..."}\n'
+        '  ],\n'
+        '  "tools": [\n'
+        '    {"tool":"Tool","description":"Professional use case","free_resource_link":"https://..."}\n'
+        '  ],\n'
+        '  "projects": [\n'
+        '    {"title":"Project Name","description":"What it proves to recruiters","difficulty":"Level"}\n'
+        '  ],\n'
+        '  "mentor_wisdom": [\n'
+        '    {"strategy":"Mentor Secret","detail":"Why most candidates fail here and how to win"}\n'
+        '  ],\n'
+        '  "career_paths": [\n'
+        '    {"role":"Job Title","salary_range":"X-Y LPA","responsibilities":"Key metrics for success"}\n'
+        '  ],\n'
+        '  "certifications": [\n'
+        '    {"name":"Certs","organization":"Org","difficulty":"Level","url":"https://..."}\n'
+        '  ],\n'
+        '  "salary_insights": {"fresher":{"yearly":500000,"monthly":40000},"mid":{"yearly":1200000,"monthly":100000},"senior":{"yearly":2500000,"monthly":200000}},\n'
+        '  "interview_questions": [\n'
+        '    {"question":"Question?","in_depth_answer":"Expert 3-line response"}\n'
+        '  ],\n'
+        '  "resources": [\n'
+        '    {"name":"Resource","description":"What it offers","url":"https://..."}\n'
+        '  ],\n'
+        '  "workflow": {\n'
+        '    "intern":{"skills":["S1","S2"],"goal":"Industry Expert Tip: focus on real production workflows"},\n'
+        '    "junior":{"skills":["S1","S2"],"goal":"Practical application in sprints"},\n'
+        '    "developer":{"skills":["S1","S2"],"goal":"Building scalable features"},\n'
+        '    "senior":{"skills":["S1","S2"],"goal":"Architectural and code complexity mastery"},\n'
+        '    "lead":{"skills":["S1","S2"],"goal":"Technical leadership and project scoping"},\n'
+        '    "architect":{"skills":["S1","S2"],"goal":"Design vision and cross-team strategy"},\n'
+        '    "manager":{"skills":["S1","S2"],"goal":"Engineering health, budget, and delivery"}\n'
+        '  }\n'
+        '}\n\n'
+        "ITEM COUNTS: beginner=5, intermediate=5, advanced=4, aptitude=4, dsa=4, tools=6, projects=4, mentor_wisdom=4, "
+        "career_paths=6, interview_questions=5, resources=6.\n\n"
+        "CRITICAL: Use REAL high-quality URLs. Every field MUST be filled with detailed data."
+    )
 
-IMPORTANT:
-- Every single topic/tool/project MUST be highly detailed.
-- Every single topic/tool/project MUST include a proper, direct URL link to a free learning resource.
-- STRICTLY valid JSON ONLY. Return ONLY JSON.
-- ESCAPE all double quotes inside strings.
-- DO NOT include trailing commas.
-
-OUTPUT FORMAT (STRICT JSON):
-{{
-  "title": "{skill.title()} Complete Career Guidance",
-  "beginner": [
-    {{"topic": "Variables", "description": "In-depth explanation...", "free_resource_link": "https://..."}}
-  ],
-  "intermediate": [
-    {{"topic": "Functions", "description": "In-depth explanation...", "free_resource_link": "https://..."}}
-  ],
-  "advanced": [
-    {{"topic": "Concurrency", "description": "In-depth explanation...", "free_resource_link": "https://..."}}
-  ],
-  "tools": [
-    {{"tool": "Docker", "description": "In-depth explanation...", "free_resource_link": "https://..."}}
-  ],
-  "projects": [
-    {{"title": "Project Name", "description": "In-depth explanation...", "difficulty": "Beginner", "free_resource_link": "https://..."}}
-  ],
-  "interview_questions": [
-    {{"question": "How does X work?", "in_depth_answer": "Detailed explanation..."}}
-  ],
-  "workflow": {{
-    "intern": {{"skills": ["Skill1", "Skill2"], "goal": "Detailed business goal..."}},
-    "junior": {{"skills": ["Skill1"], "goal": "Detailed business goal..."}},
-    "developer": {{"skills": ["Skill1"], "goal": "..."}},
-    "senior": {{"skills": ["Skill1"], "goal": "..."}},
-    "lead": {{"skills": ["Skill1"], "goal": "..."}},
-    "architect": {{"skills": ["Skill1"], "goal": "..."}},
-    "manager": {{"skills": ["Skill1"], "goal": "..."}}
-  }}
-}}"""
-    api_key = os.getenv("NVIDIA_API_KEY")
-    url = "https://integrate.api.nvidia.com/v1/chat/completions"
+    api_key = GROQ_API_KEY_2 or GROQ_API_KEY
+    url = "https://api.groq.com/openai/v1/chat/completions"
     
-    data = json.dumps({
-        "model": "meta/llama-3.1-8b-instruct",
+    payload = {
+        "model": "llama-3.3-70b-versatile",
         "messages": [{"role": "user", "content": prompt}],
-        "temperature": 0.5,
-        "max_tokens": 8192
-    }).encode('utf-8')
+        "temperature": 0.3,
+        "top_p": 0.9,
+        "max_tokens": 4096,
+        "response_format": {"type": "json_object"}
+    }
     
-    import urllib.request
-    req = urllib.request.Request(url, data=data, headers={
-        "Content-Type": "application/json",
-        "Authorization": f"Bearer {api_key}"
-    })
-
     try:
-        with urllib.request.urlopen(req, timeout=120) as response:
-            result = json.loads(response.read().decode('utf-8'))
-            raw_json = result["choices"][0]["message"]["content"]
-            raw_json = raw_json.replace('```json', '').replace('```', '').strip()
-            start_idx = raw_json.find('{')
-            end_idx = raw_json.rfind('}')
-            if start_idx != -1 and end_idx != -1:
-                raw_json = raw_json[start_idx:end_idx+1]
-            return json.loads(raw_json)
+        response = requests.post(url, headers={"Authorization": f"Bearer {api_key}"}, json=payload, timeout=120)
+        response.raise_for_status()
+        result = response.json()
+        raw_json = result["choices"][0]["message"]["content"].strip()
+        return json.loads(raw_json)
     except json.JSONDecodeError as e:
         print(f"JSON Parse error in fetch_roadmap_json: {str(e)}")
         try:
@@ -1337,8 +2117,8 @@ def generate_complete_roadmap():
     data = request.json
     skill = data.get('skill', '')
     
-    if not GEMINI_API_KEY:
-        return jsonify({"error": "Gemini API key missing"}), 500
+    if not os.getenv("GROQ_API_KEY"):
+        return jsonify({"error": "Groq API key missing"}), 500
         
     try:
         roadmap_json = fetch_roadmap_json(skill)
@@ -1358,73 +2138,228 @@ def download_complete_pdf():
         return "Skill required", 400
         
     try:
-        # --- Identify Roadmap Data (Dynamic Redo) ---
-        is_indepth = False
-        roadmap_json = generate_nvidia_roadmap(skill)
-        if roadmap_json:
-            is_indepth = True
-        
-        if not roadmap_json:
-            # Fallback to frontend summary data if NVIDIA fails or is missing
-            roadmap_raw = request.form.get('roadmap_data')
-            if roadmap_raw:
-                try:
-                    sections_list = json.loads(roadmap_raw)
-                    roadmap_json = {"sections": sections_list}
-                except: pass
-            
-        if not roadmap_json:
-            roadmap_json = fetch_roadmap_json(skill)
+        # ── EXACTLY ONE API CALL ─────────────────────────
+        # Skip the extra heavy text processing/fallback loops
+        # Directly grab the lightweight, structured JSON
+        roadmap_json = fetch_roadmap_json(skill)
+        is_indepth = True  # We have dynamic data from fetch_roadmap_json
         
         buffer = io.BytesIO()
         pdf_title = f"{skill.title()} Career Roadmap"
-        doc = SimpleDocTemplate(buffer, pagesize=letter, rightMargin=72, leftMargin=72, topMargin=72, bottomMargin=18, title=pdf_title, author="AI Career Consulting System")
+        doc = SimpleDocTemplate(
+            buffer, pagesize=letter,
+            rightMargin=60, leftMargin=60,
+            topMargin=50, bottomMargin=40,
+            title=pdf_title, author="AI Career Consulting System"
+        )
         
         styles = getSampleStyleSheet()
-        title_style = styles['Heading1']
-        h2_style = styles['Heading2']
-        h3_style = styles['Heading3']
-        body_style = styles['Normal']
+        
+        # ── Premium PDF Styles (Apple-style clean layout) ──
+        title_style = ParagraphStyle(
+            'PdfTitle', parent=styles['Heading1'],
+            fontSize=20, leading=26,
+            spaceBefore=0, spaceAfter=4,
+            alignment=1,
+            textColor='#1a1a2e',
+            fontName='Helvetica-Bold'
+        )
+        subtitle_style = ParagraphStyle(
+            'PdfSubtitle', parent=styles['Normal'],
+            fontSize=10, leading=14,
+            alignment=1,
+            spaceAfter=14,
+            textColor='#888888',
+            fontName='Helvetica'
+        )
+        h2_style = ParagraphStyle(
+            'PdfH2', parent=styles['Heading2'],
+            fontSize=16, leading=20,
+            spaceBefore=14, spaceAfter=8,
+            textColor='#1a1a2e',
+            fontName='Helvetica-Bold'
+        )
+        h3_style = ParagraphStyle(
+            'PdfH3', parent=styles['Heading3'],
+            fontSize=13, leading=17,
+            spaceBefore=10, spaceAfter=5,
+            textColor='#0f3460',
+            fontName='Helvetica-Bold'
+        )
+        body_style = ParagraphStyle(
+            'PdfBody', parent=styles['Normal'],
+            fontSize=10.5, leading=15,
+            spaceAfter=5,
+            textColor='#333333',
+            fontName='Helvetica'
+        )
+        bullet_style = ParagraphStyle(
+            'PdfBullet', parent=styles['Normal'],
+            fontSize=10.5, leading=15,
+            spaceAfter=4,
+            leftIndent=18,
+            textColor='#333333',
+            fontName='Helvetica'
+        )
+        intro_style = ParagraphStyle(
+            'PdfIntro', parent=styles['Normal'],
+            fontSize=10.5, leading=16,
+            spaceBefore=2, spaceAfter=10,
+            textColor='#444444',
+            fontName='Helvetica-Oblique'
+        )
+        mentor_style = ParagraphStyle(
+            'PdfMentor', parent=styles['Normal'],
+            fontSize=10.5, leading=15,
+            leftIndent=20, rightIndent=20,
+            spaceBefore=10, spaceAfter=10,
+            textColor='#1a1a2e',
+            backColor='#f0f4f8',
+            borderPadding=10,
+            fontName='Helvetica-Oblique'
+        )
         
         Story = []
         
-        title = roadmap_json.get("title", f"{skill.title()} Complete Career Guidance")
-        Story.append(Paragraph(title, title_style))
-        Story.append(Spacer(1, 0.2 * inch))
-        
-
+        # ── Helper: apply_linkify ───────────────────────
         def apply_linkify(text):
             if not text: return ""
-            
             safe_text = str(text).replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
-            
-            # Unescape only allowed HTML formatting tags for ReportLab
             safe_text = safe_text.replace('&lt;b&gt;', '<b>').replace('&lt;/b&gt;', '</b>')
             safe_text = safe_text.replace('&lt;strong&gt;', '<b>').replace('&lt;/strong&gt;', '</b>')
             safe_text = safe_text.replace('&lt;br&gt;', '<br/>').replace('&lt;br/&gt;', '<br/>')
-            
-            # Detect Markdown links [Title](URL)
             safe_text = re.sub(r'\[([^\]]+)\]\((https?://[^\s<>]+)\)', r'<a href=' + chr(34) + r'\2' + chr(34) + r' color=' + chr(34) + r'blue' + chr(34) + r'><u>\1</u></a>', safe_text)
-            
-            # Detect Raw URLs
             safe_text = re.sub(r'(?<!href=' + chr(34) + r')(?<!' + chr(34) + r'>)(https?://[^\s<>]+)', r'<a href=' + chr(34) + r'\1' + chr(34) + r' color=' + chr(34) + r'blue' + chr(34) + r'><u>\1</u></a>', safe_text)
-            
             return safe_text
 
-        # --- Dynamic Sections Loop (Redo: 100% UI Sync) ---
+        # ── Helper: Clean section divider ─────────────────
+        def add_divider():
+            Story.append(Spacer(1, 10))
+            Story.append(HRFlowable(width='100%', thickness=0.3, color='#dddddd', spaceAfter=6, spaceBefore=2))
+        
+        # ── Helper: Section heading with divider + real emojis ──
+        # Try to register Segoe UI Emoji for real emoji support (Windows/Local)
+        has_emoji_font = False
+        try:
+            from reportlab.pdfbase import pdfmetrics
+            from reportlab.pdfbase.ttfonts import TTFont
+            import os
+            font_path = r'C:\Windows\Fonts\seguiemj.ttf'
+            if os.path.exists(font_path):
+                pdfmetrics.registerFont(TTFont('SegoeUIEmoji', font_path))
+                has_emoji_font = True
+        except Exception as e:
+            print("Could not load emoji font:", e)
+
+        # Real Emoji Map (keyword → emoji character)
+        _section_emojis = {
+            'introduction': '🚀',
+            'beginner': '🌱',
+            'intermediate': '⚙️',
+            'advanced': '🏆',
+            'tool': '🧰',
+            'project': '💼',
+            'career': '🎯',
+            'certification': '📜',
+            'salary': '💰',
+            'interview': '❓',
+            'resource': '📚',
+            'workflow': '🏭',
+            'advice': '✅',
+            'industrial': '🏢',
+        }
+        
+        def add_section(title_text, custom_emoji=''):
+            add_divider()
+            import re as _re
+            
+            # The original AI content might have its own emojis, let's keep them if present,
+            # otherwise strip them from the text itself and add our standard one.
+            clean_title = _re.sub(r'[^\x00-\x7F]+', '', title_text).strip()
+            
+            if has_emoji_font:
+                # Use real emoji from mapping or fallback custom_emoji
+                icon_char = '📌' # default
+                for keyword, char in _section_emojis.items():
+                    if keyword in clean_title.lower():
+                        icon_char = char
+                        break
+                if custom_emoji:
+                    icon_char = custom_emoji
+                    
+                icon_markup = f'<font name="SegoeUIEmoji" size="14">{icon_char}</font>  '
+                Story.append(Paragraph(icon_markup + f'<font color="#16213e">{clean_title}</font>', h2_style))
+            else:
+                # Fallback to plain text if font fails
+                Story.append(Paragraph(f'<font color="#16213e">{clean_title}</font>', h2_style))
+        
+        # ── Helper: Render items as spaced bullets ────────
+        def add_bullets(items_list):
+            bullet_items = []
+            for item in items_list:
+                if isinstance(item, dict):
+                    name = item.get('topic') or item.get('tool') or item.get('title') or item.get('name') or item.get('question') or item.get('role') or ''
+                    desc = item.get('description') or item.get('in_depth_answer') or item.get('responsibilities') or item.get('goal') or ''
+                    link = item.get('free_resource_link') or item.get('url') or ''
+                    diff = item.get('difficulty') or item.get('organization') or ''
+                    
+                    parts = [f"<b>{apply_linkify(str(name))}</b>"]
+                    if diff:
+                        parts.append(f"  <font color='#666666'>({apply_linkify(str(diff))})</font>")
+                    if link:
+                        parts.append(f'  <a href="{link}" color="blue"><u>Link</u></a>')
+                    
+                    text = ''.join(parts)
+                    if desc:
+                        text += f"<br/><font color='#555555'>{apply_linkify(str(desc))}</font>"
+                else:
+                    text = apply_linkify(str(item).lstrip('•').strip())
+                
+                if text.strip():
+                    bullet_items.append(ListItem(Paragraph(text, bullet_style), bulletColor='#0f3460'))
+            
+            if bullet_items:
+                Story.append(ListFlowable(
+                    bullet_items,
+                    bulletType='bullet',
+                    bulletFontSize=5,
+                    bulletOffsetY=-2,
+                    start='\u2022'
+                ))
+                Story.append(Spacer(1, 6))
+        
+        # ══════════════════════════════════════════════════
+        # PDF CONTENT START
+        # ══════════════════════════════════════════════════
+        
+        title = roadmap_json.get("title", f"{skill.title()} Complete Career Guidance")
+        Story.append(Paragraph(title, title_style))
+        Story.append(Spacer(1, 2))
+        Story.append(HRFlowable(width='40%', thickness=1.5, color='#0f3460', spaceAfter=4, spaceBefore=0))
+        Story.append(Paragraph("AI-Powered Career Guidance Document", subtitle_style))
+        Story.append(Spacer(1, 8))
+        
+        # ── Introduction ─────────────────────────────
+        intro = roadmap_json.get("introduction", "")
+        if intro:
+            add_section("Introduction")
+            safe_intro = str(intro).replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
+            Story.append(Paragraph(safe_intro, intro_style))
+            Story.append(Spacer(1, 8))
+
+
+
+        # ── Dynamic Sections Loop ────────────────────────
         if 'sections' in roadmap_json and roadmap_json['sections']:
             for section in roadmap_json['sections']:
                 sec_title = section.get('title', 'Section').replace('🔥', '').replace('🚀', '').strip()
                 sec_content = section.get('content', '')
                 
-                # Skip Career/Job only if in summary mode (as they are handled later)
-                # In in-depth mode (NVIDIA), we let the AI handle them in-order.
                 if not is_indepth and ('Career' in sec_title or 'Job' in sec_title):
                     continue
-                    
-                Story.append(Paragraph(sec_title, h2_style))
                 
-                # Parse bullet points from UI content string or array
+                add_section(sec_title, '📌')
+                
                 items = []
                 if isinstance(sec_content, list):
                     items = sec_content
@@ -1435,36 +2370,29 @@ def download_complete_pdf():
                     else:
                         items = [sec_content]
 
-                for item in items:
-                    clean_item = str(item).lstrip('•').strip()
-                    if not clean_item: continue
-                    safe_item = apply_linkify(clean_item)
-                    Story.append(Paragraph(f"• {safe_item}", body_style))
-                
-                Story.append(Spacer(1, 0.1 * inch))
+                add_bullets(items)
+                Story.append(Spacer(1, 6))
         else:
-            # Fallback for manual re-fetch cases without sections key
+            # Fallback for re-fetch without sections key
             sections_map = [
-                ("Beginner Level", "beginner"),
-                ("Intermediate Level", "intermediate"),
-                ("Advanced Level", "advanced"),
-                ("Tools & Technologies", "tools"),
-                ("Web & API", "web"),
-                ("Database", "database"),
-                ("Frameworks", "frameworks"),
-                ("Real-world Projects", "projects"),
-                ("Core Requirement: DSA 🔥", "dsa")
+                ("📘 Beginner Level", "beginner"),
+                ("📗 Intermediate Level", "intermediate"),
+                ("📕 Advanced Level", "advanced"),
+                ("🛠 Tools & Technologies", "tools"),
+                ("🌐 Web & API", "web"),
+                ("🗄 Database", "database"),
+                ("⚙ Frameworks", "frameworks"),
+                ("🚀 Real-world Projects", "projects")
             ]
             for ui_title, json_key in sections_map:
                 if json_key in roadmap_json and roadmap_json[json_key]:
-                    Story.append(Paragraph(ui_title, h2_style))
-                    for item in roadmap_json[json_key]:
-                        safe_item = apply_linkify(item)
-                        Story.append(Paragraph(f"• {safe_item}", body_style))
-                    Story.append(Spacer(1, 0.1 * inch))
+                    add_section(ui_title)
+                    add_bullets(roadmap_json[json_key])
+                    Story.append(Spacer(1, 6))
                 
+        # ── Industrial Workflow ───────────────────────────
         if "workflow" in roadmap_json:
-            Story.append(Paragraph("Industrial Workflow", h2_style))
+            add_section("Industrial Workflow", "🏭")
             wf_data = roadmap_json["workflow"]
             roles = ["intern", "junior", "developer", "senior", "lead", "architect", "manager"]
             display_roles = ["Intern / Trainee", "Junior Developer", "Software Developer (Mid-Level)", "Senior Developer", "Tech Lead", "Solution Architect", "Engineering Manager"]
@@ -1472,18 +2400,79 @@ def download_complete_pdf():
             for k, display in zip(roles, display_roles):
                 if k in wf_data:
                     role_data = wf_data[k]
-                    Story.append(Paragraph(display, h3_style))
+                    Story.append(Paragraph(f"<b>{display}</b>", h3_style))
                     goal = role_data.get("goal", "")
                     if goal:
-                        safe_goal = apply_linkify(goal)
-                        Story.append(Paragraph(f"Goal: {safe_goal}", body_style))
+                        Story.append(Paragraph(f"Goal: {apply_linkify(goal)}", bullet_style))
                     skills = role_data.get("skills", [])
                     if skills:
                         skill_str = ", ".join(str(s) for s in skills)
-                        safe_skills = apply_linkify(skill_str)
-                        Story.append(Paragraph(f"Skills: {safe_skills}", body_style))
-                    Story.append(Spacer(1, 0.1 * inch))
-                    
+                        Story.append(Paragraph(f"Skills: {apply_linkify(skill_str)}", bullet_style))
+                    Story.append(Spacer(1, 4))
+
+        # ── Aptitude Preparation ──────────────────────────
+        aptitude_data = roadmap_json.get("aptitude", [])
+        if aptitude_data:
+            add_section("IMPORTANT: Aptitude & Logical Mastery", "🧠")
+            apt_items = []
+            for item in aptitude_data:
+                topic = item.get("topic", "")
+                reason = item.get("reason", "")
+                tip = item.get("preparation_tip", "")
+                link = item.get("free_resource_link", "")
+                
+                text = f"<b>{apply_linkify(topic)}</b>"
+                if reason:
+                    text += f"<br/><font color='#555555'><i>Why:</i> {apply_linkify(reason)}</font>"
+                if tip:
+                    text += f"<br/><font color='#0a4d68'><i>Mentor Tip:</i> {apply_linkify(tip)}</font>"
+                if link:
+                    text += f"<br/><a href='{link}' color='blue'><u>Access Learning Resource</u></a>"
+                
+                apt_items.append(ListItem(Paragraph(text, bullet_style), bulletColor='#0f3460'))
+            if apt_items:
+                Story.append(ListFlowable(apt_items, bulletType='bullet', bulletFontSize=6, bulletOffsetY=-2, start='•'))
+            Story.append(Spacer(1, 6))
+
+        # ── DSA Mastery ──────────────────────────────────
+        dsa_data = roadmap_json.get("dsa", [])
+        if dsa_data:
+            add_section("IMPORTANT: High-Frequency DSA Patterns", "💻")
+            dsa_items = []
+            for item in dsa_data:
+                pattern = item.get("pattern", "")
+                imp = item.get("importance", "")
+                prob = item.get("practice_problem", "")
+                link = item.get("free_resource_link", "")
+                
+                text = f"<b>{apply_linkify(pattern)}</b>"
+                if imp:
+                    text += f"<br/><font color='#555555'><i>Importance:</i> {apply_linkify(imp)}</font>"
+                if prob:
+                    text += f"<br/><font color='#7c3aed'><i>Must-Do Problem:</i> {apply_linkify(prob)}</font>"
+                if link:
+                    text += f"<br/><a href='{link}' color='blue'><u>Practice on LeetCode/GFG</u></a>"
+                
+                dsa_items.append(ListItem(Paragraph(text, bullet_style), bulletColor='#0f3460'))
+            if dsa_items:
+                Story.append(ListFlowable(dsa_items, bulletType='bullet', bulletFontSize=6, bulletOffsetY=-2, start='•'))
+            Story.append(Spacer(1, 6))
+
+        # ── Career Paths ─────────────────────────────────
+        career_paths = roadmap_json.get("career_paths", [])
+        if career_paths:
+            add_section("Career Paths", "💼")
+            add_bullets(career_paths)
+            Story.append(Spacer(1, 6))
+
+        # ── Certifications ───────────────────────────────
+        certifications = roadmap_json.get("certifications", [])
+        if certifications:
+            add_section("Certifications", "🎓")
+            add_bullets(certifications)
+            Story.append(Spacer(1, 6))
+
+        # ── Salary Insights ──────────────────────────────
         def format_salary_py(amount):
             if not amount: return "N/A"
             try:
@@ -1493,21 +2482,66 @@ def download_complete_pdf():
                 return f"Rs. {int(a)}"
             except: return str(amount)
 
-        def get_salary_fallback(skill_name):
-            # Fallback data for salary insights if API or dynamic data is missing
-            benchmarks = {
-                "java": {"fresher": {"yearly": 450000, "monthly": 35000}, "mid": {"yearly": 950000, "monthly": 80000}, "senior": {"yearly": 2200000, "monthly": 180000}},
-                "python": {"fresher": {"yearly": 500000, "monthly": 40000}, "mid": {"yearly": 1100000, "monthly": 90000}, "senior": {"yearly": 2500000, "monthly": 200000}},
-                "fullstack": {"fresher": {"yearly": 500000, "monthly": 40000}, "mid": {"yearly": 1200000, "monthly": 100000}, "senior": {"yearly": 2800000, "monthly": 230000}},
-                "ai": {"fresher": {"yearly": 800000, "monthly": 60000}, "mid": {"yearly": 1800000, "monthly": 140000}, "senior": {"yearly": 3500000, "monthly": 280000}},
-                "ml": {"fresher": {"yearly": 700000, "monthly": 55000}, "mid": {"yearly": 1600000, "monthly": 120000}, "senior": {"yearly": 3200000, "monthly": 260000}},
-                "data": {"fresher": {"yearly": 500000, "monthly": 40000}, "mid": {"yearly": 1200000, "monthly": 90000}, "senior": {"yearly": 2200000, "monthly": 180000}},
-                "cyber": {"fresher": {"yearly": 600000, "monthly": 50000}, "mid": {"yearly": 1500000, "monthly": 120000}, "senior": {"yearly": 3000000, "monthly": 250000}}
-            }
-            sn = skill_name.lower()
-            for k in benchmarks:
-                if k in sn: return benchmarks[k]
-            return {"fresher": {"yearly": 400000, "monthly": 32000}, "mid": {"yearly": 1000000, "monthly": 80000}, "senior": {"yearly": 2000000, "monthly": 160000}}
+        salary_data = roadmap_json.get("salary_insights", {})
+        if salary_data and isinstance(salary_data, dict):
+            add_section("Salary Insights (India)", "💰")
+            salary_items = []
+            for level, label in [("fresher", "Fresher (0-2 yrs)"), ("mid", "Mid-Level (2-5 yrs)"), ("senior", "Senior (5+ yrs)")]:
+                level_data = salary_data.get(level, {})
+                if isinstance(level_data, dict):
+                    yearly = level_data.get("yearly", 0)
+                    monthly = level_data.get("monthly", 0)
+                    salary_items.append(ListItem(
+                        Paragraph(f"<b>{label}:</b>  {format_salary_py(yearly)}/yr  ({format_salary_py(monthly)}/mo)", bullet_style),
+                        bulletColor='#0f3460'
+                    ))
+            if salary_items:
+                Story.append(ListFlowable(salary_items, bulletType='bullet', bulletFontSize=6, bulletOffsetY=-2, start='•'))
+            Story.append(Spacer(1, 6))
+
+        # ── Mentor Wisdom ────────────────────────────────
+        mentor_data = roadmap_json.get("mentor_wisdom", [])
+        if mentor_data:
+            add_section("Mentor Wisdom & Strategy", "✨")
+            for item in mentor_data:
+                strat = item.get("strategy", "")
+                detail = item.get("detail", "")
+                if strat:
+                    Story.append(Paragraph(f"<b>{apply_linkify(strat)}</b>", h3_style))
+                if detail:
+                    Story.append(Paragraph(apply_linkify(detail), mentor_style))
+            Story.append(Spacer(1, 8))
+
+        # ── Interview Questions ──────────────────────────
+        iq_data = roadmap_json.get("interview_questions", [])
+        if iq_data:
+            add_section("Interview Questions", "❓")
+            add_bullets(iq_data)
+            Story.append(Spacer(1, 6))
+
+        # ── Best Resources ────────────────────────────────
+        resources_data = roadmap_json.get("resources", [])
+        if resources_data:
+            add_section("Best Resources", "🌐")
+            res_items = []
+            for res in resources_data:
+                if isinstance(res, dict):
+                    name = res.get("name", "")
+                    desc = res.get("description", "")
+                    url = res.get("url", "")
+                    parts = [f"<b>{apply_linkify(str(name))}</b>"]
+                    if desc:
+                        parts.append(f" — {apply_linkify(str(desc))}")
+                    if url:
+                        parts.append(f' <a href="{url}" color="blue"><u>Visit</u></a>')
+                    text = ''.join(parts)
+                else:
+                    text = apply_linkify(str(res))
+                if text.strip():
+                    res_items.append(ListItem(Paragraph(text, bullet_style), bulletColor='#0f3460'))
+            if res_items:
+                Story.append(ListFlowable(res_items, bulletType='bullet', bulletFontSize=6, bulletOffsetY=-2, start='•'))
+            Story.append(Spacer(1, 6))
 
         # --- Manual Extensions (Only if NOT in-depth) ---
         if not is_indepth:
@@ -1622,8 +2656,7 @@ def download_complete_pdf():
                         Story.append(Paragraph(f"• {safe_item_c}", body_style))
                 Story.append(Spacer(1, 0.1 * inch))
 
-        # --- Guaranteed Resources Section ---
-        # If the AI or fallback didn't generate a "Resources" section, append a curated list.
+        # ── Resources ────────────────────────────────────
         has_resources = False
         if 'sections' in roadmap_json and roadmap_json['sections']:
             for s in roadmap_json['sections']:
@@ -1632,19 +2665,19 @@ def download_complete_pdf():
                     break
         
         if not has_resources:
-            Story.append(Paragraph("Resources & Official Docs", h2_style))
+            add_section("Resources & Official Docs", "📚")
             resources_html = [
-                "• Official Documentation: <a href='https://docs.oracle.com/' color='blue'><u>Oracle</u></a> / <a href='https://devdocs.io/' color='blue'><u>DevDocs</u></a>",
-                "• Core Logic & Syntax: <a href='https://www.w3schools.com/' color='blue'><u>W3Schools</u></a>",
-                "• Advanced Concepts: <a href='https://www.geeksforgeeks.org/' color='blue'><u>GeeksforGeeks</u></a> / <a href='https://developer.mozilla.org/' color='blue'><u>MDN</u></a>",
-                "• Interview Prep & Practice: <a href='https://leetcode.com/' color='blue'><u>LeetCode</u></a> / <a href='https://www.hackerrank.com/' color='blue'><u>HackerRank</u></a>"
+                "Official Documentation: <a href='https://docs.oracle.com/' color='blue'><u>Oracle</u></a> / <a href='https://devdocs.io/' color='blue'><u>DevDocs</u></a>",
+                "Core Logic & Syntax: <a href='https://www.w3schools.com/' color='blue'><u>W3Schools</u></a>",
+                "Advanced Concepts: <a href='https://www.geeksforgeeks.org/' color='blue'><u>GeeksforGeeks</u></a> / <a href='https://developer.mozilla.org/' color='blue'><u>MDN</u></a>",
+                "Interview Prep: <a href='https://leetcode.com/' color='blue'><u>LeetCode</u></a> / <a href='https://www.hackerrank.com/' color='blue'><u>HackerRank</u></a>"
             ]
-            for r_html in resources_html:
-                Story.append(Paragraph(r_html, body_style))
-            Story.append(Spacer(1, 0.1 * inch))
+            res_items = [ListItem(Paragraph(r, bullet_style), bulletColor='#0f3460') for r in resources_html]
+            Story.append(ListFlowable(res_items, bulletType='bullet', bulletFontSize=6, bulletOffsetY=-2, start='•'))
+            Story.append(Spacer(1, 6))
 
-        # --- Final Advice ---
-        Story.append(Paragraph("Final Advice", h2_style))
+        # ── Final Advice ─────────────────────────────────
+        add_section("Final Advice", "✅")
         advice_points = [
             "Practice coding daily (1–2 hrs)",
             "Focus on DSA + core concepts",
@@ -1652,9 +2685,9 @@ def download_complete_pdf():
             "Stay consistent for 3–6 months",
             "Don't just watch tutorials, implement everything"
         ]
-        advice_html = "<br/>".join([f"• {a}" for a in advice_points])
-        Story.append(Paragraph(advice_html, body_style))
-        Story.append(Spacer(1, 0.2 * inch))
+        advice_items = [ListItem(Paragraph(a, bullet_style), bulletColor='#0f3460') for a in advice_points]
+        Story.append(ListFlowable(advice_items, bulletType='bullet', bulletFontSize=6, bulletOffsetY=-2, start='•'))
+        Story.append(Spacer(1, 12))
 
         doc.build(Story)
         buffer.seek(0)
@@ -1666,7 +2699,224 @@ def download_complete_pdf():
         
     except Exception as e:
         print("PDF Generation Error:", e)
+        import traceback
+        traceback.print_exc()
+        return "PDF generation failed. Please try again.", 500
+@app.route('/api/topic_explanation', methods=['POST'])
+def topic_explanation():
+    data = request.json
+    topic = data.get('topic', '')
+    
+    # Force reload environment to catch immediate .env changes
+    from dotenv import load_dotenv
+    load_dotenv(override=True)
+    
+    api_key = os.getenv('GROQ_API_KEY')
+    if not api_key:
+        return jsonify({"success": False, "error": "GROQ_API_KEY not configured. Please add it to your .env file."}), 500
+        
+    try:
+        url = "https://api.groq.com/openai/v1/chat/completions"
+        headers = {
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json"
+        }
+        
+        prompt = f"""Explain the topic: {topic}
+
+Provide:
+
+1. Short explanation (3–5 lines)
+
+2. FREE RESOURCES ONLY:
+
+- 2–3 Articles (with title + link)
+- 1 Documentation link
+- 1 YouTube video
+
+Rules:
+- Beginner friendly
+- Short and clear
+- No long paragraphs
+- Real links only (https://...)"""
+
+        payload = {
+            "model": "llama-3.1-8b-instant",
+            "messages": [
+                {"role": "system", "content": "You are a helpful AI tutor. You provide clear, short explanations and always format resources exactly as requested: [Article] Title URL, [Docs] Title URL, [Video] Title URL."},
+                {"role": "user", "content": prompt}
+            ],
+            "temperature": 0.3,
+            "max_tokens": 400
+        }
+        
+        response = requests.post(url, headers=headers, json=payload, timeout=12)
+        response.raise_for_status()
+        res_data = response.json()
+        ai_text = res_data["choices"][0]["message"]["content"]
+        
+        return jsonify({"success": True, "content": ai_text})
+        
+    except Exception as e:
+        print(f"Groq API Error: {str(e)}")
+        return jsonify({"success": False, "error": f"Groq AI service error: {str(e)}"}), 500
+
+@app.route('/api/generate_quiz', methods=['POST'])
+def generate_quiz():
+    data = request.json
+    section = data.get('topic', '')
+    subtopics = data.get('subtopics', [])
+    
+    # Create topic description for AI
+    target = f"{section} (focusing on: {', '.join(subtopics)})" if subtopics else section
+    
+    # --- Try OpenAI First ---
+    openai_key = os.getenv('OPENAI_API_KEY')
+    if openai_key and not openai_key.startswith('sk-1234'):
+        try:
+            url = "https://api.openai.com/v1/chat/completions"
+            headers = {
+                "Authorization": f"Bearer {openai_key}",
+                "Content-Type": "application/json"
+            }
+            prompt = f"""Generate a technical quiz for the section '{section}'. 
+            The user has specifically completed these sub-topics: {', '.join(subtopics)}.
+            Create EXACTLY 5 challenging multiple-choice questions focusing ONLY on these sub-topics.
+            
+            Format:
+            {{
+                "questions": [
+                    {{
+                        "question": "Question text?",
+                        "options": ["A", "B", "C", "D"],
+                        "correctIndex": 0
+                    }},
+                    ...
+                ]
+            }}
+            Return ONLY the strict JSON object."""
+            
+            payload = {
+                "model": "gpt-4o-mini",
+                "messages": [{"role": "user", "content": prompt}],
+                "temperature": 0.5,
+                "response_format": {"type": "json_object"}
+            }
+            response = requests.post(url, headers=headers, json=payload, timeout=15)
+            if response.status_code == 200:
+                quiz_json = response.json()["choices"][0]["message"]["content"]
+                return jsonify({"success": True, "quiz": json.loads(quiz_json), "provider": "openai"})
+        except Exception as e:
+            print(f"OpenAI Quiz Error: {str(e)}")
+
+    # --- Fallback to Groq ---
+    groq_key = os.getenv('GROQ_API_KEY')
+    if not groq_key:
+        return jsonify({"success": False, "error": "AI service unavailable."}), 500
+        
+    try:
+        url = "https://api.groq.com/openai/v1/chat/completions"
+        headers = {
+            "Authorization": f"Bearer {groq_key}",
+            "Content-Type": "application/json"
+        }
+        prompt = f"""Generate a 5-question technical quiz for: {target}.
+        Focus exclusively on assessment of knowledge for these topics: {', '.join(subtopics)}.
+        Format: {{ "questions": [ {{ "question": "...", "options": ["...", "..."], "correctIndex": 0 }} ] }}
+        Return ONLY valid JSON."""
+
+        payload = {
+            "model": "llama-3.1-8b-instant",
+            "messages": [{"role": "user", "content": prompt}],
+            "temperature": 0.5,
+            "response_format": {"type": "json_object"}
+        }
+        response = requests.post(url, headers=headers, json=payload, timeout=15)
+        response.raise_for_status()
+        quiz_json = response.json()["choices"][0]["message"]["content"]
+        return jsonify({"success": True, "quiz": json.loads(quiz_json), "provider": "groq"})
+        
+    except Exception as e:
+        print(f"Groq API Error: {str(e)}")
+        return jsonify({"success": False, "error": "AI provider error."}), 500
+
+@app.route("/redirect")
+def redirect_to_resource():
+    """Securely redirect to external resources via backend middleman."""
+    import urllib.parse
+    target_url = request.args.get("url")
+    if not target_url:
+        return "Invalid Resource URL", 400
+    
+    try:
+        decoded_url = urllib.parse.unquote(target_url)
+        return redirect(decoded_url)
+    except Exception as e:
+        print(f"Redirect Error: {e}")
+        return "Failed to redirect to target resource", 500
+
+@app.route('/api/market-demand')
+def market_demand_api():
+    try:
+        data = get_groq_market_demand()
+        if isinstance(data, str):
+            data = json.loads(data)
+        if not data:
+            raise ValueError("Empty data from AI")
+        return jsonify(data)
+    except Exception as e:
+        # Emergency Fallback
+        return jsonify({
+            "skills": [
+                {"name": "AI / ML", "demand": 95, "growth": 15, "color": "#6366f1"},
+                {"name": "Cloud Computing", "demand": 88, "growth": 10, "color": "#0ea5e9"},
+                {"name": "Web Dev", "demand": 85, "growth": 8, "color": "#10b981"},
+                {"name": "Data Eng", "demand": 82, "growth": 12, "color": "#f59e0b"},
+                {"name": "Cyber Security", "demand": 80, "growth": 11, "color": "#f43f5e"},
+                {"name": "DevOps", "demand": 76, "growth": 9, "color": "#8b5cf6"}
+            ]
+        })
+
+@app.route('/api/share_pdf_wa', methods=['POST'])
+def share_pdf_wa():
+    data = request.get_json(silent=True) or {}
+    skill = data.get('skill', '')
+    if not skill:
+         return jsonify({"error": "Skill required"}), 400
+         
+    safe_skill = "".join(c for c in skill if c.isalnum() or c in " _-").replace(' ', '_')
+    filename = f"{safe_skill}_Career_Guidance.pdf"
+    
+    # Create static directory if it doesn't exist
+    static_dir = os.path.join(app.root_path, 'static', 'generated_pdfs')
+    os.makedirs(static_dir, exist_ok=True)
+    file_path = os.path.join(static_dir, filename)
+    
+    # Check if already exists
+    if not os.path.exists(file_path):
+        try:
+            # Re-use logic from download_complete_pdf within correct request context
+            response = download_complete_pdf()
+            
+            # If it's a tuple, an error occurred (e.g., "Skill required", 400)
+            if isinstance(response, tuple):
+                 return jsonify({"error": "Failed to generate PDF"}), 500
+                 
+            # Extract bytes from the Flask Response object
+            pdf_bytes = response.get_data()
+            with open(file_path, 'wb') as f:
+                f.write(pdf_bytes)
+        except Exception as e:
+            return jsonify({"error": str(e)}), 500
+            
+    # Return full URL
+    pdf_url = request.host_url.rstrip('/') + f"/static/generated_pdfs/{filename}"
+    return jsonify({"url": pdf_url})
+
 if __name__ == '__main__':
     init_db()
     app.run(debug=True, port=5000)
 # Force reload for new env config
+
+
+

@@ -2,17 +2,73 @@
 
 {% block content %}
 <div class="dashboard-container">
+    <style>
+        @media (max-width: 768px) {
+            .hero-centered-layout {
+                padding-top: 8rem !important; /* Standard shift for consistency */
+                padding-left: 10px !important;
+                padding-right: 10px !important;
+            }
+            .dashboard-hero-card {
+                padding: 1.5rem 1.25rem !important;
+                border-radius: 20px !important;
+            }
+            .hero-title-new {
+                font-size: 1.7rem !important;
+                line-height: 1.3 !important;
+            }
+            .hero-subtitle-new {
+                font-size: 0.95rem !important;
+                margin-bottom: 1.5rem !important;
+            }
+            /* Upload Box Mobile */
+            .upload-box-mobile {
+                padding: 1.5rem 1rem !important;
+                margin: 1rem auto !important;
+            }
+            .upload-box-mobile i {
+                font-size: 2.2rem !important;
+                margin-bottom: 1rem !important;
+            }
+            .upload-box-mobile h3 {
+                font-size: 1.1rem !important;
+            }
+            .upload-box-mobile p {
+                font-size: 0.85rem !important;
+            }
+            .upload-buttons-mobile {
+                flex-direction: column !important;
+                gap: 10px !important;
+            }
+            .upload-buttons-mobile button {
+                width: 100% !important;
+                padding: 0.7rem !important;
+            }
+            /* Success Section Mobile */
+            #atsScoreRing {
+                width: 90px !important;
+                height: 90px !important;
+                border-width: 6px !important;
+            }
+            #atsScoreValue {
+                font-size: 1.8rem !important;
+            }
+            #atsSuccessMessage {
+                padding: 1.25rem !important;
+            }
+        }
+    </style>
     <div class="hero-centered-layout">
         <div class="dashboard-hero-card">
             <h1 class="hero-title-new">ATS Resume Checker</h1>
             <p class="hero-subtitle-new">Upload your resume to check its ATS compatibility and get actionable improvements.</p>
             
-            <div onclick="document.getElementById('resumeUpload').click()" style="max-width: 600px; margin: 2rem auto; background: rgba(108, 99, 255, 0.05); border: 2px dashed rgba(108, 99, 255, 0.3); border-radius: 16px; padding: 3rem 2rem; text-align: center; transition: all 0.3s ease; cursor: pointer;" onmouseover="this.style.borderColor='rgba(108, 99, 255, 0.8)'" onmouseout="this.style.borderColor='rgba(108, 99, 255, 0.3)'">
+            <div onclick="document.getElementById('resumeUpload').click()" class="upload-box-mobile" style="max-width: 600px; margin: 2rem auto; background: rgba(108, 99, 255, 0.05); border: 2px dashed rgba(108, 99, 255, 0.3); border-radius: 16px; padding: 3rem 2rem; text-align: center; transition: all 0.3s ease; cursor: pointer;" onmouseover="this.style.borderColor='rgba(108, 99, 255, 0.8)'" onmouseout="this.style.borderColor='rgba(108, 99, 255, 0.3)'">
                 <i class="fa-solid fa-cloud-arrow-up" style="font-size: 3.5rem; color: var(--primary-color); margin-bottom: 1.5rem;"></i>
                 <h3 style="color: var(--text-primary); margin-bottom: 1rem; font-size: 1.3rem;">Drag & Drop or Click to upload resume</h3>
                 <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">Supported formats: PDF, DOCX (Max 5MB)</p>
                 <input type="file" id="resumeUpload" style="display: none;" accept=".pdf,.doc,.docx" onchange="updateFileName(this)">
-                <div style="display: flex; justify-content: center; width: 100%; gap: 1rem;">
+                <div style="display: flex; justify-content: center; width: 100%; gap: 1rem;" class="upload-buttons-mobile">
                     <button type="button" onclick="event.stopPropagation(); document.getElementById('resumeUpload').click()" class="btn-gradient" style="padding: 0.8rem 2rem;">Browse Files</button>
                     <button type="button" id="removeFileBtn" onclick="event.stopPropagation(); removeFile()" class="btn-primary" style="padding: 0.8rem 2rem; display: none; background: #ef4444; border-color: #ef4444;">Remove</button>
                 </div>
