@@ -63,7 +63,20 @@ document.addEventListener('DOMContentLoaded', () => {
             cbWindow.classList.remove('active');
         });
 
-        chatSend.addEventListener('click', sendMessage);
+        chatSend.addEventListener('click', (e) => {
+            e.preventDefault();
+            sendMessage();
+        });
+        
+        // Mobile-centric touch support
+        chatSend.addEventListener('touchstart', (e) => {
+            // No preventDefault here to allow the virtual keyboard to stay open or close naturally
+            // but we ensure the message sends
+            if (chatInput.value.trim()) {
+                sendMessage();
+            }
+        }, { passive: true });
+
         chatInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') sendMessage();
         });

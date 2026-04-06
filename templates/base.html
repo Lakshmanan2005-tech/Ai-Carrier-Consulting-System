@@ -226,7 +226,7 @@
                 <strong><i class="fa-solid fa-robot"></i> AI Career Assistant</strong>
                 <button class="close-chat" id="closeChat">&times;</button>
             </div>
-            <div class="chat-body" id="chatBody">
+            <div class="chat-body" id="chatBody" data-lenis-prevent>
                 <div class="chat-bubble ai">Hello! I am your AI Career Assistant. Ask me anything about skills,
                     roadmaps, or career paths.</div>
             </div>
@@ -460,8 +460,8 @@
         .cm-modal-body {
             flex: 1;
             overflow-y: auto;
-            padding-right: 8px;
-            padding-bottom: 20px;
+            -webkit-overflow-scrolling: touch; /* Optimizes mobile momentum scroll */
+            overscroll-behavior: contain;
         }
 
         /* Scrollbar Styling */

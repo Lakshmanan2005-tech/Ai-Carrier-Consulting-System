@@ -1892,7 +1892,7 @@ body.dark-mode .roadmap-mandatory-note b, body.dark-mode .roadmap-mandatory-note
     position: fixed;
     bottom: 24px;
     right: 24px;
-    z-index: 999;
+    z-index: 1100; /* Increased to stay above mobile overlays (999) and sidebar (1000) */
 }
 
 @media (max-width: 768px) {
@@ -1974,16 +1974,16 @@ body.dark-mode .roadmap-mandatory-note b, body.dark-mode .roadmap-mandatory-note
 }
 
 /* Tablet */
-@media (max-width: 768px) {
-    .chatbot-window {
-        right: 16px;
-        bottom: 88px;
-        width: calc(100vw - 32px);
-        max-width: 360px;
-        height: 480px;
-        max-height: calc(100vh - 110px);
-        border-radius: 18px;
-    }
+    @media (max-width: 768px) {
+        .chatbot-window {
+            right: 16px;
+            bottom: 88px;
+            width: calc(100vw - 32px);
+            max-width: 360px;
+            height: 480px;
+            max-height: calc(100dvh - 110px);
+            border-radius: 18px;
+        }
 
     .chat-body {
         padding: 16px 14px;
@@ -2017,7 +2017,7 @@ body.dark-mode .roadmap-mandatory-note b, body.dark-mode .roadmap-mandatory-note
         max-width: none;
         bottom: 82px;
         height: 440px;
-        max-height: calc(100vh - 100px);
+        max-height: calc(100dvh - 100px);
         border-radius: 16px;
     }
 }
@@ -2104,6 +2104,8 @@ body.dark-mode .roadmap-mandatory-note b, body.dark-mode .roadmap-mandatory-note
     background: linear-gradient(180deg, #f8f9fe 0%, #f1f4fd 100%);
     scroll-behavior: smooth;
     min-height: 0;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
 }
 
 /* Thin custom scrollbar */
