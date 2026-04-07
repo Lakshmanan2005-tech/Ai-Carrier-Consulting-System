@@ -363,7 +363,7 @@
             max-width: 90% !important;
             min-height: 250px !important;
             max-height: 90vh !important;
-            overflow: hidden !important;
+            overflow: hidden;
             display: flex;
             flex-direction: column;
             margin: 0 auto !important;
@@ -460,9 +460,12 @@
 
         .cm-modal-body {
             flex: 1;
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch; /* Optimizes mobile momentum scroll */
+            min-height: 0;
+            overflow-y: auto !important;
+            -webkit-overflow-scrolling: touch !important;
             overscroll-behavior: contain;
+            touch-action: pan-y !important;
+            pointer-events: auto !important;
         }
 
         /* Scrollbar Styling */
