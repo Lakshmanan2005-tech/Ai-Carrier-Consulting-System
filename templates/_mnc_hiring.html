@@ -92,6 +92,51 @@
         display: flex; flex-direction: column; align-items: center;
     }
 
+    body.dark-mode .mnc-hiring-section-wrapper {
+        background: rgba(15, 23, 42, 0.4) !important;
+        border-color: rgba(255, 255, 255, 0.05) !important;
+    }
+
+    body.dark-mode .mnc-hiring-card {
+        background: rgba(30, 41, 59, 0.6) !important;
+        border-color: rgba(255, 255, 255, 0.08) !important;
+    }
+    body.dark-mode .mnc-hiring-card:hover { box-shadow: 0 8px 24px var(--accent-glow) !important; }
+
+    body.dark-mode .mnc-month-label { color: #f8fafc !important; }
+
+    body.dark-mode .mnc-company-pill {
+        background: rgba(15, 23, 42, 0.7) !important;
+        border-color: rgba(255, 255, 255, 0.1) !important;
+        color: #c4b5fd !important;
+    }
+    body.dark-mode .mnc-company-pill:hover {
+        background: var(--accent) !important;
+        color: #fff !important;
+        border-color: var(--accent) !important;
+        box-shadow: 0 4px 12px var(--accent-glow) !important;
+    }
+
+    /* Fixed Headers */
+    .mnc-hiring-title {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-size: 1.8rem;
+        font-weight: 800;
+        color: #1e1b4b;
+        margin-bottom: 0.4rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.6rem;
+    }
+    .mnc-hiring-subtitle {
+        color: #64748b;
+        font-size: 0.97rem;
+    }
+
+    body.dark-mode .mnc-hiring-title { color: #f8fafc !important; }
+    body.dark-mode .mnc-hiring-subtitle { color: #94a3b8 !important; }
+
     @media (max-width: 1024px) {
         .mnc-hiring-section-wrapper { max-width: 95%; height: 65vh; padding: 1.2rem; }
         .mnc-main-container { padding: 0 1rem; }
@@ -105,10 +150,10 @@
 
 <div class="mnc-main-container" style="margin-top: 2.5rem;" data-lenis-prevent>
     <div style="text-align:center; margin-bottom: 2rem; width: 100%;">
-        <h2 style="font-family:'Plus Jakarta Sans',sans-serif; font-size: 1.8rem; font-weight: 800; color: #1e1b4b; margin-bottom: 0.4rem; display:flex; align-items:center; justify-content:center; gap:0.6rem;">
+        <h2 class="mnc-hiring-title">
             <i class="fa-solid fa-building" style="color:#7c3aed;"></i> Top MNC Off-Campus Hiring
         </h2>
-        <p style="color: #64748b; font-size: 0.97rem;">Click any company to visit their official careers portal.</p>
+        <p class="mnc-hiring-subtitle">Click any company to visit their official careers portal.</p>
     </div>
 
     <div class="mnc-hiring-section-wrapper" data-lenis-prevent>
