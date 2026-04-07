@@ -1837,10 +1837,24 @@
             border-color: rgba(99, 102, 241, 0.2);
         }
 
+        .rm-premium-subtitle {
+            font-size: 0.75rem;
+            color: var(--text-muted, #64748b);
+            margin-bottom: 1rem;
+            line-height: 1.4;
+            font-weight: 500;
+        }
+
+        .rm-premium-card:hover .rm-premium-subtitle {
+            color: var(--text-secondary);
+        }
+
         .iw-desc-box {
             display: none;
+            position: relative;
             margin-top: 0.8rem;
             padding: 0.8rem 1rem;
+            padding-right: 2.5rem;
             background: rgba(0, 0, 0, 0.02);
             border-left: 3px solid #8b5cf6;
             border-radius: 0 8px 8px 0;
@@ -1848,6 +1862,20 @@
             color: var(--text-secondary, #475569);
             animation: fadeInDesc 0.3s ease;
             line-height: 1.4;
+        }
+
+        .iw-desc-close {
+            position: absolute;
+            top: 0.8rem;
+            right: 1rem;
+            cursor: pointer;
+            opacity: 0.5;
+            transition: opacity 0.2s;
+            font-size: 0.9rem;
+        }
+
+        .iw-desc-close:hover {
+            opacity: 1;
         }
 
         body.dark-mode .iw-desc-box {
@@ -2768,46 +2796,46 @@
             /* ─────────── SKILL-SPECIFIC STAGE DATA ─────────── */
             const skillProfiles = {
                 python: {
-                    intern: { skills: ['Python basics', 'OOP', 'Git', 'REST APIs', 'SQL basics', 'Flask/Django intro', 'Jupyter'], resp: ['Fix bugs in existing codebase', 'Write unit tests', 'Document functions', 'Assist in data cleaning tasks', 'Attend code reviews'] },
-                    junior: { skills: ['Django/Flask', 'SQLAlchemy', 'PostgreSQL', 'Docker basics', 'REST API design', 'Pytest', 'Linux CLI'], resp: ['Build feature modules', 'Write & run automated tests', 'Participate in sprint planning', 'Debug production issues', 'Collaborate via Git PRs'] },
-                    mid: { skills: ['Celery', 'Redis', 'Microservices', 'AWS/GCP', 'CI/CD pipelines', 'GraphQL', 'Performance tuning'], resp: ['Design API architecture', 'Mentor interns & juniors', 'Own feature delivery end-to-end', 'Review PRs & enforce code quality', 'Integrate third-party services'] },
-                    senior: { skills: ['System design', 'Distributed systems', 'Kafka', 'Kubernetes', 'Security best practices', 'Cost optimization'], resp: ['Architect backend systems', 'Define tech standards', 'Lead cross-team initiatives', 'Drive hiring & interviews', 'Resolve production incidents'] },
-                    lead: { skills: ['Cloud architecture', 'MLOps', 'FinOps', 'Stakeholder management', 'Strategic roadmapping', 'Vendor evaluation'], resp: ['Set engineering direction', 'Align tech with business goals', 'Budget & team scaling', 'Executive reporting', 'Evaluate emerging technologies'] },
+                    intern: { skills: ['🐍 Python basics', '🧱 OOP', '🌿 Git', '🔌 REST APIs', '📊 SQL basics', '🎸 Flask/Django intro', '📓 Jupyter'], resp: ['Fix bugs in existing codebase', 'Write unit tests', 'Document functions', 'Assist in data cleaning tasks', 'Attend code reviews'] },
+                    junior: { skills: ['🎸 Django/Flask', '🔗 SQLAlchemy', '🐘 PostgreSQL', '🐳 Docker basics', '🔌 REST API design', '🃏 Pytest', '🐧 Linux CLI'], resp: ['Build feature modules', 'Write & run automated tests', 'Participate in sprint planning', 'Debug production issues', 'Collaborate via Git PRs'] },
+                    mid: { skills: ['🥬 Celery', '⚡ Redis', '🏗️ Microservices', '☁️ AWS/GCP', '🔄 CI/CD pipelines', '📡 GraphQL', '⚙️ Performance tuning'], resp: ['Design API architecture', 'Mentor interns & juniors', 'Own feature delivery end-to-end', 'Review PRs & enforce code quality', 'Integrate third-party services'] },
+                    senior: { skills: ['🏛️ System design', '🌐 Distributed systems', '🚇 Kafka', '🛳️ Kubernetes', '🔒 Security best practices', '💰 Cost optimization'], resp: ['Architect backend systems', 'Define tech standards', 'Lead cross-team initiatives', 'Drive hiring & interviews', 'Resolve production incidents'] },
+                    lead: { skills: ['☁️ Cloud architecture', '🤖 MLOps', '💵 FinOps', '🤝 Stakeholder management', '🗺️ Strategic roadmapping', '⚖️ Vendor evaluation'], resp: ['Set engineering direction', 'Align tech with business goals', 'Budget & team scaling', 'Executive reporting', 'Evaluate emerging technologies'] },
                 },
                 javascript: {
-                    intern: { skills: ['HTML/CSS', 'JS ES6+', 'Git', 'Chrome DevTools', 'React basics', 'npm', 'REST fetch'], resp: ['Build UI components', 'Fix UI bugs', 'Write markup from designs', 'Attend standups', 'Review wireframes'] },
-                    junior: { skills: ['React/Vue', 'TypeScript', 'Webpack/Vite', 'REST & GraphQL', 'Jest', 'SCSS', 'Accessibility'], resp: ['Develop feature UIs', 'Connect APIs to frontend', 'Fix cross-browser issues', 'Write component tests', 'Improve UI performance'] },
-                    mid: { skills: ['Next.js', 'State management', 'WebSockets', 'SSR/SSG', 'CI/CD', 'Web performance', 'PWA'], resp: ['Own frontend architecture decisions', 'Lead UI redesigns', 'Conduct performance audits', 'Mentor juniors', 'Drive DX improvements'] },
-                    senior: { skills: ['Micro-frontends', 'Module federation', 'Design systems', 'Monorepos', 'Accessibility audits', 'Analytics integration'], resp: ['Define frontend standards', 'Scale component libraries', 'Interview candidates', 'Collaborate with product & design', 'Drive technical debt reduction'] },
-                    lead: { skills: ['Platform strategy', 'Multi-team coordination', 'FinOps', 'Stakeholder alignment', 'OKR planning'], resp: ['Own frontend platform vision', 'Manage engineering squads', 'Represent tech in board updates', 'Drive cross-product consistency', 'Build frontend culture'] },
+                    intern: { skills: ['🌐 HTML/CSS', '📜 JS ES6+', '🌿 Git', '💻 Chrome DevTools', '⚛️ React basics', '📦 npm', '🔌 REST fetch'], resp: ['Build UI components', 'Fix UI bugs', 'Write markup from designs', 'Attend standups', 'Review wireframes'] },
+                    junior: { skills: ['⚛️ React/Vue', '📘 TypeScript', '📦 Webpack/Vite', '🔌 REST & GraphQL', '🃏 Jest', '🎨 SCSS', '♿ Accessibility'], resp: ['Develop feature UIs', 'Connect APIs to frontend', 'Fix cross-browser issues', 'Write component tests', 'Improve UI performance'] },
+                    mid: { skills: ['⚛️ Next.js', '📊 State management', '🔌 WebSockets', '🚀 SSR/SSG', '🔄 CI/CD', '⚡ Web performance', '📱 PWA'], resp: ['Own frontend architecture decisions', 'Lead UI redesigns', 'Conduct performance audits', 'Mentor juniors', 'Drive DX improvements'] },
+                    senior: { skills: ['🏗️ Micro-frontends', '🔗 Module federation', '🎨 Design systems', '📦 Monorepos', '♿ Accessibility audits', '📈 Analytics integration'], resp: ['Define frontend standards', 'Scale component libraries', 'Interview candidates', 'Collaborate with product & design', 'Drive technical debt reduction'] },
+                    lead: { skills: ['🚀 Platform strategy', '🤝 Multi-team coordination', '💵 FinOps', '🤝 Stakeholder alignment', '🎯 OKR planning'], resp: ['Own frontend platform vision', 'Manage engineering squads', 'Represent tech in board updates', 'Drive cross-product consistency', 'Build frontend culture'] },
                 },
                 java: {
-                    intern: { skills: ['Core Java', 'OOP', 'Maven', 'Spring MVC basics', 'MySQL', 'Git', 'JUnit'], resp: ['Write utility classes', 'Fix reported bugs', 'Write basic unit tests', 'Study codebase conventions', 'Participate in reviews'] },
-                    junior: { skills: ['Spring Boot', 'Hibernate', 'REST APIs', 'Docker', 'JPA', 'PostgreSQL', 'Swagger'], resp: ['Build REST endpoints', 'Write integration tests', 'Maintain API documentation', 'Implement business logic', 'Support deployments'] },
-                    mid: { skills: ['Microservices', 'Kafka', 'Redis', 'Kubernetes', 'AWS', 'CQRS/Event sourcing', 'OAuth2'], resp: ['Architect service boundaries', 'Drive API versioning', 'Design for high availability', 'Review and merge PRs', 'Own sprint velocity'] },
-                    senior: { skills: ['JVM tuning', 'Distributed systems', 'System design', 'Security (OWASP)', 'SRE practices'], resp: ['Lead backend guild', 'Define coding standards', 'Own architecture decisions', 'Liaise with DevOps teams', 'Drive incident post-mortems'] },
-                    lead: { skills: ['Enterprise architecture', 'Vendor selection', 'Cost governance', 'Team growth strategy', 'Risk management'], resp: ['Set technical vision', 'Manage engineering budget', 'Align with CTO roadmap', 'Scale engineering org', 'Recruit principal engineers'] },
+                    intern: { skills: ['☕ Core Java', '🧱 OOP', '🏗️ Maven', '🍃 Spring MVC basics', '🐬 MySQL', '🌿 Git', '🃏 JUnit'], resp: ['Write utility classes', 'Fix reported bugs', 'Write basic unit tests', 'Study codebase conventions', 'Participate in reviews'] },
+                    junior: { skills: ['🍃 Spring Boot', '❄️ Hibernate', '🔌 REST APIs', '🐳 Docker', '🔗 JPA', '🐘 PostgreSQL', '📖 Swagger'], resp: ['Build REST endpoints', 'Write integration tests', 'Maintain API documentation', 'Implement business logic', 'Support deployments'] },
+                    mid: { skills: ['🏗️ Microservices', '🚇 Kafka', '⚡ Redis', '🛳️ Kubernetes', '☁️ AWS', '🔄 CQRS/Event sourcing', '🔑 OAuth2'], resp: ['Architect service boundaries', 'Drive API versioning', 'Design for high availability', 'Review and merge PRs', 'Own sprint velocity'] },
+                    senior: { skills: ['⚙️ JVM tuning', '🌐 Distributed systems', '🏛️ System design', '🛡️ Security (OWASP)', '🛠️ SRE practices'], resp: ['Lead backend guild', 'Define coding standards', 'Own architecture decisions', 'Liaise with DevOps teams', 'Drive incident post-mortems'] },
+                    lead: { skills: ['🏛️ Enterprise architecture', '⚖️ Vendor selection', '💵 Cost governance', '📈 Team growth strategy', '⚠️ Risk management'], resp: ['Set technical vision', 'Manage engineering budget', 'Align with CTO roadmap', 'Scale engineering org', 'Recruit principal engineers'] },
                 },
                 react: {
-                    intern: { skills: ['HTML/CSS', 'JSX', 'Props & State', 'Git', 'npm', 'Chrome DevTools'], resp: ['Build presentational components', 'Fix styling bugs', 'Implement layouts from Figma', 'Read component documentation', 'Attend sprint demos'] },
-                    junior: { skills: ['Hooks', 'React Router', 'Context API', 'Axios', 'Jest/RTL', 'CSS-in-JS', 'Responsive design'], resp: ['Develop reusable components', 'Integrate REST APIs', 'Write component tests', 'Collaborate with UX designers', 'Fix accessibility issues'] },
-                    mid: { skills: ['Redux/Zustand', 'Next.js', 'Code splitting', 'Web performance', 'Storybook', 'GraphQL/Apollo'], resp: ['Design component architecture', 'Lead feature development', 'Conduct code reviews', 'Drive performance optimizations', 'Define frontend conventions'] },
-                    senior: { skills: ['Micro-frontends', 'Module federation', 'Design systems', 'Monorepo tooling', 'A11y audits', 'Analytics'], resp: ['Scale component library', 'Mentor frontend team', 'Drive technical decisions', 'Represent frontend in architecture meetings', 'Optimize CI/CD pipelines'] },
-                    lead: { skills: ['Frontend platform strategy', 'Multi-team alignment', 'FinOps', 'Roadmap planning', 'Stakeholder management'], resp: ['Own frontend ecosystem', 'Grow engineering squads', 'Set quality benchmarks', 'Align with product leadership', 'Drive frontend culture'] },
+                    intern: { skills: ['🌐 HTML/CSS', '📜 JSX', '⚛️ Props & State', '🌿 Git', '📦 npm', '💻 Chrome DevTools'], resp: ['Build presentational components', 'Fix styling bugs', 'Implement layouts from Figma', 'Read component documentation', 'Attend sprint demos'] },
+                    junior: { skills: ['⚛️ Hooks', '🛣️ React Router', '📦 Context API', '🔌 Axios', '🃏 Jest/RTL', '🎨 CSS-in-JS', '📱 Responsive design'], resp: ['Develop reusable components', 'Integrate REST APIs', 'Write component tests', 'Collaborate with UX designers', 'Fix accessibility issues'] },
+                    mid: { skills: ['🟣 Redux/Zustand', '⚛️ Next.js', '📦 Code splitting', '⚡ Web performance', '🎨 Storybook', '📡 GraphQL/Apollo'], resp: ['Design component architecture', 'Lead feature development', 'Conduct code reviews', 'Drive performance optimizations', 'Define frontend conventions'] },
+                    senior: { skills: ['🏗️ Micro-frontends', '🔗 Module federation', '🎨 Design systems', '📦 Monorepo tooling', '♿ A11y audits', '📈 Analytics'], resp: ['Scale component library', 'Mentor frontend team', 'Drive technical decisions', 'Represent frontend in architecture meetings', 'Optimize CI/CD pipelines'] },
+                    lead: { skills: ['🚀 Frontend platform strategy', '🤝 Multi-team alignment', '💵 FinOps', '🎯 Roadmap planning', '🤝 Stakeholder management'], resp: ['Own frontend ecosystem', 'Grow engineering squads', 'Set quality benchmarks', 'Align with product leadership', 'Drive frontend culture'] },
                 },
                 datascience: {
-                    intern: { skills: ['Python', 'Pandas', 'NumPy', 'Matplotlib', 'Basic ML (sklearn)', 'SQL', 'Jupyter'], resp: ['Data cleaning & EDA', 'Create visualizations', 'Assist model validation', 'Document datasets', 'Run baseline experiments'] },
-                    junior: { skills: ['Scikit-learn', 'Feature engineering', 'SQL', 'Statistical analysis', 'Git', 'Model evaluation metrics', 'Power BI/Tableau'], resp: ['Build classification/regression models', 'Work on A/B testing', 'Prepare data pipelines', 'Present insights to stakeholders', 'Maintain model versions'] },
-                    mid: { skills: ['TensorFlow/PyTorch', 'MLflow', 'Airflow', 'Spark', 'Cloud ML', 'Time series', 'NLP basics'], resp: ['Design end-to-end ML pipelines', 'Deploy models to production', 'Own model monitoring', 'Lead data initiatives', 'Collaborate with business teams'] },
-                    senior: { skills: ['LLMs', 'MLOps', 'Feature stores', 'Causal inference', 'Deep learning', 'Distributed training'], resp: ['Define ML strategy', 'Drive research prototypes to production', 'Mentor DS team', 'Architect data platform', 'Present to C-suite'] },
-                    lead: { skills: ['AI strategy', 'Data governance', 'Team leadership', 'Vendor evaluation', 'BI ecosystem design'], resp: ['Set AI/data vision', 'Align ML roadmap with business', 'Manage data science org', 'Ensure model ethics & compliance', 'Drive revenue through data'] },
+                    intern: { skills: ['🐍 Python', '🐼 Pandas', '🔢 NumPy', '📈 Matplotlib', '🤖 Basic ML (sklearn)', '📊 SQL', '📓 Jupyter'], resp: ['Data cleaning & EDA', 'Create visualizations', 'Assist model validation', 'Document datasets', 'Run baseline experiments'] },
+                    junior: { skills: ['🤖 Scikit-learn', '🛠️ Feature engineering', '📊 SQL', '📈 Statistical analysis', '🌿 Git', '🎯 Model evaluation metrics', '📊 Power BI/Tableau'], resp: ['Build classification/regression models', 'Work on A/B testing', 'Prepare data pipelines', 'Present insights to stakeholders', 'Maintain model versions'] },
+                    mid: { skills: ['🔥 TensorFlow/PyTorch', '🤖 MLflow', '🌪️ Airflow', '⚡ Spark', '☁️ Cloud ML', '📈 Time series', '🗣️ NLP basics'], resp: ['Design end-to-end ML pipelines', 'Deploy models to production', 'Own model monitoring', 'Lead data initiatives', 'Collaborate with business teams'] },
+                    senior: { skills: ['🧠 LLMs', '🤖 MLOps', '🗄️ Feature stores', '📈 Causal inference', '🧠 Deep learning', '🌐 Distributed training'], resp: ['Define ML strategy', 'Drive research prototypes to production', 'Mentor DS team', 'Architect data platform', 'Present to C-suite'] },
+                    lead: { skills: ['🤖 AI strategy', '🛡️ Data governance', '👥 Team leadership', '⚖️ Vendor evaluation', '📊 BI ecosystem design'], resp: ['Set AI/data vision', 'Align ML roadmap with business', 'Manage data science org', 'Ensure model ethics & compliance', 'Drive revenue through data'] },
                 },
                 default: {
-                    intern: { skills: ['Core fundamentals', 'Git version control', 'Problem solving', 'Documentation', 'Team communication', 'Unit testing basics'], resp: ['Fix existing bugs', 'Build small features', 'Write unit tests', 'Attend code reviews', 'Learn codebase conventions'] },
-                    junior: { skills: ['Framework proficiency', 'REST APIs', 'Database basics', 'Docker basics', 'CI/CD basics', 'Agile workflow'], resp: ['Build feature modules', 'Write automated tests', 'Collaborate via PRs', 'Fix production bugs', 'Deliver sprint tasks'] },
-                    mid: { skills: ['System design', 'Cloud platforms', 'Microservices', 'Performance tuning', 'Security fundamentals', 'Mentoring'], resp: ['Own feature delivery', 'Design technical solutions', 'Conduct code reviews', 'Mentor junior developers', 'Drive sprint planning'] },
-                    senior: { skills: ['Distributed systems', 'Architecture patterns', 'SRE practices', 'Cross-team leadership', 'Technical strategy'], resp: ['Architect systems', 'Set coding standards', 'Lead technical interviews', 'Drive incident management', 'Collaborate with product leadership'] },
-                    lead: { skills: ['Engineering strategy', 'Stakeholder management', 'Budget & resource planning', 'Org design', 'Technology roadmapping'], resp: ['Set technical direction', 'Grow and scale the team', 'Align tech with business goals', 'Drive hiring strategy', 'Executive-level reporting'] },
+                    intern: { skills: ['🧩 Core fundamentals', '🌿 Git version control', '💡 Problem solving', '📝 Documentation', '💬 Team communication', '🧪 Unit testing basics'], resp: ['Fix existing bugs', 'Build small features', 'Write unit tests', 'Attend code reviews', 'Learn codebase conventions'] },
+                    junior: { skills: ['🏗️ Framework proficiency', '🔌 REST APIs', '📊 Database basics', '🐳 Docker basics', '🔄 CI/CD basics', '🏃 Agile workflow'], resp: ['Build feature modules', 'Write automated tests', 'Collaborate via PRs', 'Fix production bugs', 'Deliver sprint tasks'] },
+                    mid: { skills: ['🏛️ System design', '☁️ Cloud platforms', '🏗️ Microservices', '⚙️ Performance tuning', '🔒 Security fundamentals', '👥 Mentoring'], resp: ['Own feature delivery', 'Design technical solutions', 'Conduct code reviews', 'Mentor junior developers', 'Drive sprint planning'] },
+                    senior: { skills: ['🌐 Distributed systems', '🧩 Architecture patterns', '🛠️ SRE practices', '👥 Cross-team leadership', '🎯 Technical strategy'], resp: ['Architect systems', 'Set coding standards', 'Lead technical interviews', 'Drive incident management', 'Collaborate with product leadership'] },
+                    lead: { skills: ['🚀 Engineering strategy', '🤝 Stakeholder management', '💵 Budget & resource planning', '👥 Org design', '🗺️ Technology roadmapping'], resp: ['Set technical direction', 'Grow and scale the team', 'Align tech with business goals', 'Drive hiring strategy', 'Executive-level reporting'] },
                 },
             };
 
@@ -2829,7 +2857,8 @@
                     return;
                 }
 
-                descBox.innerHTML = `<strong>${skillName}:</strong> <span style="font-style: italic; opacity: 0.8;"><i class="fa-solid fa-circle-notch fa-spin"></i> Generating with Groq AI...</span>`;
+                const closeIcon = `<i class="fa-solid fa-xmark iw-desc-close" onclick="this.parentElement.style.display='none'"></i>`;
+                descBox.innerHTML = `${closeIcon}<strong>${skillName}:</strong> <span style="font-style: italic; opacity: 0.8;"><i class="fa-solid fa-circle-notch fa-spin"></i> Generating with Groq AI...</span>`;
                 descBox.style.borderLeftColor = color;
                 descBox.style.display = 'block';
                 descBox.dataset.currentSkill = skillName;
@@ -2838,12 +2867,12 @@
                     const response = await fetch(`/api/explain_skill?skill=${encodeURIComponent(skillName)}`);
                     const data = await response.json();
                     if (data.explanation) {
-                        descBox.innerHTML = `<strong>${skillName}:</strong> (Powered by Groq ✨) <br> ${data.explanation}`;
+                        descBox.innerHTML = `${closeIcon}<strong>${skillName}:</strong> (Powered by Groq ✨) <br> ${data.explanation}`;
                     } else {
-                        descBox.innerHTML = `<strong>${skillName}:</strong> Could not fetch explanation. Please try again.`;
+                        descBox.innerHTML = `${closeIcon}<strong>${skillName}:</strong> Could not fetch explanation. Please try again.`;
                     }
                 } catch (err) {
-                    descBox.innerHTML = `<strong>${skillName}:</strong> Error fetching explanation.`;
+                    descBox.innerHTML = `${closeIcon}<strong>${skillName}:</strong> Error fetching explanation.`;
                 }
             };
 
@@ -3039,7 +3068,7 @@
         </div>
         <div id="iq-loader" style="text-align: center; padding: 2rem;">
             <i class="fa-solid fa-spinner fa-spin" style="font-size: 2rem; color: #8b5cf6;"></i>
-            <p style="margin-top: 1rem; color: #64748b;">Fetching expert questions via NVIDIA AI...</p>
+            <p style="margin-top: 1rem; color: #64748b;">Fetching expert questions...</p>
         </div>
         <ul class="iq-list" id="iq-list">
             <!-- Questions will be injected here -->
@@ -3244,6 +3273,22 @@
 
                 const hasSection = (keyword) => sections.some(s => s.title.toLowerCase().includes(keyword));
 
+                // Add IT Basics card if not present (Universal Frontend Injection)
+                if (!hasSection('it basics')) {
+                    sections.unshift({
+                        title: 'IT Basics You Must Know',
+                        subtitle: 'Before jumping into programming, build a strong foundation',
+                        content: [
+                            'Computer Fundamentals',
+                            'Operating System Basics',
+                            'Internet & Networking',
+                            'Logic & Problem Solving',
+                            'Basic Math',
+                            'Developer Tools'
+                        ]
+                    });
+                }
+
                 function getContent(map) {
                     for (const k in map) { if (skill.includes(k)) return map[k]; }
                     return map.default;
@@ -3340,6 +3385,7 @@
 
                 // 3. Define EXACT order
                 const exactOrder = [
+                    'it basics',
                     'beginner',
                     'intermediate',
                     'advanced',
@@ -3371,6 +3417,13 @@
                     const t = s.title.toLowerCase();
                     return !(t.includes('salary') || t.includes('career') || t.includes('industry tool') || t.includes('project'));
                 }).length;
+
+                // Sync the total count with the server for dashboard accuracy
+                fetch('/api/sync-roadmap-total', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ skill: skill, total_sections: totalSections })
+                }).catch(e => console.warn("Background sync failed:", e));
 
                 const themes = [
                     { main: '#7c3aed', soft: '#f5f3ff' }, { main: '#3b82f6', soft: '#eff6ff' },
@@ -3409,6 +3462,7 @@
                     else if (t.includes('web') || t.includes('api')) { icon = 'globe'; label = 'Network'; }
                     else if (t.includes('security') || t.includes('cyber')) { icon = 'shield-halved'; label = 'Protect'; }
                     else if (t.includes('data') || t.includes('ml') || t.includes('ai')) { icon = 'brain'; label = 'Intelligence'; }
+                    else if (t.includes('it basics')) { icon = 'microchip'; label = 'Start Here'; }
                     else if (t.includes('cloud') || t.includes('devops')) { icon = 'cloud'; label = 'Infra'; }
 
                     // Disable interactive logic for informative cards
@@ -3451,6 +3505,7 @@
                 <h3 class="rm-premium-title">
                     ${s.title}
                 </h3>
+                ${s.subtitle ? `<p class="rm-premium-subtitle">${s.subtitle}</p>` : ''}
                 ${listHtml}
                 ${!isSpecial ? `
                 <button class="rm-btn-test" onclick="startSectionQuiz('${s.title.replace(/'/g, "\\'")}')">

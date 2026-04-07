@@ -51,11 +51,18 @@ body.dark-mode .login-card {
     /* Scaled down for ultra-compact card */
     font-weight: 800;
     margin-bottom: 0.3rem;
-    background: linear-gradient(135deg, #1e293b 0%, #6366f1 50%, #8b5cf6 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
+    background: linear-gradient(135deg, #1e293b 0%, #6366f1 50%, #8b5cf6 100%) !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
     letter-spacing: -0.02em;
+}
+
+body.dark-mode .login-header h2 {
+    background: linear-gradient(135deg, #e2e8f0 0%, #6366f1 50%, #8b5cf6 100%) !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
 }
 
 #authSubtitle {
@@ -89,6 +96,10 @@ body.dark-mode #authSubtitle {
 body.dark-mode .form-control {
     background: rgba(30, 41, 59, 0.5) !important;
     border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+body.dark-mode.login-page-bg .login-card a {
+    color: #f9fafb !important;
 }
 
 .form-control:focus {

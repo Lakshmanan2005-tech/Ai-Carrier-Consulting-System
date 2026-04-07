@@ -451,7 +451,7 @@ body.login-page-bg .login-card {
 }
 
 body.login-page-bg .login-card h2 {
-    color: #111827 !important;
+    /* Color managed by login.css branding */
     font-weight: 700 !important;
     letter-spacing: -0.5px !important;
     font-size: 1.8rem !important;
@@ -495,7 +495,6 @@ body.dark-mode.login-page-bg .login-card {
     border-color: #374151 !important;
 }
 
-body.dark-mode.login-page-bg .login-card h2,
 body.dark-mode.login-page-bg .login-card a {
     color: #f9fafb !important;
 }

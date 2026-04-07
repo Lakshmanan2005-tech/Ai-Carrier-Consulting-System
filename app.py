@@ -180,63 +180,62 @@ def generate_nvidia_roadmap(skill):
         return None
 
 def get_nvidia_interview_questions(skill):
-    """Generates the top 5 interview questions for a given skill using NVIDIA AI."""
-    if not NVIDIA_API_KEY:
+    """Generates the top 5 interview questions for a given skill using Groq AI with robust fallback."""
+    api_key = os.getenv('GROQ_CHAT_API_KEY') or os.getenv('GROQ_API_KEY')
+    if not api_key:
         return None
         
-    url = "https://integrate.api.nvidia.com/v1/chat/completions"
+    url = "https://api.groq.com/openai/v1/chat/completions"
     headers = {
-        "Authorization": f"Bearer {NVIDIA_API_KEY}",
+        "Authorization": f"Bearer {api_key}",
         "Content-Type": "application/json"
     }
     
     prompt = f"""
-    Generate exactly 5 highly relevant and popular technical interview questions for the skill: {skill}.
-    
-    For each item:
-    1. A sophisticated technical question.
-    2. A concise, expert-level answer (max 3 sentences).
-    3. Identify 1-3 most important technical keywords in both the question and the answer.
-    4. Wrap these keywords in a <span class="iq-keyword">...</span> tag.
-    
-    Example:
-    Question: "What is the difference between <span class="iq-keyword">Machine Learning</span> and <span class="iq-keyword">Deep Learning</span>?"
-    Answer: "<span class="iq-keyword">Machine Learning</span> uses algorithms to parse data, whereas <span class="iq-keyword">Deep Learning</span> uses neural networks to simulate human intelligence."
-    
-    STRICT REQUIREMENTS:
-    1. Return ONLY a valid JSON object with a single root key 'items'.
-    2. 'items' must be a list of objects, each with 'q' (question) and 'a' (answer) keys.
-    3. Use standard HTML tags sparingly.
-    4. Provide the result as:
+    Generate exactly 5 highly relevant technical interview questions for the skill: {skill}.
+    Return ONLY a JSON object:
     {{
         "items": [
-            {{ "q": "Question text...", "a": "Answer text..." }},
-            ...
+            {{ "q": "Sophisticated Question", "a": "Expert-level Answer" }}
         ]
     }}
+    Rules:
+    - Include 1-3 keywords wrapped in <span class="iq-keyword">...</span> in both 'q' and 'a'.
+    - Use JSON format ONLY.
     """
 
-    payload = {
-        "model": "meta/llama-3.1-70b-instruct",
-        "messages": [{"role": "user", "content": prompt}],
-        "temperature": 0.5,
-        "max_tokens": 2048,
-        "stream": False
-    }
-
-    try:
-        response = requests.post(url, headers=headers, json=payload, timeout=45)
-        res_json = response.json()
-        content = res_json['choices'][0]['message']['content']
-        # Extract JSON from markdown if needed
-        if '```json' in content:
-            content = content.split('```json')[1].split('```')[0].strip()
-        elif '```' in content:
-            content = content.split('```')[1].split('```')[0].strip()
-        return json.loads(content)
-    except Exception as e:
-        print(f"NVIDIA Interview questions Error: {e}")
-        return None
+    # Try models in order of reliability
+    models = ["llama-3.3-70b-versatile", "llama-3.1-70b-versatile", "llama-3.1-8b-instant"]
+    
+    for model_name in models:
+        payload = {
+            "model": model_name,
+            "messages": [{"role": "user", "content": prompt}],
+            "temperature": 0.5,
+            "max_tokens": 1500,
+            "response_format": {"type": "json_object"}
+        }
+        try:
+            response = requests.post(url, headers=headers, json=payload, timeout=15)
+            response.raise_for_status()
+            res_json = response.json()
+            content = res_json['choices'][0]['message']['content'].strip()
+            
+            # Robust JSON extraction
+            if '```' in content:
+                content = re.sub(r'```(?:json)?|```', '', content).strip()
+            
+            data = json.loads(content)
+            if data and (data.get('items') or data.get('questions')):
+                # Normalize key names
+                if 'questions' in data and 'items' not in data:
+                    data['items'] = data['questions']
+                return data
+        except Exception as e:
+            print(f"Groq API Attempt ({model_name}) failed: {e}")
+            continue # Try next model
+            
+    return None
 
 @app.route('/api/interview-questions')
 def api_interview_questions():
@@ -400,61 +399,45 @@ def api_topic_explanation():
     if not topic:
         return jsonify({"error": "No topic provided"}), 400
         
-    if not GROQ_API_KEY:
+    # Robust retry logic for Topic Explanation
+    api_key = os.getenv('GROQ_CHAT_API_KEY') or os.getenv('GROQ_API_KEY')
+    if not api_key:
         return jsonify({"error": "Groq API Key missing"}), 500
         
     url = "https://api.groq.com/openai/v1/chat/completions"
-    headers = {
-        "Authorization": f"Bearer {GROQ_API_KEY}",
-        "Content-Type": "application/json"
-    }
+    headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
     
-    prompt = f"""
-    Explain the topic: {topic}
-
-    Provide:
-    1. Short explanation (3–5 lines)
-    2. FREE RESOURCES ONLY:
-    - Exactly 2 Official Docs or Website links
-    - Exactly 2 YouTube video links
-
-    Rules:
-    - Beginner friendly
-    - Short and clear
-    - No long paragraphs
-    - Real links only (https://...)
-
-    Return ONLY a valid JSON object with this exact structure:
+    prompt = f"""Explain '{topic}'. Return ONLY a JSON object:
     {{
         "title": "{topic}",
-        "explanation": "A short 3-5 line beginner-friendly explanation.",
-        "resources": [
-            {{"type": "Docs", "title": "First Docs/Website Title", "link": "https://..."}},
-            {{"type": "Docs", "title": "Second Docs/Website Title", "link": "https://..."}},
-            {{"type": "Video", "title": "First YouTube Video Title", "link": "https://www.youtube.com/..."}},
-            {{"type": "Video", "title": "Second YouTube Video Title", "link": "https://www.youtube.com/..."}}
-        ],
-        "ai_tutor_article": "A detailed, structured guide explaining {topic} from scratch, suitable for a personalized AI tutor section."
-    }}
-    """
+        "explanation": "3-5 lines...",
+        "resources": [{{"type": "Docs/Video", "title": "...", "link": "..."}}],
+        "ai_tutor_article": "Detailed guide..."
+    }}"""
 
-    payload = {
-        "model": "llama-3.3-70b-versatile",
-        "messages": [{"role": "user", "content": prompt}],
-        "temperature": 0.3,
-        "max_tokens": 400,
-        "response_format": {"type": "json_object"}
-    }
-    
-    try:
-        response = requests.post(url, headers=headers, json=payload, timeout=15)
-        response.raise_for_status()
-        res_data = response.json()
-        content = res_data['choices'][0]['message']['content']
-        return content # Already a JSON string from Groq
-    except Exception as e:
-        print(f"Groq API Error (Topic Explanation): {e}")
-        return jsonify({"error": "Failed to fetch explanation"}), 500
+    for model_name in ["llama-3.3-70b-versatile", "llama-3.1-8b-instant"]:
+        try:
+            payload = {
+                "model": model_name,
+                "messages": [{"role": "user", "content": prompt}],
+                "temperature": 0.3,
+                "max_tokens": 1000,
+                "response_format": {"type": "json_object"}
+            }
+            response = requests.post(url, headers=headers, json=payload, timeout=15)
+            response.raise_for_status()
+            res_data = response.json()
+            content = res_data['choices'][0]['message']['content'].strip()
+            
+            # Verify basic structure
+            test_json = json.loads(content)
+            if test_json.get('explanation'):
+                return content
+        except Exception as e:
+            print(f"Topic Explanation Attempt ({model_name}) failed: {e}")
+            continue
+            
+    return jsonify({"error": "Failed to fetch explanation"}), 500
 
 @app.route('/api/explain_skill')
 def api_explain_skill():
@@ -462,37 +445,36 @@ def api_explain_skill():
     if not skill:
         return jsonify({"error": "No skill provided"}), 400
         
-    if not GROQ_API_KEY:
+    # Robust implementation for Skill Explanation
+    api_key = os.getenv('GROQ_CHAT_API_KEY') or os.getenv('GROQ_API_KEY')
+    if not api_key:
         return jsonify({"error": "Groq API Key missing"}), 500
         
     url = "https://api.groq.com/openai/v1/chat/completions"
-    headers = {
-        "Authorization": f"Bearer {GROQ_API_KEY}",
-        "Content-Type": "application/json"
-    }
+    headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
     
-    prompt = f"""
-    Explain the skill '{skill}' to a university student or fresher in a very simple, easy-to-understand way.
-    Focus strictly on WHY real tech companies actually expect this skill and what it is used to build or solve in the real world.
-    Keep it strictly 2-3 sentences. Make it engaging but professional. No markdown, no bullet points.
-    """
+    prompt = f"Explain the technical skill '{skill}' to a university student in 2-3 engaging sentences. Focus on WHY companies value it and what it solves. No markdown."
 
-    payload = {
-        "model": "llama-3.3-70b-versatile",
-        "messages": [{"role": "user", "content": prompt}],
-        "temperature": 0.3,
-        "max_tokens": 150
-    }
-    
-    try:
-        response = requests.post(url, headers=headers, json=payload, timeout=10)
-        response.raise_for_status()
-        res_data = response.json()
-        explanation = res_data['choices'][0]['message']['content'].strip()
-        return jsonify({"explanation": explanation})
-    except Exception as e:
-        print(f"Groq API Error (Explain Skill): {e}")
-        return jsonify({"error": "Failed to fetch explanation"}), 500
+    # Sequential fallback for reliability
+    for model_name in ["llama-3.3-70b-versatile", "llama-3.1-70b-versatile", "llama-3.1-8b-instant"]:
+        try:
+            payload = {
+                "model": model_name,
+                "messages": [{"role": "user", "content": prompt}],
+                "temperature": 0.3,
+                "max_tokens": 300
+            }
+            response = requests.post(url, headers=headers, json=payload, timeout=12)
+            response.raise_for_status()
+            res_data = response.json()
+            explanation = res_data['choices'][0]['message']['content'].strip()
+            if explanation:
+                return jsonify({"explanation": explanation})
+        except Exception as e:
+            print(f"Skill Explanation Attempt ({model_name}) failed: {e}")
+            continue
+            
+    return jsonify({"error": "Failed to fetch explanation"}), 500
 
 DATABASE = 'database.db'
 
@@ -1159,6 +1141,39 @@ def submit_section_test():
     finally:
         conn.close()
     return jsonify({"success": True, "percentage": percentage, "total_passed": len(passed_list)})
+    
+@app.route('/api/sync-roadmap-total', methods=['POST'])
+def sync_roadmap_total():
+    if 'user_id' not in session:
+        return jsonify({"success": False, "error": "Login required"}), 401
+        
+    data = request.json
+    skill = get_canonical_skill(data.get('skill', ''))
+    total_sections = data.get('total_sections', 1)
+    
+    if not skill:
+        return jsonify({"success": False, "error": "Missing skill"}), 400
+
+    conn = get_db_connection()
+    try:
+        existing = conn.execute('SELECT * FROM roadmap_progress WHERE user_id = ? AND skill = ?', (session['user_id'], skill)).fetchone()
+        if existing:
+            try:
+                passed_list = json.loads(existing['passed_sections'] or "[]")
+            except: passed_list = []
+            
+            testable_total = int(total_sections) if total_sections else 1
+            if testable_total == 0: testable_total = 1
+            
+            percentage = int((len(passed_list) / testable_total) * 100)
+            if percentage > 100: percentage = 100
+            
+            conn.execute('UPDATE roadmap_progress SET percentage = ?, last_updated = CURRENT_TIMESTAMP WHERE id = ?', (percentage, existing['id']))
+            conn.commit()
+            return jsonify({"success": True, "percentage": percentage})
+        return jsonify({"success": True, "message": "No existing progress to sync"})
+    finally:
+        conn.close()
 
 @app.route('/api/delete-progress', methods=['POST'])
 def delete_progress():
@@ -1630,13 +1645,13 @@ def ai_suggest():
 def chat():
     data = request.json
     message = data.get('message', '')
-    # Fallback to general key if chat key is missing
-    api_key = os.getenv('NVIDIA_CHAT_API_KEY') or os.getenv('NVIDIA_API_KEY')
+    # Fallback to general Groq key if chat-specific key is missing
+    api_key = os.getenv('GROQ_CHAT_API_KEY') or os.getenv('GROQ_API_KEY')
     
     if not api_key:
-        return jsonify({"reply": "AI Assistant is currently offline. Please set your NVIDIA API key in .env"})
+        return jsonify({"reply": "AI Assistant is currently offline. Please set your GROQ API key in .env"})
 
-    url = "https://integrate.api.nvidia.com/v1/chat/completions"
+    url = "https://api.groq.com/openai/v1/chat/completions"
     headers = {
         "Authorization": f"Bearer {api_key}",
         "Content-Type": "application/json"
@@ -1649,7 +1664,7 @@ def chat():
         "IMPORTANT: NEVER add the 'dark-study-badge' to study/career questions. ONLY add it for OUT-OF-SCOPE questions."
     )
     payload = {
-        "model": "meta/llama-3.1-70b-instruct",
+        "model": "llama-3.3-70b-versatile",
         "messages": [
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": message}
@@ -1666,7 +1681,7 @@ def chat():
         reply = res_data["choices"][0]["message"]["content"]
         return jsonify({"reply": reply})
     except Exception as e:
-        print(f"NVIDIA API Error: {str(e)}")
+        print(f"Groq Chat API Error: {str(e)}")
         return jsonify({"reply": "Sorry, I couldn't connect right now. Please ask your question again in a few seconds!"})
 
 
@@ -1931,7 +1946,7 @@ def get_industrial_workflow():
         if key in skill:
             return jsonify({"status": "success", "data": workflow})
 
-    groq_api_key = os.getenv('GROQ_API_KEY_2.0') or os.getenv('GROQ_API_KEY')
+    groq_api_key = os.getenv('GROQ_CHAT_API_KEY') or os.getenv('GROQ_API_KEY_2.0') or os.getenv('GROQ_API_KEY')
     if not groq_api_key:
         return jsonify({"status": "success", "data": DEFAULT_WORKFLOW})
 
@@ -2073,7 +2088,9 @@ def fetch_roadmap_json(skill):
         response.raise_for_status()
         result = response.json()
         raw_json = result["choices"][0]["message"]["content"].strip()
-        return json.loads(raw_json)
+        res_json = json.loads(raw_json)
+        
+        return res_json
     except json.JSONDecodeError as e:
         print(f"JSON Parse error in fetch_roadmap_json: {str(e)}")
         try:
