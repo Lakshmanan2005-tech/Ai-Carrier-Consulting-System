@@ -1,0 +1,14 @@
+[
+  {
+    "id": 3,
+    "user_id": 2,
+    "skill": "java",
+    "progress_json": {},
+    "percentage": 20,
+    "last_updated": "2026-04-07 06:38:47",
+    "passed_sections": [
+      "Beginner Level",
+      "Intermediate Level"
+    ]
+  }
+]

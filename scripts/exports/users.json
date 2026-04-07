@@ -1,0 +1,37 @@
+[
+  {
+    "id": 1,
+    "name": "Lakshman",
+    "email": "ui_testlakshman@example.com",
+    "password": "scrypt:32768:8:1$t97zp0RfFvatALZt$cf550af1b3ba1edec07df925d97b53b654614c41468b86be466372bc609a52302345e5e14cb51b7f65e9d3b755e0a90c69651f49fc7472df7c5f281754ac0fae",
+    "theme": "light"
+  },
+  {
+    "id": 2,
+    "name": "kumar",
+    "email": "lakshmanan944588@gmail.com",
+    "password": "scrypt:32768:8:1$mUVWoCcbPvJNdAKG$60371eb73ef4fb8635cf5bf735a826ab555ed95a1a0c606ccc90ae597e6ed7bf254a50683b18f563380701e11b676c852dd6b8ac2ef00f345202301b80fb1da5",
+    "theme": "light"
+  },
+  {
+    "id": 3,
+    "name": "ammaappa20000",
+    "email": "ammaappa20000@gmail.com",
+    "password": "scrypt:32768:8:1$5glVr4f6x4ru6rsD$bdc98604f3ac73aa5412af74ddfc4a3e55ad0f523e47066198913a45f5d6a1ab79aea5e10c0bc0bf1a8921bffbccb111c412568d512580351ee3cac93fee76ab",
+    "theme": "light"
+  },
+  {
+    "id": 4,
+    "name": "test",
+    "email": "test@test.com",
+    "password": "scrypt:32768:8:1$NUAYdinGMOr8Gof6$5b5f1644831a925dc693121ac6a12f759dba720cc32530e19c7530a9f4603c82f3d30223efcb258e95ed6f1e792c41f1e216c29fd465411533ffaf241c909ad7",
+    "theme": "dark"
+  },
+  {
+    "id": 5,
+    "name": "LAKSHMANAN",
+    "email": "vigneshvicky63699848@gmail.com",
+    "password": "scrypt:32768:8:1$vQRLD2SSWBOm6v9D$370e73728841f2df423c344cfaae127066678f1a8a476dfd614299ec3b3566e93e5f66b94c09a04331e8f7a6fee5021b0849a63b9452b2b7572db22e6b900af3",
+    "theme": "light"
+  }
+]

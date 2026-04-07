@@ -1,0 +1,170 @@
+2026-04-07 15:37:42,317  [INFO]  ============================================================
+2026-04-07 15:37:42,318  [INFO]  STEP 1 — Creating database backup
+2026-04-07 15:37:42,318  [INFO]    Source : D:\Ai-Carrier-Consulting-System\database.db
+2026-04-07 15:37:42,319  [INFO]    Backup : D:\Ai-Carrier-Consulting-System\scripts\backups\database_backup_20260407_153742.db
+2026-04-07 15:37:42,330  [INFO]    [OK] Backup created (98304 bytes)
+2026-04-07 15:37:42,332  [INFO]  ============================================================
+2026-04-07 15:37:42,333  [INFO]  STEP 2 — Exporting tables to JSON
+2026-04-07 15:37:42,412  [INFO]    [history]
+2026-04-07 15:37:42,413  [INFO]      → Rows exported : 1290
+2026-04-07 15:37:42,547  [INFO]      → Null values   : 0
+2026-04-07 15:37:42,550  [INFO]      → Convert errors: 0
+2026-04-07 15:37:42,553  [INFO]      → File          : D:\Ai-Carrier-Consulting-System\scripts\exports\history.json
+2026-04-07 15:37:42,560  [INFO]    [mnc_reports]
+2026-04-07 15:37:42,560  [INFO]      → Rows exported : 1
+2026-04-07 15:37:42,564  [INFO]      → Null values   : 0
+2026-04-07 15:37:42,567  [INFO]      → Convert errors: 0
+2026-04-07 15:37:42,570  [INFO]      → File          : D:\Ai-Carrier-Consulting-System\scripts\exports\mnc_reports.json
+2026-04-07 15:37:42,577  [INFO]    [roadmap_progress]
+2026-04-07 15:37:42,578  [INFO]      → Rows exported : 1
+2026-04-07 15:37:42,580  [INFO]      → Null values   : 0
+2026-04-07 15:37:42,583  [INFO]      → Convert errors: 0
+2026-04-07 15:37:42,585  [INFO]      → File          : D:\Ai-Carrier-Consulting-System\scripts\exports\roadmap_progress.json
+2026-04-07 15:37:42,588  [INFO]    Skipping system table: sqlite_sequence
+2026-04-07 15:37:42,592  [INFO]    [users]
+2026-04-07 15:37:42,593  [INFO]      → Rows exported : 5
+2026-04-07 15:37:42,597  [INFO]      → Null values   : 0
+2026-04-07 15:37:42,600  [INFO]      → Convert errors: 0
+2026-04-07 15:37:42,603  [INFO]      → File          : D:\Ai-Carrier-Consulting-System\scripts\exports\users.json
+2026-04-07 15:37:42,610  [INFO]    [OK] JSON export complete
+2026-04-07 15:37:42,610  [INFO]  ============================================================
+2026-04-07 15:37:42,611  [INFO]  STEP 3 — Verifying JSON structure
+2026-04-07 15:37:42,675  [INFO]    [OK] history: 1290 records, structure valid
+2026-04-07 15:37:42,702  [INFO]    [OK] mnc_reports: 1 records, structure valid
+2026-04-07 15:37:42,720  [INFO]    [OK] roadmap_progress: 1 records, structure valid
+2026-04-07 15:37:42,737  [INFO]    [OK] users: 5 records, structure valid
+2026-04-07 15:37:42,737  [INFO]    [OK] All JSON files verified successfully
+2026-04-07 16:13:19,186  [INFO]  
+============================================================
+2026-04-07 16:13:19,187  [INFO]    SQLITE → FIRESTORE MIGRATION (REST API)
+2026-04-07 16:13:19,371  [INFO]    Started: 2026-04-07 16:13:19
+2026-04-07 16:13:19,372  [INFO]  ============================================================
+2026-04-07 16:13:19,375  [INFO]  ============================================================
+2026-04-07 16:13:19,375  [INFO]  STEP 1 — Creating database backup
+2026-04-07 16:13:19,376  [INFO]    Source : d:\Ai-Carrier-Consulting-System\database.db
+2026-04-07 16:13:19,376  [INFO]    Backup : d:\Ai-Carrier-Consulting-System\scripts\backups\database_backup_20260407_161319.db
+2026-04-07 16:13:19,390  [INFO]    [OK] Backup created (98304 bytes)
+2026-04-07 16:13:19,392  [INFO]  ============================================================
+2026-04-07 16:13:19,392  [INFO]  STEP 2 — Exporting tables to JSON
+2026-04-07 16:13:19,479  [INFO]    [history]
+2026-04-07 16:13:19,479  [INFO]      → Rows exported : 1290
+2026-04-07 16:13:19,481  [INFO]      → Null values   : 0
+2026-04-07 16:13:19,484  [INFO]      → Convert errors: 0
+2026-04-07 16:13:19,486  [INFO]      → File          : d:\Ai-Carrier-Consulting-System\scripts\exports\history.json
+2026-04-07 16:13:19,491  [INFO]    [mnc_reports]
+2026-04-07 16:13:19,491  [INFO]      → Rows exported : 1
+2026-04-07 16:13:19,493  [INFO]      → Null values   : 0
+2026-04-07 16:13:19,494  [INFO]      → Convert errors: 0
+2026-04-07 16:13:19,496  [INFO]      → File          : d:\Ai-Carrier-Consulting-System\scripts\exports\mnc_reports.json
+2026-04-07 16:13:19,499  [INFO]    [roadmap_progress]
+2026-04-07 16:13:19,499  [INFO]      → Rows exported : 1
+2026-04-07 16:13:19,501  [INFO]      → Null values   : 0
+2026-04-07 16:13:19,503  [INFO]      → Convert errors: 0
+2026-04-07 16:13:19,505  [INFO]      → File          : d:\Ai-Carrier-Consulting-System\scripts\exports\roadmap_progress.json
+2026-04-07 16:13:19,506  [INFO]    Skipping system table: sqlite_sequence
+2026-04-07 16:13:19,508  [INFO]    [users]
+2026-04-07 16:13:19,508  [INFO]      → Rows exported : 5
+2026-04-07 16:13:19,510  [INFO]      → Null values   : 0
+2026-04-07 16:13:19,512  [INFO]      → Convert errors: 0
+2026-04-07 16:13:19,513  [INFO]      → File          : d:\Ai-Carrier-Consulting-System\scripts\exports\users.json
+2026-04-07 16:13:19,518  [INFO]    [OK] JSON export complete
+2026-04-07 16:13:19,518  [INFO]  ============================================================
+2026-04-07 16:13:19,519  [INFO]  STEP 3 — Verifying JSON structure
+2026-04-07 16:13:19,546  [INFO]    [OK] history: 1290 records, structure valid
+2026-04-07 16:13:19,564  [INFO]    [OK] mnc_reports: 1 records, structure valid
+2026-04-07 16:13:19,579  [INFO]    [OK] roadmap_progress: 1 records, structure valid
+2026-04-07 16:13:19,607  [INFO]    [OK] users: 5 records, structure valid
+2026-04-07 16:13:19,607  [INFO]    [OK] All JSON files verified successfully
+2026-04-07 16:13:19,607  [INFO]  ============================================================
+2026-04-07 16:13:19,607  [INFO]  STEP 4 — Uploading to Firebase Firestore (REST API)
+2026-04-07 16:13:19,983  [INFO]    Uploading [history] → Firestore collection 'history' (1290 documents)...
+2026-04-07 16:14:05,146  [INFO]  
+============================================================
+2026-04-07 16:14:05,146  [INFO]    SQLITE → FIRESTORE MIGRATION (REST API)
+2026-04-07 16:14:05,152  [INFO]    Started: 2026-04-07 16:14:05
+2026-04-07 16:14:05,153  [INFO]  ============================================================
+2026-04-07 16:14:05,153  [INFO]  ============================================================
+2026-04-07 16:14:05,153  [INFO]  STEP 1 — Creating database backup
+2026-04-07 16:14:05,154  [INFO]    Source : d:\Ai-Carrier-Consulting-System\database.db
+2026-04-07 16:14:05,154  [INFO]    Backup : d:\Ai-Carrier-Consulting-System\scripts\backups\database_backup_20260407_161405.db
+2026-04-07 16:14:05,166  [INFO]    [OK] Backup created (98304 bytes)
+2026-04-07 16:14:05,166  [INFO]  ============================================================
+2026-04-07 16:14:05,167  [INFO]  STEP 2 — Exporting tables to JSON
+2026-04-07 16:14:05,224  [INFO]    [history]
+2026-04-07 16:14:05,224  [INFO]      → Rows exported : 1290
+2026-04-07 16:14:05,227  [INFO]      → Null values   : 0
+2026-04-07 16:14:05,229  [INFO]      → Convert errors: 0
+2026-04-07 16:14:05,231  [INFO]      → File          : d:\Ai-Carrier-Consulting-System\scripts\exports\history.json
+2026-04-07 16:14:05,236  [INFO]    [mnc_reports]
+2026-04-07 16:14:05,236  [INFO]      → Rows exported : 1
+2026-04-07 16:14:05,238  [INFO]      → Null values   : 0
+2026-04-07 16:14:05,240  [INFO]      → Convert errors: 0
+2026-04-07 16:14:05,243  [INFO]      → File          : d:\Ai-Carrier-Consulting-System\scripts\exports\mnc_reports.json
+2026-04-07 16:14:05,246  [INFO]    [roadmap_progress]
+2026-04-07 16:14:05,246  [INFO]      → Rows exported : 1
+2026-04-07 16:14:05,248  [INFO]      → Null values   : 0
+2026-04-07 16:14:05,251  [INFO]      → Convert errors: 0
+2026-04-07 16:14:05,253  [INFO]      → File          : d:\Ai-Carrier-Consulting-System\scripts\exports\roadmap_progress.json
+2026-04-07 16:14:05,255  [INFO]    Skipping system table: sqlite_sequence
+2026-04-07 16:14:05,257  [INFO]    [users]
+2026-04-07 16:14:05,257  [INFO]      → Rows exported : 5
+2026-04-07 16:14:05,260  [INFO]      → Null values   : 0
+2026-04-07 16:14:05,261  [INFO]      → Convert errors: 0
+2026-04-07 16:14:05,263  [INFO]      → File          : d:\Ai-Carrier-Consulting-System\scripts\exports\users.json
+2026-04-07 16:14:05,269  [INFO]    [OK] JSON export complete
+2026-04-07 16:14:05,270  [INFO]  ============================================================
+2026-04-07 16:14:05,270  [INFO]  STEP 3 — Verifying JSON structure
+2026-04-07 16:14:05,297  [INFO]    [OK] history: 1290 records, structure valid
+2026-04-07 16:14:05,300  [INFO]    [OK] mnc_reports: 1 records, structure valid
+2026-04-07 16:14:05,303  [INFO]    [OK] roadmap_progress: 1 records, structure valid
+2026-04-07 16:14:05,306  [INFO]    [OK] users: 5 records, structure valid
+2026-04-07 16:14:05,306  [INFO]    [OK] All JSON files verified successfully
+2026-04-07 16:14:05,307  [INFO]  ============================================================
+2026-04-07 16:14:05,307  [INFO]  STEP 4 — Uploading to Firebase Firestore (REST API)
+2026-04-07 16:14:05,624  [INFO]    Uploading [history] -> Firestore collection 'history' (1290 documents)...
+2026-04-07 16:45:04,156  [INFO]    [history] Done — Uploaded: 1290, Errors: 0
+2026-04-07 16:45:04,167  [INFO]    Uploading [mnc_reports] → Firestore collection 'mnc_reports' (1 documents)...
+2026-04-07 16:45:05,455  [INFO]    [mnc_reports] Done — Uploaded: 1, Errors: 0
+2026-04-07 16:45:05,458  [INFO]    Uploading [roadmap_progress] → Firestore collection 'roadmap_progress' (1 documents)...
+2026-04-07 16:45:06,870  [INFO]    [roadmap_progress] Done — Uploaded: 1, Errors: 0
+2026-04-07 16:45:06,881  [INFO]    Uploading [users] → Firestore collection 'users' (5 documents)...
+2026-04-07 16:45:16,868  [INFO]    [users] Done — Uploaded: 5, Errors: 0
+2026-04-07 16:45:16,874  [INFO]  ============================================================
+2026-04-07 16:45:16,875  [INFO]  STEP 5 — Verification: SQLite vs Firestore record counts
+2026-04-07 16:45:16,876  [INFO]    Table                SQLite Rows     Uploaded     Errors     Match?
+2026-04-07 16:45:16,877  [INFO]    ----------------------------------------------------------------------
+2026-04-07 16:45:16,878  [INFO]    history              1290            1290         0          ✓ YES
+2026-04-07 16:45:16,882  [INFO]    mnc_reports          1               1            0          ✓ YES
+2026-04-07 16:45:16,886  [INFO]    roadmap_progress     1               1            0          ✓ YES
+2026-04-07 16:45:16,890  [INFO]    users                5               5            0          ✓ YES
+2026-04-07 16:45:16,894  [INFO]    ----------------------------------------------------------------------
+2026-04-07 16:45:16,895  [INFO]  ============================================================
+2026-04-07 16:45:16,895  [INFO]    MIGRATION STATUS : ✓ SUCCESS
+2026-04-07 16:45:16,899  [INFO]    All SQLite records are now in Firestore.
+2026-04-07 16:45:16,899  [INFO]    Original SQLite database is UNTOUCHED.
+2026-04-07 16:45:16,900  [INFO]    Backup saved at: d:\Ai-Carrier-Consulting-System\scripts\backups\database_backup_20260407_161319.db
+2026-04-07 16:45:16,900  [INFO]  ============================================================
+
+2026-04-07 16:45:51,292  [INFO]    [history] Done — Uploaded: 1290, Errors: 0
+2026-04-07 16:45:51,300  [INFO]    Uploading [mnc_reports] -> Firestore collection 'mnc_reports' (1 documents)...
+2026-04-07 16:45:52,557  [INFO]    [mnc_reports] Done — Uploaded: 1, Errors: 0
+2026-04-07 16:45:52,559  [INFO]    Uploading [roadmap_progress] -> Firestore collection 'roadmap_progress' (1 documents)...
+2026-04-07 16:45:53,886  [INFO]    [roadmap_progress] Done — Uploaded: 1, Errors: 0
+2026-04-07 16:45:53,888  [INFO]    Uploading [users] -> Firestore collection 'users' (5 documents)...
+2026-04-07 16:45:59,199  [INFO]    [users] Done — Uploaded: 5, Errors: 0
+2026-04-07 16:45:59,205  [INFO]  ============================================================
+2026-04-07 16:45:59,206  [INFO]  STEP 5 — Verification: SQLite vs Firestore record counts
+2026-04-07 16:45:59,206  [INFO]    Table                SQLite Rows     Uploaded     Errors     Match?
+2026-04-07 16:45:59,207  [INFO]    ----------------------------------------------------------------------
+2026-04-07 16:45:59,208  [INFO]    history              1290            1290         0          [OK] YES
+2026-04-07 16:45:59,208  [INFO]    mnc_reports          1               1            0          [OK] YES
+2026-04-07 16:45:59,208  [INFO]    roadmap_progress     1               1            0          [OK] YES
+2026-04-07 16:45:59,209  [INFO]    users                5               5            0          [OK] YES
+2026-04-07 16:45:59,209  [INFO]    ----------------------------------------------------------------------
+2026-04-07 16:45:59,209  [INFO]  ============================================================
+2026-04-07 16:45:59,210  [INFO]    MIGRATION STATUS : [OK] SUCCESS
+2026-04-07 16:45:59,210  [INFO]    All SQLite records are now in Firestore.
+2026-04-07 16:45:59,210  [INFO]    Original SQLite database is UNTOUCHED.
+2026-04-07 16:45:59,211  [INFO]    Backup saved at: d:\Ai-Carrier-Consulting-System\scripts\backups\database_backup_20260407_161405.db
+2026-04-07 16:45:59,211  [INFO]  ============================================================
+

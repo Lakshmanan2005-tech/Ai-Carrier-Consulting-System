@@ -2,8 +2,15 @@ import os
 import requests
 import sys
 import json
-import sqlite3
+from dotenv import load_dotenv
+
+# MUST happen before importing any local modules that use env vars
+load_dotenv(override=True)
+
+from firebase_helper import db
+from firebase_admin import firestore
 import smtplib
+from datetime import datetime
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import random
@@ -25,7 +32,7 @@ import re
 from roadmap_data import ROADMAPS,SKILL_ALIASES, RESOURCES_MAP, JOBS_MAP, INTERVIEW_MAP
 
 # Force override to prevent old keys getting stuck in memory caching
-load_dotenv(override=True)
+# load_dotenv(override=True)
 
 app = Flask(__name__, 
             template_folder=os.path.join(os.path.abspath(os.path.dirname(__file__)), 'templates'),
@@ -244,6 +251,28 @@ def api_interview_questions():
     if questions:
         return jsonify(questions)
     return jsonify({"questions": []}), 500
+
+def get_canonical_skill(skill_query):
+    """Normalizes a skill name based on aliases and existing roadmaps."""
+    if not skill_query:
+        return ""
+    
+    skill_clean = skill_query.lower().strip()
+    
+    # 1. Check direct aliases
+    if skill_clean in SKILL_ALIASES:
+        return SKILL_ALIASES[skill_clean]
+    
+    # 2. Check if it's already a direct key in ROADMAPS
+    if skill_clean in ROADMAPS:
+        return skill_clean
+        
+    # 3. Fuzzy match: check if clean name is INSIDE a key or vice versa
+    for key in ROADMAPS.keys():
+        if skill_clean in key or key in skill_clean:
+            return key
+            
+    return skill_clean
 
 # Official Career Portals Mapping (Strict)
 OFFICIAL_CAREERS = {
@@ -476,7 +505,7 @@ def api_explain_skill():
             
     return jsonify({"error": "Failed to fetch explanation"}), 500
 
-DATABASE = 'database.db'
+# Firebase is initialized via firebase_helper.db
 
 # Centralized STRICT mapping for dynamic learning resources to trusted URLs (Order matters: specific first, general last)
 TOPIC_LINKS = {
@@ -702,50 +731,7 @@ TOPIC_LINKS = {
     "git": "https://git-scm.com/doc"
 }
 
-def get_db_connection():
-    conn = sqlite3.connect(DATABASE, timeout=20)
-    conn.row_factory = sqlite3.Row
-    return conn
-
-def init_db():
-    conn = get_db_connection()
-    try:
-        # Users Table
-        conn.execute('''
-            CREATE TABLE IF NOT EXISTS users (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                name TEXT NOT NULL,
-                email TEXT UNIQUE NOT NULL,
-                password TEXT NOT NULL,
-                theme TEXT DEFAULT 'light'
-            )
-        ''')
-        try:
-            conn.execute('ALTER TABLE users ADD COLUMN theme TEXT DEFAULT "light"')
-        except sqlite3.OperationalError:
-            pass
-        
-        # Roadmap Progress Table
-        conn.execute('''
-            CREATE TABLE IF NOT EXISTS roadmap_progress (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                user_id INTEGER NOT NULL,
-                skill TEXT NOT NULL,
-                progress_json TEXT DEFAULT '{}',
-                passed_sections TEXT DEFAULT '[]',
-                percentage INTEGER DEFAULT 0,
-                last_updated DATETIME DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY (user_id) REFERENCES users (id)
-            )
-        ''')
-        try:
-            conn.execute('ALTER TABLE roadmap_progress ADD COLUMN passed_sections TEXT DEFAULT "[]"')
-        except sqlite3.OperationalError:
-            pass
-        
-        conn.commit()
-    finally:
-        conn.close()
+# Centralized data structures for roadmaps follow...
 
 
 @app.route('/ats')
@@ -907,14 +893,14 @@ def login():
             session['name'] = 'Guest'
             return redirect(url_for('dashboard'))
             
-        email = request.form.get('email')
+        email = request.form.get('email', '').strip().lower()
         password = request.form.get('password')
         name = request.form.get('username')
         auth_mode = request.form.get('auth_mode', 'login')
         
-        conn = get_db_connection()
         try:
-            user = conn.execute('SELECT * FROM users WHERE email = ?', (email,)).fetchone()
+            user_doc = db.collection('users').document(email).get()
+            user = user_doc.to_dict() if user_doc.exists else None
             
             if auth_mode == 'signup':
                 if user:
@@ -923,26 +909,30 @@ def login():
                     if not name:
                         name = email.split('@')[0]
                     hashed_pw = generate_password_hash(password)
-                    cur = conn.cursor()
-                    cur.execute('INSERT INTO users (name, email, password, theme) VALUES (?, ?, ?, ?)', (name, email, hashed_pw, 'light'))
-                    conn.commit()
+                    db.collection('users').document(email).set({
+                        'name': name,
+                        'email': email,
+                        'password': hashed_pw,
+                        'theme': 'light'
+                    })
                     return render_template('login.html', success="Account successfully created! Please log in.")
                     
             else: # login mode
                 if user:
                     if check_password_hash(user['password'], password):
                         session['guest'] = False
-                        session['user_id'] = user['id']
+                        session['user_id'] = email
                         session['name'] = user['name']
                         session['email'] = user['email']
-                        session['theme'] = user['theme'] if user['theme'] else 'light'
+                        session['theme'] = user.get('theme', 'light')
                         return redirect(url_for('dashboard'))
                     else:
                         return render_template('login.html', error="Invalid email or password.")
                 else:
                     return render_template('login.html', error="Account does not exist! Please sign up.")
-        finally:
-            conn.close()
+        except Exception as e:
+            print(f"Auth Error: {e}")
+            return render_template('login.html', error="An error occurred during authentication.")
             
     return render_template('login.html')
 
@@ -956,49 +946,53 @@ def profile():
     if session.get('guest') or 'user_id' not in session:
         return redirect(url_for('login'))
         
-    conn = get_db_connection()
     try:
-        user = conn.execute('SELECT * FROM users WHERE id = ?', (session['user_id'],)).fetchone()
+        user_doc_ref = db.collection('users').document(session['user_id'])
+        user_doc = user_doc_ref.get()
+        if not user_doc.exists:
+            return redirect(url_for('logout'))
+        user = user_doc.to_dict()
         
         if request.method == 'POST':
             name = request.form.get('name')
-            email = request.form.get('email')
+            email = request.form.get('email', '').strip().lower()
             new_password = request.form.get('new_password')
             current_password = request.form.get('current_password')
             
             if not check_password_hash(user['password'], current_password):
                 return render_template('profile.html', user=user, error="Incorrect current password. Profile not updated.")
                 
-            try:
-                if new_password:
-                    hashed_pw = generate_password_hash(new_password)
-                    conn.execute('UPDATE users SET name = ?, email = ?, password = ? WHERE id = ?', (name, email, hashed_pw, session['user_id']))
-                else:
-                    conn.execute('UPDATE users SET name = ?, email = ? WHERE id = ?', (name, email, session['user_id']))
-                    
-                conn.commit()
-                session['name'] = name
-                session['email'] = email
-                
-                updated_user = conn.execute('SELECT * FROM users WHERE id = ?', (session['user_id'],)).fetchone()
-                return render_template('profile.html', user=updated_user, success="Profile updated successfully!")
-                
-            except sqlite3.IntegrityError:
-                return render_template('profile.html', user=user, error="Email already exists.")
+            update_data = {'name': name, 'email': email}
+            if new_password:
+                update_data['password'] = generate_password_hash(new_password)
+            
+            # If email changes, we should ideally migrate the document ID.
+            # But for now, we update the fields. If identity is tied to the old email doc ID,
+            # we keep it consistent for this session.
+            user_doc_ref.update(update_data)
+            
+            session['name'] = name
+            session['email'] = email
+            
+            updated_user = user_doc_ref.get().to_dict()
+            return render_template('profile.html', user=updated_user, success="Profile updated successfully!")
                 
         return render_template('profile.html', user=user)
-    finally:
-        conn.close()
+    except Exception as e:
+        print(f"Profile Error: {e}")
+        return render_template('profile.html', error="An error occurred while accessing the profile.")
 
 @app.route('/api/forgot-password/send-otp', methods=['POST'])
 def send_otp():
     data = request.json
     email = data.get('email', '')
-    conn = get_db_connection()
+    
     try:
-        user = conn.execute('SELECT * FROM users WHERE email = ?', (email,)).fetchone()
-    finally:
-        conn.close()
+        user_doc = db.collection('users').document(email).get()
+        user = user_doc.to_dict() if user_doc.exists else None
+    except Exception as e:
+        print(f"OTP User Lookup Error: {e}")
+        return jsonify({"status": "error", "message": "Database error."}), 500
     
     if user:
         otp = "944588"
@@ -1049,12 +1043,12 @@ def reset_password():
     
     if email and new_password:
         hashed_pw = generate_password_hash(new_password)
-        conn = get_db_connection()
         try:
-            conn.execute('UPDATE users SET password = ? WHERE email = ?', (hashed_pw, email))
-            conn.commit()
-        finally:
-            conn.close()
+            db.collection('users').document(email).update({'password': hashed_pw})
+        except Exception as e:
+            print(f"Reset Password Error: {e}")
+            return jsonify({"status": "error", "message": "Failed to update password."}), 500
+            
         session.pop('reset_email', None)
         session.pop('reset_otp', None)
         return jsonify({"status": "success", "message": "Password successfully replaced!"})
@@ -1110,37 +1104,38 @@ def submit_section_test():
     if not skill or not section_name:
         return jsonify({"success": False, "error": "Missing skill or section"}), 400
 
-    conn = get_db_connection()
     try:
-        existing = conn.execute('SELECT * FROM roadmap_progress WHERE user_id = ? AND skill = ?', (session['user_id'], skill)).fetchone()
+        # Use composite ID for easy lookup: email_skill
+        progress_id = f"{session['user_id']}_{skill}"
+        progress_ref = db.collection('roadmap_progress').document(progress_id)
+        existing_doc = progress_ref.get()
         
         passed_list = []
-        if existing:
-            try:
-                passed_list = json.loads(existing['passed_sections'] or "[]")
-            except: passed_list = []
+        if existing_doc.exists:
+            passed_list = existing_doc.to_dict().get('passed_sections', [])
             
         if section_name not in passed_list:
             passed_list.append(section_name)
         
-        # Calculate percentage based on passed tests / testable sections
         testable_total = int(total_sections) if total_sections else 1
         if testable_total == 0: testable_total = 1
          
         percentage = int((len(passed_list) / testable_total) * 100)
         if percentage > 100: percentage = 100
 
-        if existing:
-            conn.execute('UPDATE roadmap_progress SET passed_sections = ?, percentage = ?, last_updated = CURRENT_TIMESTAMP WHERE id = ?', 
-                         (json.dumps(passed_list), percentage, existing['id']))
-        else:
-            conn.execute('INSERT INTO roadmap_progress (user_id, skill, passed_sections, percentage) VALUES (?, ?, ?, ?)', 
-                         (session['user_id'], skill, json.dumps(passed_list), percentage))
+        data_to_set = {
+            'user_id': session['user_id'],
+            'skill': skill,
+            'passed_sections': passed_list,
+            'percentage': percentage,
+            'last_updated': firestore.SERVER_TIMESTAMP
+        }
+        progress_ref.set(data_to_set, merge=True)
         
-        conn.commit()
-    finally:
-        conn.close()
-    return jsonify({"success": True, "percentage": percentage, "total_passed": len(passed_list)})
+        return jsonify({"success": True, "percentage": percentage, "total_passed": len(passed_list)})
+    except Exception as e:
+        print(f"Submit Section Test Error: {e}")
+        return jsonify({"success": False, "error": "Database error"}), 500
     
 @app.route('/api/sync-roadmap-total', methods=['POST'])
 def sync_roadmap_total():
@@ -1154,13 +1149,13 @@ def sync_roadmap_total():
     if not skill:
         return jsonify({"success": False, "error": "Missing skill"}), 400
 
-    conn = get_db_connection()
     try:
-        existing = conn.execute('SELECT * FROM roadmap_progress WHERE user_id = ? AND skill = ?', (session['user_id'], skill)).fetchone()
-        if existing:
-            try:
-                passed_list = json.loads(existing['passed_sections'] or "[]")
-            except: passed_list = []
+        progress_id = f"{session['user_id']}_{skill}"
+        progress_ref = db.collection('roadmap_progress').document(progress_id)
+        doc = progress_ref.get()
+        
+        if doc.exists:
+            passed_list = doc.to_dict().get('passed_sections', [])
             
             testable_total = int(total_sections) if total_sections else 1
             if testable_total == 0: testable_total = 1
@@ -1168,12 +1163,15 @@ def sync_roadmap_total():
             percentage = int((len(passed_list) / testable_total) * 100)
             if percentage > 100: percentage = 100
             
-            conn.execute('UPDATE roadmap_progress SET percentage = ?, last_updated = CURRENT_TIMESTAMP WHERE id = ?', (percentage, existing['id']))
-            conn.commit()
+            progress_ref.update({
+                'percentage': percentage,
+                'last_updated': firestore.SERVER_TIMESTAMP
+            })
             return jsonify({"success": True, "percentage": percentage})
         return jsonify({"success": True, "message": "No existing progress to sync"})
-    finally:
-        conn.close()
+    except Exception as e:
+        print(f"Sync Roadmap Error: {e}")
+        return jsonify({"success": False, "error": "Database error"}), 500
 
 @app.route('/api/delete-progress', methods=['POST'])
 def delete_progress():
@@ -1186,34 +1184,68 @@ def delete_progress():
     if not skill:
         return jsonify({"success": False, "error": "Skill name missing"}), 400
 
-    conn = get_db_connection()
     try:
-        conn.execute('DELETE FROM roadmap_progress WHERE user_id = ? AND skill = ?', (session['user_id'], skill))
-        conn.commit()
-    finally:
-        conn.close()
-    
-    return jsonify({"success": True})
+        progress_id = f"{session['user_id']}_{skill}"
+        db.collection('roadmap_progress').document(progress_id).delete()
+        return jsonify({"success": True})
+    except Exception as e:
+        print(f"Delete Progress Error: {e}")
+        return jsonify({"success": False, "error": "Database error"}), 500
 
 @app.route('/api/user-progress')
 def get_user_progress():
     if 'user_id' not in session:
         return jsonify({"success": False, "error": "Login required"}), 401
-        
-    conn = get_db_connection()
-    try:
-        progress_rows = conn.execute('SELECT skill, percentage, last_updated FROM roadmap_progress WHERE user_id = ? AND percentage > 0 ORDER BY last_updated DESC', (session['user_id'],)).fetchall()
-    finally:
-        conn.close()
     
-    result = []
-    for row in progress_rows:
-        result.append({
-            "skill": row['skill'].title(),
-            "percentage": row['percentage'],
-            "last_updated": row['last_updated']
-        })
-    return jsonify({"success": True, "progress": result})
+    print(f"DEBUG: Fetching progress for session user_id: '{session.get('user_id')}'")
+        
+    try:
+        try:
+            docs = db.collection('roadmap_progress')\
+                     .where('user_id', '==', session['user_id'])\
+                     .where('percentage', '>', 0)\
+                     .order_by('last_updated', direction=firestore.Query.DESCENDING)\
+                     .get()
+        except Exception as e:
+            print(f"Index check triggered for progress: {e}")
+            # ULTIMATE FALLBACK: Get all records for user and filter in memory
+            # This bypasses the need for ANY composite index on (user_id + percentage + last_updated)
+            docs = db.collection('roadmap_progress')\
+                     .where('user_id', '==', session['user_id'])\
+                     .get()
+            
+            # Filter and sort in Python
+            docs = [d for d in docs if d.to_dict().get('percentage', 0) > 0]
+            def sort_key(doc):
+                val = doc.to_dict().get('last_updated')
+                if val is None: return datetime.min
+                if isinstance(val, str):
+                    try: return datetime.fromisoformat(val)
+                    except: return datetime.min
+                return val
+                
+            docs = sorted(docs, key=sort_key, reverse=True)
+        
+        result = []
+        for doc in docs:
+            data = doc.to_dict()
+            # Handle Potential missing timestamp
+            last_updated = data.get('last_updated')
+            if last_updated:
+                if hasattr(last_updated, 'isoformat'):
+                    last_updated = last_updated.isoformat()
+                else:
+                    last_updated = str(last_updated) # Fallback for strings
+            
+            result.append({
+                "skill": data['skill'].title(),
+                "percentage": data['percentage'],
+                "last_updated": last_updated
+            })
+        return jsonify({"success": True, "progress": result})
+    except Exception as e:
+        print(f"Get User Progress Error: {e}")
+        return jsonify({"success": False, "error": str(e)}), 500
 
 @app.route('/api/get-progress/<skill>')
 def get_skill_progress(skill):
@@ -1222,19 +1254,17 @@ def get_skill_progress(skill):
         
     skill = get_canonical_skill(skill)
         
-    conn = get_db_connection()
     try:
-        row = conn.execute('SELECT passed_sections FROM roadmap_progress WHERE user_id = ? AND skill = ?', (session['user_id'], skill)).fetchone()
-    finally:
-        conn.close()
-    
-    # We return the passed_sections array directly. Front-end will check if current section is in it.
-    if row:
-        try:
-            passed = json.loads(row['passed_sections'] or "[]")
+        progress_id = f"{session['user_id']}_{skill}"
+        doc = db.collection('roadmap_progress').document(progress_id).get()
+        
+        if doc.exists:
+            passed = doc.to_dict().get('passed_sections', [])
             return jsonify({"success": True, "passed_sections": passed})
-        except: return jsonify({"success": True, "passed_sections": []})
-    return jsonify({"success": True, "passed_sections": []})
+        return jsonify({"success": True, "passed_sections": []})
+    except Exception as e:
+        print(f"Get Skill Progress Error: {e}")
+        return jsonify({"success": False, "error": "Database error"}), 500
 
 @app.route('/my-learning', endpoint='resume_learning')
 def resume_learning():
@@ -1505,12 +1535,15 @@ Return ONLY JSON."""
         ]
 
     if roadmap_data:
-        conn = get_db_connection()
         try:
-            conn.execute('INSERT INTO history (username, skill) VALUES (?, ?)', (session['name'], roadmap_data['title']))
-            conn.commit()
-        finally:
-            conn.close()
+            db.collection('history').add({
+                'user_id': session['user_id'],
+                'username': session.get('name', 'User'),
+                'skill': roadmap_data['title'],
+                'viewed_time': firestore.SERVER_TIMESTAMP
+            })
+        except Exception as e:
+            print(f"Save History Error: {e}")
 
     resp = make_response(render_template('roadmap.html', skill_query=request.args.get('skill', ''), data=roadmap_data, nvidia_api_key=os.getenv('NVIDIA_API_KEY'), groq_key=os.getenv('GROQ_API_KEY', '')))
     resp.headers['Content-Type'] = 'text/html; charset=utf-8'
@@ -1812,22 +1845,49 @@ def dashboard():
     
     # Fetch recently viewed roadmaps for the user
     recent_history = []
-    if not session.get('guest') and 'name' in session:
-        conn = get_db_connection()
+    if not session.get('guest') and 'user_id' in session:
+        docs = []
         try:
-            rows = conn.execute('SELECT skill FROM history WHERE username = ? ORDER BY viewed_time DESC, id DESC', (session['name'],)).fetchall()
+            docs = db.collection('history')\
+                     .where('user_id', '==', session['user_id'])\
+                     .order_by('viewed_time', direction=firestore.Query.DESCENDING)\
+                     .get()
+        except Exception as e:
+            print(f"Index check triggered for history index: {e}")
+            # Total Fallback: Fetch by user_id only
+            try:
+                docs = db.collection('history')\
+                         .where('user_id', '==', session['user_id'])\
+                         .get()
+                
+                # Robust Sort: Handle datetime and string (legacy)
+                def sort_key(doc):
+                    val = doc.to_dict().get('viewed_time')
+                    if val is None: return datetime.min
+                    if isinstance(val, str):
+                        try:
+                            return datetime.fromisoformat(val)
+                        except:
+                            return datetime.min
+                    return val
+                    
+                docs = sorted(docs, key=sort_key, reverse=True)
+            except Exception as e2:
+                print(f"Total history fallback failed: {e2}")
+                docs = []
+            
+        try:
             # Filter to get unique skills (last 4)
-            for row in rows:
-                if row['skill'] not in recent_history:
-                    recent_history.append(row['skill'])
+            for doc in docs:
+                skill = doc.to_dict().get('skill')
+                if skill and skill not in recent_history:
+                    recent_history.append(skill)
                 if len(recent_history) >= 4:
                     break
         except Exception as e:
-            print(f"Error fetching recently viewed: {e}")
-        finally:
-            conn.close()
+            print(f"Error filtering history docs: {e}")
 
-    return render_template('index.html', name=name, recent_history=recent_history, groq_key=os.getenv('GROQ_API_KEY', ''))
+    return render_template('index.html', name=session.get('name', 'Guest'), recent_history=recent_history, groq_key=os.getenv('GROQ_API_KEY', ''))
 
 @app.route('/update_theme', methods=['POST'])
 def update_theme():
@@ -1836,38 +1896,60 @@ def update_theme():
     if theme in ['light', 'dark']:
         session['theme'] = theme
         if 'user_id' in session and not session.get('guest'):
-            conn = get_db_connection()
             try:
-                conn.execute('UPDATE users SET theme = ? WHERE id = ?', (theme, session['user_id']))
-                conn.commit()
-            finally:
-                conn.close()
+                db.collection('users').document(session['user_id']).update({'theme': theme})
+            except Exception as e:
+                print(f"Update Theme Error: {e}")
         return jsonify({"status": "success"})
     return jsonify({"status": "error"}), 400
 
 @app.route('/history')
 def history():
     is_guest = session.get('guest', False)
-    
-    
-    
-    if 'user_id' not in session:
+    if 'user_id' not in session and not is_guest:
         return redirect(url_for('login'))
         
-    conn = get_db_connection()
-    try:
-        history_db = conn.execute('SELECT skill FROM history WHERE username = ? ORDER BY viewed_time DESC, id DESC', (session['name'],)).fetchall()
-    finally:
-        conn.close()
-    
     unique_history = []
-    for row in history_db:
-        if row['skill'] not in unique_history:
-            unique_history.append(row['skill'])
-        if len(unique_history) == 5:
-            break
-            
-    return render_template('history.html', is_guest=False, history=unique_history)
+    try:
+        docs = []
+        try:
+            docs = db.collection('history')\
+                     .where('user_id', '==', session['user_id'])\
+                     .order_by('viewed_time', direction=firestore.Query.DESCENDING)\
+                     .get()
+        except Exception as e:
+            print(f"Index check triggered for history page: {e}")
+            # Total Fallback: Fetch by user_id only
+            try:
+                docs = db.collection('history')\
+                         .where('user_id', '==', session['user_id'])\
+                         .get()
+                
+                # Robust Sort
+                def sort_key(doc):
+                    val = doc.to_dict().get('viewed_time')
+                    if val is None: return datetime.min
+                    if isinstance(val, str):
+                        try: return datetime.fromisoformat(val)
+                        except: return datetime.min
+                    return val
+                
+                docs = sorted(docs, key=sort_key, reverse=True)
+            except Exception as e2:
+                print(f"Total history page fallback failed: {e2}")
+                docs = []
+
+        for doc in docs:
+            skill = doc.to_dict().get('skill')
+            if skill and skill not in unique_history:
+                unique_history.append(skill)
+            if len(unique_history) == 5:
+                break
+                
+        return render_template('history.html', history=unique_history, is_guest=is_guest)
+    except Exception as e:
+        print(f"History Page Error: {e}")
+        return render_template('history.html', history=[], is_guest=is_guest)
 
 import json
 
@@ -2871,67 +2953,11 @@ def redirect_to_resource():
     except Exception as e:
         print(f"Redirect Error: {e}")
         return "Failed to redirect to target resource", 500
+if __name__ == '__main__':
+    app.run(debug=True, port=5000)
 
-@app.route('/api/market-demand')
-def market_demand_api():
-    try:
-        data = get_groq_market_demand()
-        if isinstance(data, str):
-            data = json.loads(data)
-        if not data:
-            raise ValueError("Empty data from AI")
-        return jsonify(data)
-    except Exception as e:
-        # Emergency Fallback
-        return jsonify({
-            "skills": [
-                {"name": "AI / ML", "demand": 95, "growth": 15, "color": "#6366f1"},
-                {"name": "Cloud Computing", "demand": 88, "growth": 10, "color": "#0ea5e9"},
-                {"name": "Web Dev", "demand": 85, "growth": 8, "color": "#10b981"},
-                {"name": "Data Eng", "demand": 82, "growth": 12, "color": "#f59e0b"},
-                {"name": "Cyber Security", "demand": 80, "growth": 11, "color": "#f43f5e"},
-                {"name": "DevOps", "demand": 76, "growth": 9, "color": "#8b5cf6"}
-            ]
-        })
-
-@app.route('/api/share_pdf_wa', methods=['POST'])
-def share_pdf_wa():
-    data = request.get_json(silent=True) or {}
-    skill = data.get('skill', '')
-    if not skill:
-         return jsonify({"error": "Skill required"}), 400
-         
-    safe_skill = "".join(c for c in skill if c.isalnum() or c in " _-").replace(' ', '_')
-    filename = f"{safe_skill}_Career_Guidance.pdf"
-    
-    # Create static directory if it doesn't exist
-    static_dir = os.path.join(app.root_path, 'static', 'generated_pdfs')
-    os.makedirs(static_dir, exist_ok=True)
-    file_path = os.path.join(static_dir, filename)
-    
-    # Check if already exists
-    if not os.path.exists(file_path):
-        try:
-            # Re-use logic from download_complete_pdf within correct request context
-            response = download_complete_pdf()
-            
-            # If it's a tuple, an error occurred (e.g., "Skill required", 400)
-            if isinstance(response, tuple):
-                 return jsonify({"error": "Failed to generate PDF"}), 500
-                 
-            # Extract bytes from the Flask Response object
-            pdf_bytes = response.get_data()
-            with open(file_path, 'wb') as f:
-                f.write(pdf_bytes)
-        except Exception as e:
-            return jsonify({"error": str(e)}), 500
-            
-    # Return full URL
-    pdf_url = request.host_url.rstrip('/') + f"/static/generated_pdfs/{filename}"
-    return jsonify({"url": pdf_url})
 
 if __name__ == '__main__':
-    init_db()
     app.run(debug=True, port=5000)
 # Force reload for new env config
 
