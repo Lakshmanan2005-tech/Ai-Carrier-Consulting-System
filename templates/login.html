@@ -1,125 +1,217 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="en">
 
-{% block content %}
-<div class="login-container">
-    <div class="login-card">
-        <div class="login-header">
-            <img src="/static/ai-logo.png" style="width: 28px; height: 28px; border-radius: 8px; margin-bottom: 0.3rem; box-shadow: 0 4px 10px rgba(99, 102, 241, 0.08); border: 1px solid rgba(255, 255, 255, 0.1);" alt="AI Logo" />
-            <h2 id="authTitle" style="font-size: 1.05rem; margin-bottom: 0.1rem;">AI Career Consulting</h2>
-            <p id="authSubtitle" style="font-size: 0.68rem; margin-bottom: 0.6rem;">Your path to success</p>
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Login | AI Career Consulting</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='logo_final.png') }}?v=3.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}?v=47.0">
+</head>
+
+<body class="login-page">
+    <main class="auth-shell">
+        <div class="auth-console" aria-label="AI Career Consulting login">
+
+            <!-- ── LEFT: Features Panel ── -->
+            <aside class="career-panel" aria-label="Platform features">
+                <div class="cp-content">
+                    <div class="cp-brand">
+                        <span>AI Career Consulting</span>
+                    </div>
+
+                    <div class="cp-tagline">
+                        <h1 id="authTitle" class="cp-headline">Your future starts here</h1>
+                        <p id="authSubtitle" class="cp-sub">"The best way to predict the future is to create it."</p>
+                    </div>
+
+                    <!-- Platform Features List -->
+                    <div class="cp-features-list">
+                        <div class="cp-feature-item">
+                            <div class="cp-feature-icon">
+                                <i class="fa-solid fa-compass-drafting" aria-hidden="true"></i>
+                            </div>
+                            <div class="cp-feature-text">
+                                <h3>AI Career Roadmaps</h3>
+                                <p>Personalized paths for every goal.</p>
+                            </div>
+                        </div>
+
+                        <div class="cp-feature-item">
+                            <div class="cp-feature-icon">
+                                <i class="fa-solid fa-microphone-lines" aria-hidden="true"></i>
+                            </div>
+                            <div class="cp-feature-text">
+                                <h3>Interview Success</h3>
+                                <p>Mock interviews and real-time prep.</p>
+                            </div>
+                        </div>
+
+                        <div class="cp-feature-item">
+                            <div class="cp-feature-icon">
+                                <i class="fa-solid fa-file-invoice" aria-hidden="true"></i>
+                            </div>
+                            <div class="cp-feature-text">
+                                <h3>ATS Resume Checker</h3>
+                                <p>Analyze and optimize for top company standards.</p>
+                            </div>
+                        </div>
+
+                        <div class="cp-feature-item">
+                            <div class="cp-feature-icon">
+                                <i class="fa-solid fa-briefcase" aria-hidden="true"></i>
+                            </div>
+                            <div class="cp-feature-text">
+                                <h3>Job Matching</h3>
+                                <p>Connect with top MNCs directly.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- ── RIGHT: Auth Form Panel ── -->
+            <section class="auth-panel" aria-labelledby="authTitle">
+
+                <div class="auth-head">
+                    <p class="auth-kicker">Welcome Back!</p>
+                    <h2>Sign in to continue</h2>
+                </div>
+
+                {% if success %}
+                <div class="alert-box alert-success" role="status">
+                    <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
+                    <span>{{ success }}</span>
+                </div>
+                {% endif %}
+                {% if error %}
+                <div class="alert-box alert-error" role="alert">
+                    <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
+                    <span>{{ error }}</span>
+                </div>
+                {% endif %}
+
+                <form method="POST" action="{{ url_for('login') }}" id="guestForm" class="guest-form">
+                    <button type="submit" name="action" value="guest" id="guestBtn" class="btn btn-secondary">
+                        <i class="fa-solid fa-user-graduate" aria-hidden="true"></i>
+                        <span>Explore as Guest</span>
+                    </button>
+                </form>
+
+                <div class="divider" aria-hidden="true">
+                    <span></span>
+                    <p>Or use your email</p>
+                    <span></span>
+                </div>
+
+                <form method="POST" action="{{ url_for('login') }}" class="auth-form">
+                    <input type="hidden" id="authMode" name="auth_mode" value="login">
+
+                    <div id="usernameField" class="form-field reveal-field" style="display: none; opacity: 0;" aria-hidden="true">
+                        <label for="usernameInput">Username</label>
+                        <div class="input-shell">
+                            <i class="fa-solid fa-user-tag" aria-hidden="true"></i>
+                            <input id="usernameInput" name="username" placeholder="Choose a catchy username" type="text" autocomplete="name">
+                        </div>
+                    </div>
+
+                    <div class="form-field">
+                        <label for="email">Email</label>
+                        <div class="input-shell">
+                            <i class="fa-solid fa-envelope" aria-hidden="true"></i>
+                            <input id="email" name="email" placeholder="hello@gmail.com" type="email" autocomplete="email" required>
+                        </div>
+                    </div>
+
+                    <div class="form-field">
+                        <div class="field-row">
+                            <label for="password">Password</label>
+                            <span id="forgotPwdContainer">
+                                <a href="#" onclick="openForgotModal(); return false;">Forgot?</a>
+                            </span>
+                        </div>
+                        <div class="input-shell">
+                            <i class="fa-solid fa-key" aria-hidden="true"></i>
+                            <input id="password" name="password" placeholder="Enters your secret key" type="password" autocomplete="current-password" required>
+                        </div>
+                    </div>
+
+                    <button type="submit" id="mainSubmitBtn" name="action" value="login" class="btn btn-primary">Sign In to Grow</button>
+                </form>
+
+                <p id="toggleTextContainer" class="toggle-container">
+                    <span id="togglePrefix">New here?</span>
+                    <a href="#" id="toggleAuthBtn" onclick="toggleAuthMode(event)">Join the community</a>
+                </p>
+
+                <footer class="login-footer">
+                    <span>&copy; 2026 AI Career Consulting</span>
+                </footer>
+            </section>
+
         </div>
+    </main>
 
-        {% if success %}
-        <p class="alert-success">{{ success }}</p>
-        {% endif %}
-        {% if error %}
-        <p class="alert-error">{{ error }}</p>
-        {% endif %}
-
-        <form method="POST" action="{{ url_for('login') }}">
-            <input type="hidden" id="authMode" name="auth_mode" value="login">
-            
-            <div id="usernameField" class="form-group" style="display: none;">
-                <input type="text" id="usernameInput" name="username" class="form-control" placeholder="Username">
-            </div>
-
-            <div class="form-group">
-                <input type="email" name="email" class="form-control" placeholder="Email ID" required>
-            </div>
-            
-            <div class="form-group">
-                <input type="password" name="password" class="form-control" placeholder="Password" required>
-            </div>
-
-            <div id="forgotPwdContainer" class="text-right">
-                <a href="#" onclick="openForgotModal(); return false;">Forgot Password?</a>
-            </div>
-
-            <button type="submit" id="mainSubmitBtn" name="action" value="login" class="btn-gradient btn-block">Login</button>
-            <button type="submit" id="guestBtn" name="action" value="guest" class="btn-secondary btn-block guest-btn-premium" formnovalidate>
-                <i class="fa-solid fa-user-secret" style="margin-right: 8px; opacity: 0.8;"></i>
-                Continue as Guest
+    <!-- Forgot Password Modal -->
+    <div class="forgot-pwd-modal" id="forgotPwdModal" aria-hidden="true">
+        <div class="fp-card" role="dialog" aria-modal="true" aria-labelledby="forgotPwdTitle">
+            <button class="close-modal" type="button" onclick="closeForgotModal()" aria-label="Close dialog">
+                <i class="fa-solid fa-xmark" aria-hidden="true"></i>
             </button>
 
-            <div id="toggleTextContainer" class="toggle-container">
-                <span id="togglePrefix">Don't have an account?</span> 
-                <a href="#" id="toggleAuthBtn" onclick="toggleAuthMode(event)">Sign Up</a>
+            <div class="fp-header">
+                <p>Don't worry, we got you!</p>
+                <h2 id="forgotPwdTitle">Reset Password</h2>
             </div>
-        </form>
-    </div>
-</div>
 
-<!-- Forgot Password Modal -->
-<div class="forgot-pwd-modal" id="forgotPwdModal">
-    <div class="fp-card">
-        <button class="close-modal" onclick="closeForgotModal()">&times;</button>
-        <h3>Reset Password</h3>
+            <div id="fp-step-1" class="fp-step">
+                <p>Enter your email and we'll send you a recovery code.</p>
+                <div class="input-shell">
+                    <i class="fa-solid fa-envelope-open" aria-hidden="true"></i>
+                    <input type="email" id="fpEmail" placeholder="Your student email" autocomplete="email">
+                </div>
+                <button class="btn btn-primary" type="button" id="btnSendOtp" onclick="sendOtp()">
+                    <span id="sendOtpText">Get Secuity Code</span>
+                    <i class="fa-solid fa-circle-notch fa-spin" id="sendOtpLoader" style="display: none;" aria-hidden="true"></i>
+                </button>
+                <p id="fpError1" class="error-msg"></p>
+                <p class="demo-note">Demo Code: <strong>944588</strong></p>
+            </div>
 
-        <!-- Step 1: Email -->
-        <div id="fp-step-1">
-            <p>Enter your registered email address below.</p>
-            <div class="form-group">
-                <input type="email" id="fpEmail" class="form-control" placeholder="Email Address">
+            <div id="fp-step-2" class="fp-step" style="display: none;">
+                <p>Type in the 6-digit code we just sent.</p>
+                <div class="input-shell">
+                    <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
+                    <input type="text" id="fpOtp" placeholder="0 0 0 0 0 0" maxlength="6" inputmode="numeric">
+                </div>
+                <button class="btn btn-primary" type="button" onclick="verifyOtp()">Verify Me</button>
+                <p id="fpError2" class="error-msg"></p>
             </div>
-            <button class="btn-gradient btn-block" id="btnSendOtp" onclick="sendOtp()">
-                <span id="sendOtpText">Send OTP</span>
-                <i class="fa-solid fa-spinner fa-spin" id="sendOtpLoader" style="display: none;"></i>
-            </button>
-            <p id="fpError1" class="error-msg"></p>
-            <p class="demo-note">(Demo: OTP is fixed at 944588)</p>
-        </div>
 
-        <!-- Step 2: OTP -->
-        <div id="fp-step-2" style="display: none;">
-            <p>Enter the 6-digit OTP sent to your email.</p>
-            <div class="form-group">
-                <input type="text" id="fpOtp" class="form-control" placeholder="Enter OTP" maxlength="6">
+            <div id="fp-step-3" class="fp-step" style="display: none;">
+                <p>Set a new password for your account.</p>
+                <div class="input-stack">
+                    <div class="input-shell">
+                        <i class="fa-solid fa-lock" aria-hidden="true"></i>
+                        <input type="password" id="fpNewPwd" placeholder="New strong password" autocomplete="new-password">
+                    </div>
+                    <div class="input-shell">
+                        <i class="fa-solid fa-lock" aria-hidden="true"></i>
+                        <input type="password" id="fpConfirmPwd" placeholder="Confirm your password" autocomplete="new-password">
+                    </div>
+                </div>
+                <button class="btn btn-primary" type="button" onclick="resetPassword()">Update & Log In</button>
+                <p id="fpError3" class="error-msg"></p>
+                <p id="fpSuccess" class="success-msg"></p>
             </div>
-            <button class="btn-gradient btn-block" onclick="verifyOtp()">Verify OTP</button>
-            <p id="fpError2" class="error-msg"></p>
-        </div>
-
-        <!-- Step 3: Reset -->
-        <div id="fp-step-3" style="display: none;">
-            <p>Enter your new password.</p>
-            <div class="form-group">
-                <input type="password" id="fpNewPwd" class="form-control" placeholder="New Password">
-            </div>
-            <div class="form-group">
-                <input type="password" id="fpConfirmPwd" class="form-control" placeholder="Confirm Password">
-            </div>
-            <button class="btn-gradient btn-block" onclick="resetPassword()">Reset Password</button>
-            <p id="fpError3" class="error-msg"></p>
-            <p id="fpSuccess" class="success-msg"></p>
         </div>
     </div>
-</div>
 
-<style>
-    /* Utility & Form Alert Classes */
-    .text-right { text-align: right; margin-bottom: 1.1rem; }
-    .text-right a { font-size: 0.8rem; font-weight: 600; text-decoration: none; color: #6366f1; }
-    .toggle-container { margin-top: -0.2rem; font-size: 1.05rem; color: #64748b; font-weight: 700; text-align: center; }
-    .toggle-container a { 
-        font-weight: 900; 
-        color: #4f46e5;
-        text-decoration: none;
-        margin-left: 5px;
-        display: inline-block;
-        transition: transform 0.3s ease;
-    }
-    .toggle-container a:hover { transform: scale(1.1); }
-    
-    .alert-success { color: #10b981; background: rgba(16, 185, 129, 0.1); padding: 0.8rem; border-radius: 12px; margin-bottom: 1.5rem; font-weight: 500; }
-    .alert-error { color: #ef4444; background: rgba(239, 68, 68, 0.1); padding: 0.8rem; border-radius: 12px; margin-bottom: 1.5rem; font-weight: 500; }
-    
-    .error-msg { color: #ef4444; margin-top: 10px; font-size: 0.85rem; display: none; }
-    .success-msg { color: #10b981; margin-top: 10px; font-size: 0.95rem; display: none; font-weight: 600; text-align: center; }
-    .demo-note { color: #10b981; font-size: 0.8rem; margin-top: 1rem; font-weight: 600; }
-    .fp-card p { margin-bottom: 1.2rem; font-size: 0.95rem; line-height: 1.4; }
-    .fp-card h3 { margin-bottom: 1.5rem; font-weight: 700; }
-</style>
+    <script src="{{ url_for('static', filename='js/login.js') }}?v=3.0" defer></script>
+</body>
 
-<link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
-<script src="{{ url_for('static', filename='js/login.js') }}"></script>
-{% endblock %}
+</html>

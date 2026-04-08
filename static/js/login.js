@@ -1,184 +1,268 @@
-    let isSignUpMode = false;
+let isSignUpMode = false;
 
-    function toggleAuthMode(e) {
-        e.preventDefault();
-        isSignUpMode = !isSignUpMode;
+function byId(id) {
+    return document.getElementById(id);
+}
 
-        const subtitle = document.getElementById('authSubtitle');
-        const usernameField = document.getElementById('usernameField');
-        const usernameInput = document.getElementById('usernameInput');
-        const forgotPwd = document.getElementById('forgotPwdContainer');
-        const submitBtn = document.getElementById('mainSubmitBtn');
-        const guestBtn = document.getElementById('guestBtn');
-        const togglePrefix = document.getElementById('togglePrefix');
-        const toggleBtn = document.getElementById('toggleAuthBtn');
-        const toggleContainer = document.getElementById('toggleTextContainer');
+function setVisible(element, visible, displayValue = '') {
+    if (!element) return;
+    element.style.display = visible ? displayValue : 'none';
+}
 
-        // Smooth fade out
-        subtitle.style.opacity = '0';
-        submitBtn.style.opacity = '0';
-        toggleContainer.style.opacity = '0';
+function setMessage(element, message) {
+    if (!element) return;
+    element.textContent = message;
+    element.style.display = message ? 'block' : 'none';
+}
 
-        setTimeout(() => {
-            if (isSignUpMode) {
-                document.getElementById('authMode').value = "signup";
-                subtitle.innerText = "Create your account";
-                usernameField.style.display = 'block';
-                setTimeout(() => { usernameField.style.opacity = '1'; }, 50);
-                usernameInput.required = true;
+function toggleAuthMode(e) {
+    if (e) e.preventDefault();
+    isSignUpMode = !isSignUpMode;
 
-                forgotPwd.style.display = 'none';
-                guestBtn.style.display = 'none';
+    const title = byId('authTitle');
+    const subtitle = byId('authSubtitle');
+    const usernameField = byId('usernameField');
+    const usernameInput = byId('usernameInput');
+    const forgotPwd = byId('forgotPwdContainer');
+    const submitBtn = byId('mainSubmitBtn');
+    const guestForm = byId('guestForm');
+    const guestBtn = byId('guestBtn');
+    const togglePrefix = byId('togglePrefix');
+    const toggleBtn = byId('toggleAuthBtn');
+    const toggleContainer = byId('toggleTextContainer');
+    const authMode = byId('authMode');
 
-                submitBtn.innerText = "Sign Up";
-                togglePrefix.innerText = "Already have an account?";
-                toggleBtn.innerText = "Login";
-            } else {
-                document.getElementById('authMode').value = "login";
-                subtitle.innerText = "Your path to success starts here";
+    [subtitle, submitBtn, toggleContainer].forEach((element) => {
+        if (element) element.style.opacity = '0';
+    });
+
+    window.setTimeout(() => {
+        if (isSignUpMode) {
+            if (authMode) authMode.value = 'signup';
+            if (title) title.innerText = 'Create Account';
+            if (subtitle) subtitle.innerText = 'Start a guided workspace for your career plan.';
+            if (usernameField) {
+                usernameField.style.display = 'grid';
+                usernameField.setAttribute('aria-hidden', 'false');
+                window.requestAnimationFrame(() => {
+                    usernameField.style.opacity = '1';
+                });
+            }
+            if (usernameInput) usernameInput.required = true;
+            setVisible(forgotPwd, false);
+            setVisible(guestForm, false);
+            setVisible(guestBtn, false);
+            if (submitBtn) submitBtn.innerText = 'Create Account';
+            if (togglePrefix) togglePrefix.innerText = 'Already have an account?';
+            if (toggleBtn) toggleBtn.innerText = 'Sign In';
+        } else {
+            if (authMode) authMode.value = 'login';
+            if (title) title.innerText = 'Welcome Back';
+            if (subtitle) subtitle.innerText = 'Log in to continue your roadmap, resume prep, and interview practice.';
+            if (usernameField) {
                 usernameField.style.opacity = '0';
-                setTimeout(() => { usernameField.style.display = 'none'; }, 300);
+                usernameField.setAttribute('aria-hidden', 'true');
+                window.setTimeout(() => {
+                    if (!isSignUpMode) usernameField.style.display = 'none';
+                }, 180);
+            }
+            if (usernameInput) {
                 usernameInput.required = false;
                 usernameInput.value = '';
-
-                forgotPwd.style.display = 'block';
-                guestBtn.style.display = 'block';
-
-                submitBtn.innerText = "Login";
-                togglePrefix.innerText = "Don't have an account?";
-                toggleBtn.innerText = "Sign Up";
             }
-
-            // Smooth fade in
-            subtitle.style.opacity = '1';
-            submitBtn.style.opacity = '1';
-            toggleContainer.style.opacity = '1';
-        }, 300);
-    }
-
-    function openForgotModal() {
-        const modal = document.getElementById('forgotPwdModal');
-        modal.classList.add('show');
-        resetModalState();
-        setTimeout(() => modal.classList.add('active'), 10);
-    }
-
-    function closeForgotModal() {
-        const modal = document.getElementById('forgotPwdModal');
-        modal.classList.remove('active');
-        setTimeout(() => modal.classList.remove('show'), 300);
-    }
-
-    function resetModalState() {
-        document.getElementById('fp-step-1').style.display = 'block';
-        document.getElementById('fp-step-2').style.display = 'none';
-        document.getElementById('fp-step-3').style.display = 'none';
-        document.getElementById('fpEmail').value = '';
-        document.getElementById('fpOtp').value = '';
-        document.getElementById('fpNewPwd').value = '';
-        document.getElementById('fpConfirmPwd').value = '';
-        document.getElementById('fpError1').style.display = 'none';
-        document.getElementById('fpError2').style.display = 'none';
-        document.getElementById('fpError3').style.display = 'none';
-        document.getElementById('fpSuccess').style.display = 'none';
-    }
-
-    async function sendOtp() {
-        const email = document.getElementById('fpEmail').value;
-        const err = document.getElementById('fpError1');
-        if (!email) { err.textContent = "Please enter your email"; err.style.display = 'block'; return; }
-
-        err.style.display = 'none';
-        document.getElementById('sendOtpText').textContent = "Sending...";
-        document.getElementById('sendOtpLoader').style.display = 'block';
-        document.getElementById('btnSendOtp').disabled = true;
-
-        try {
-            const res = await fetch('/api/forgot-password/send-otp', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email })
-            });
-            const data = await res.json();
-
-            document.getElementById('sendOtpText').textContent = "Send OTP";
-            document.getElementById('sendOtpLoader').style.display = 'none';
-            document.getElementById('btnSendOtp').disabled = false;
-
-            if (res.ok) {
-                if (data.status === "demo") {
-                    alert("⚠️ DEMO MODE: You haven't configured a real email server in .env yet!\n\nYour 6-digit OTP for " + data.email + " is: " + data.otp);
-                }
-                document.getElementById('fp-step-1').style.display = 'none';
-                document.getElementById('fp-step-2').style.display = 'block';
-            } else {
-                err.textContent = data.message;
-                err.style.display = 'block';
-            }
-        } catch (e) {
-            err.textContent = "Network Error";
-            err.style.display = 'block';
-        }
-    }
-
-    async function verifyOtp() {
-        const otp = document.getElementById('fpOtp').value;
-        const err = document.getElementById('fpError2');
-        if (!otp || otp.length < 6) { err.textContent = "Please enter a valid 6-digit OTP"; err.style.display = 'block'; return; }
-
-        err.style.display = 'none';
-        try {
-            const res = await fetch('/api/forgot-password/verify-otp', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ otp })
-            });
-            const data = await res.json();
-
-            if (res.ok) {
-                document.getElementById('fp-step-2').style.display = 'none';
-                document.getElementById('fp-step-3').style.display = 'block';
-            } else {
-                err.textContent = data.message;
-                err.style.display = 'block';
-            }
-        } catch (e) {
-            err.textContent = "Network Error";
-            err.style.display = 'block';
-        }
-    }
-
-    async function resetPassword() {
-        const newPwd = document.getElementById('fpNewPwd').value;
-        const confPwd = document.getElementById('fpConfirmPwd').value;
-        const err = document.getElementById('fpError3');
-        const success = document.getElementById('fpSuccess');
-
-        if (!newPwd || newPwd !== confPwd) {
-            err.textContent = "Passwords do not match!";
-            err.style.display = 'block';
-            return;
+            setVisible(forgotPwd, true);
+            setVisible(guestForm, true);
+            setVisible(guestBtn, true);
+            if (submitBtn) submitBtn.innerText = 'Sign In';
+            if (togglePrefix) togglePrefix.innerText = 'New to the platform?';
+            if (toggleBtn) toggleBtn.innerText = 'Create Account';
         }
 
-        err.style.display = 'none';
-        try {
-            const res = await fetch('/api/forgot-password/reset', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ new_password: newPwd })
-            });
-            const data = await res.json();
+        [subtitle, submitBtn, toggleContainer].forEach((element) => {
+            if (element) element.style.opacity = '1';
+        });
+    }, 180);
+}
 
-            if (res.ok) {
-                success.textContent = "Password smoothly reset! Please close and Login.";
-                success.style.display = 'block';
-                setTimeout(() => closeForgotModal(), 3000);
-            } else {
-                err.textContent = data.message;
-                err.style.display = 'block';
-            }
-        } catch (e) {
-            err.textContent = "Network Error";
-            err.style.display = 'block';
-        }
+function openForgotModal() {
+    const modal = byId('forgotPwdModal');
+    if (!modal) return;
+
+    resetModalState();
+    modal.classList.add('show');
+    modal.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('modal-open');
+
+    window.requestAnimationFrame(() => {
+        modal.classList.add('active');
+        const emailInput = byId('fpEmail');
+        if (emailInput) emailInput.focus();
+    });
+}
+
+function closeForgotModal() {
+    const modal = byId('forgotPwdModal');
+    if (!modal) return;
+
+    modal.classList.remove('active');
+    modal.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('modal-open');
+
+    window.setTimeout(() => {
+        modal.classList.remove('show');
+    }, 180);
+}
+
+function resetModalState() {
+    setVisible(byId('fp-step-1'), true, 'grid');
+    setVisible(byId('fp-step-2'), false);
+    setVisible(byId('fp-step-3'), false);
+
+    ['fpEmail', 'fpOtp', 'fpNewPwd', 'fpConfirmPwd'].forEach((id) => {
+        const field = byId(id);
+        if (field) field.value = '';
+    });
+
+    ['fpError1', 'fpError2', 'fpError3', 'fpSuccess'].forEach((id) => {
+        setMessage(byId(id), '');
+    });
+
+    const sendOtpText = byId('sendOtpText');
+    const sendOtpLoader = byId('sendOtpLoader');
+    const sendOtpButton = byId('btnSendOtp');
+    if (sendOtpText) sendOtpText.textContent = 'Send OTP';
+    if (sendOtpLoader) sendOtpLoader.style.display = 'none';
+    if (sendOtpButton) sendOtpButton.disabled = false;
+}
+
+async function sendOtp() {
+    const emailInput = byId('fpEmail');
+    const email = emailInput ? emailInput.value.trim() : '';
+    const err = byId('fpError1');
+
+    if (!email) {
+        setMessage(err, 'Please enter your email');
+        return;
     }
+
+    setMessage(err, '');
+    const sendOtpText = byId('sendOtpText');
+    const sendOtpLoader = byId('sendOtpLoader');
+    const sendOtpButton = byId('btnSendOtp');
+    if (sendOtpText) sendOtpText.textContent = 'Sending...';
+    if (sendOtpLoader) sendOtpLoader.style.display = 'inline-block';
+    if (sendOtpButton) sendOtpButton.disabled = true;
+
+    try {
+        const res = await fetch('/api/forgot-password/send-otp', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email })
+        });
+        const data = await res.json();
+
+        if (sendOtpText) sendOtpText.textContent = 'Send OTP';
+        if (sendOtpLoader) sendOtpLoader.style.display = 'none';
+        if (sendOtpButton) sendOtpButton.disabled = false;
+
+        if (res.ok) {
+            if (data.status === 'demo') {
+                alert('DEMO MODE: Email server is not configured yet.\n\nYour 6-digit OTP for ' + data.email + ' is: ' + data.otp);
+            }
+            setVisible(byId('fp-step-1'), false);
+            setVisible(byId('fp-step-2'), true, 'grid');
+            const otpInput = byId('fpOtp');
+            if (otpInput) otpInput.focus();
+        } else {
+            setMessage(err, data.message || 'Unable to send OTP. Please try again.');
+        }
+    } catch (error) {
+        if (sendOtpText) sendOtpText.textContent = 'Send OTP';
+        if (sendOtpLoader) sendOtpLoader.style.display = 'none';
+        if (sendOtpButton) sendOtpButton.disabled = false;
+        setMessage(err, 'Network error. Please try again.');
+    }
+}
+
+async function verifyOtp() {
+    const otpInput = byId('fpOtp');
+    const otp = otpInput ? otpInput.value.trim() : '';
+    const err = byId('fpError2');
+
+    if (!otp || otp.length < 6) {
+        setMessage(err, 'Please enter a valid 6-digit OTP');
+        return;
+    }
+
+    setMessage(err, '');
+    try {
+        const res = await fetch('/api/forgot-password/verify-otp', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ otp })
+        });
+        const data = await res.json();
+
+        if (res.ok) {
+            setVisible(byId('fp-step-2'), false);
+            setVisible(byId('fp-step-3'), true, 'grid');
+            const newPassword = byId('fpNewPwd');
+            if (newPassword) newPassword.focus();
+        } else {
+            setMessage(err, data.message || 'Invalid OTP. Please try again.');
+        }
+    } catch (error) {
+        setMessage(err, 'Network error. Please try again.');
+    }
+}
+
+async function resetPassword() {
+    const newPasswordInput = byId('fpNewPwd');
+    const confirmPasswordInput = byId('fpConfirmPwd');
+    const newPwd = newPasswordInput ? newPasswordInput.value : '';
+    const confPwd = confirmPasswordInput ? confirmPasswordInput.value : '';
+    const err = byId('fpError3');
+    const success = byId('fpSuccess');
+
+    if (!newPwd || newPwd !== confPwd) {
+        setMessage(success, '');
+        setMessage(err, 'Passwords do not match.');
+        return;
+    }
+
+    setMessage(err, '');
+    try {
+        const res = await fetch('/api/forgot-password/reset', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ new_password: newPwd })
+        });
+        const data = await res.json();
+
+        if (res.ok) {
+            setMessage(success, 'Password reset complete. Please sign in.');
+            window.setTimeout(() => closeForgotModal(), 2400);
+        } else {
+            setMessage(success, '');
+            setMessage(err, data.message || 'Unable to reset password. Please try again.');
+        }
+    } catch (error) {
+        setMessage(success, '');
+        setMessage(err, 'Network error. Please try again.');
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const modal = byId('forgotPwdModal');
+    if (modal) {
+        modal.addEventListener('click', (event) => {
+            if (event.target === modal) closeForgotModal();
+        });
+    }
+
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && modal && modal.classList.contains('show')) {
+            closeForgotModal();
+        }
+    });
+});

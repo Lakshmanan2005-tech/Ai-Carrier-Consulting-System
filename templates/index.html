@@ -803,7 +803,7 @@
                     Your Learning Journey</h3>
                 <p
                     style="color: var(--text-secondary); margin-bottom: 1.8rem; font-size: 0.95rem; line-height: 1.6; max-width: 450px; margin-left: auto; margin-right: auto;">
-                    Log in to store your roadmaps permanently and track your skill development over time.</p>
+                    Please <a href="{{ url_for('login') }}" style="color: var(--primary-color); font-weight: 700; text-decoration: none;">login</a> to store your roadmap and track your skill development over time.</p>
                 <a href="{{ url_for('login') }}" class="btn-gradient"
                     style="padding: 12px 30px; border-radius: 12px; text-decoration: none; font-weight: 700; font-size: 0.95rem; display: inline-block;">Get
                     Started Free</a>
@@ -902,11 +902,7 @@
                     Active Roadmaps</h3>
                 <p
                     style="color: var(--text-secondary); margin-bottom: 0; font-size: 0.95rem; line-height: 1.6; max-width: 450px; margin-left: auto; margin-right: auto;">
-                    Please <a href="{{ url_for('login') }}"
-                        style="color: var(--primary-color, #6366f1); font-weight: 700; text-decoration: none; border-bottom: 2px solid rgba(99, 102, 241, 0.2); transition: all 0.3s ease;"
-                        onmouseover="this.style.borderBottomColor='#6366f1'"
-                        onmouseout="this.style.borderBottomColor='rgba(99, 102, 241, 0.2)'">login</a> to store your
-                    roadmap</p>
+                    You haven't viewed any roadmaps yet. Start exploring skills to build your personalized career path!</p>
             </div>
             {% endif %}
         </div>

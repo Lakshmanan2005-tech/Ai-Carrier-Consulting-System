@@ -59,10 +59,11 @@ except Exception as e:
 NVIDIA_API_KEY = os.getenv('NVIDIA_API_KEY')
 GROQ_API_KEY = os.getenv('GROQ_API_KEY')
 GROQ_API_KEY_2 = os.getenv('GROQ_API_KEY_2.0')
+GROQ_CHAT_API_KEY = os.getenv('GROQ_CHAT_API_KEY')
 
 def get_groq_market_demand():
     """Fetches real-time IT market demand data using Groq Llama-3."""
-    if not GROQ_API_KEY:
+    if not GROQ_CHAT_API_KEY:
         # High-quality Mock Data if API key is missing
         return {
             "skills": [
@@ -77,7 +78,7 @@ def get_groq_market_demand():
     
     url = "https://api.groq.com/openai/v1/chat/completions"
     headers = {
-        "Authorization": f"Bearer {GROQ_API_KEY}",
+        "Authorization": f"Bearer {GROQ_CHAT_API_KEY}",
         "Content-Type": "application/json"
     }
     
@@ -109,6 +110,23 @@ def get_groq_market_demand():
     except Exception as e:
         print(f"Groq API Error: {e}")
         return None
+
+@app.route('/api/market-demand')
+def api_market_demand():
+    data = get_groq_market_demand()
+    if data is None:
+        return jsonify({"skills": []}), 500
+    if isinstance(data, str):
+        # AI returns a JSON string, try to parse it safely
+        try:
+            parsed = json.loads(data)
+            return jsonify(parsed)
+        except Exception as e:
+            print(f"Failed to parse Market Demand JSON: {e}")
+            return jsonify({"skills": []}), 500
+    # Mock data case (it returns a dict)
+    return jsonify(data)
+
 
 def generate_nvidia_roadmap(skill):
     """Generates an in-depth, expert-level 12-point roadmap using NVIDIA AI."""
