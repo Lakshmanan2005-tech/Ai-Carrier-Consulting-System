@@ -849,6 +849,73 @@
         border: 1px solid rgba(255, 255, 255, 0.08);
     }
 
+    /* ========== SKELETON LOADING ========== */
+    .rm-skeleton-card {
+        background: var(--card-bg, #ffffff);
+        border: 1px solid var(--border-color, rgba(0, 0, 0, 0.05));
+        border-radius: 18px;
+        padding: 2rem 1.5rem;
+        min-height: 420px;
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+        position: relative;
+        overflow: hidden;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .rm-skeleton-shimmer {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(0, 0, 0, 0.03),
+            transparent
+        );
+        animation: rm-shimmer 1.5s infinite;
+    }
+
+    body.dark-mode .rm-skeleton-shimmer {
+        background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(255, 255, 255, 0.05),
+            transparent
+        );
+    }
+
+    @keyframes rm-shimmer {
+        0% { transform: translateX(-100%); }
+        100% { transform: translateX(100%); }
+    }
+
+    .rm-skeleton-circle {
+        width: 50px;
+        height: 50px;
+        border-radius: 12px;
+        background: rgba(0, 0, 0, 0.05);
+        margin: 0 auto;
+    }
+
+    .rm-skeleton-line {
+        height: 14px;
+        background: rgba(0, 0, 0, 0.05);
+        border-radius: 8px;
+    }
+
+    body.dark-mode .rm-skeleton-card {
+        border-color: rgba(255, 255, 255, 0.05);
+    }
+
+    body.dark-mode .rm-skeleton-circle,
+    body.dark-mode .rm-skeleton-line {
+        background: rgba(255, 255, 255, 0.05);
+    }
+
     /* ====================================================
        COMPREHENSIVE DARK MODE — ALL CARDS, ICONS & ITEMS
        ==================================================== */
@@ -1377,6 +1444,66 @@
         .wa-panel-btn-primary, .wa-panel-btn-secondary { width: 100%; justify-content: center; }
     }
 
+    /* Industrial Workflow Inline Drawers */
+    .iw-inline-explanation {
+        display: none;
+        width: 100%;
+        margin-top: 15px;
+        padding: 1.5rem;
+        background: rgba(0, 0, 0, 0.02);
+        border-radius: 16px;
+        border: 1px dashed var(--stage-border, rgba(139, 92, 246, 0.2));
+        font-size: 0.95rem;
+        color: var(--text-secondary);
+        position: relative;
+        animation: slideDownIn 0.3s ease-out;
+        box-sizing: border-box;
+    }
+
+    @keyframes iwLoadingShimmer {
+        0% { opacity: 0.4; transform: scale(0.98); }
+        50% { opacity: 1; transform: scale(1); }
+        100% { opacity: 0.4; transform: scale(0.98); }
+    }
+
+    .iw-loading-state {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+        gap: 1rem;
+        animation: iwLoadingShimmer 1.5s infinite ease-in-out;
+    }
+
+    body.dark-mode .iw-inline-explanation {
+        background: rgba(255, 255, 255, 0.02);
+    }
+
+    .iw-desc-close {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        cursor: pointer;
+        color: #94a3b8;
+        padding: 5px;
+        transition: color 0.2s;
+    }
+
+    .iw-desc-close:hover {
+        color: #ef4444;
+    }
+
+    .iw-clickable-item {
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .iw-clickable-item:hover {
+        background: var(--stage-hover-bg, rgba(139, 92, 246, 0.05)) !important;
+        border-radius: 8px;
+    }
+
     /* Premium PDF Loading Toast (Box) */
     .pdf-loading-toast {
         display: none;
@@ -1573,7 +1700,53 @@
     </script>
 
     <!-- ===== ORDERED CARD GRID (JS-rendered in exact order) ===== -->
-    <div id="rm-main-grid" class="rm-grid"></div>
+    <div id="rm-main-grid" class="rm-grid">
+        <!-- Initial Skeleton Loaders (Removed by JS once data arrives) -->
+        <div class="rm-skeleton-card">
+            <div class="rm-skeleton-shimmer"></div>
+            <div class="rm-skeleton-circle"></div>
+            <div class="rm-skeleton-line" style="width: 60%; margin: 0 auto;"></div>
+            <div style="margin-top: 1rem; display: flex; flex-direction: column; gap: 0.8rem;">
+                <div class="rm-skeleton-line"></div>
+                <div class="rm-skeleton-line"></div>
+                <div class="rm-skeleton-line" style="width: 80%;"></div>
+                <div class="rm-skeleton-line"></div>
+            </div>
+        </div>
+        <div class="rm-skeleton-card">
+            <div class="rm-skeleton-shimmer"></div>
+            <div class="rm-skeleton-circle"></div>
+            <div class="rm-skeleton-line" style="width: 60%; margin: 0 auto;"></div>
+            <div style="margin-top: 1rem; display: flex; flex-direction: column; gap: 0.8rem;">
+                <div class="rm-skeleton-line"></div>
+                <div class="rm-skeleton-line"></div>
+                <div class="rm-skeleton-line" style="width: 80%;"></div>
+                <div class="rm-skeleton-line"></div>
+            </div>
+        </div>
+        <div class="rm-skeleton-card">
+            <div class="rm-skeleton-shimmer"></div>
+            <div class="rm-skeleton-circle"></div>
+            <div class="rm-skeleton-line" style="width: 60%; margin: 0 auto;"></div>
+            <div style="margin-top: 1rem; display: flex; flex-direction: column; gap: 0.8rem;">
+                <div class="rm-skeleton-line"></div>
+                <div class="rm-skeleton-line"></div>
+                <div class="rm-skeleton-line" style="width: 80%;"></div>
+                <div class="rm-skeleton-line"></div>
+            </div>
+        </div>
+        <div class="rm-skeleton-card">
+            <div class="rm-skeleton-shimmer"></div>
+            <div class="rm-skeleton-circle"></div>
+            <div class="rm-skeleton-line" style="width: 60%; margin: 0 auto;"></div>
+            <div style="margin-top: 1rem; display: flex; flex-direction: column; gap: 0.8rem;">
+                <div class="rm-skeleton-line"></div>
+                <div class="rm-skeleton-line"></div>
+                <div class="rm-skeleton-line" style="width: 80%;"></div>
+                <div class="rm-skeleton-line"></div>
+            </div>
+        </div>
+    </div>
 
     <!-- ===== INDUSTRIAL WORKFLOW SECTION ===== -->
     <style>
@@ -1665,13 +1838,13 @@
         }
 
         .iw-stage-dot {
-            width: 78px;
+            width: 70px;
             flex-shrink: 0;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 0.35rem;
-            padding-top: 0.2rem;
+            gap: 0.5rem;
+            padding-top: 0.4rem;
         }
 
         .iw-dot-circle {
@@ -1700,7 +1873,9 @@
             letter-spacing: 0.5px;
             text-transform: uppercase;
             text-align: center;
-            white-space: nowrap;
+            width: 100%;
+            word-wrap: break-word;
+            line-height: 1.2;
         }
 
         .iw-stage-body {
@@ -1837,6 +2012,35 @@
             border-color: rgba(99, 102, 241, 0.2);
         }
 
+        /* ===== CLICKABLE WORKFLOW ITEMS (TOOLS ONLY) ===== */
+        .iw-clickable-item {
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .rm-step-item.topic-clickable {
+            cursor: pointer;
+        }
+
+        .iw-clickable-item {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            padding: 4px 10px;
+            margin: -2px -10px;
+            border-radius: 8px;
+            display: block; /* Use block to remove default list styling */
+        }
+
+        .iw-clickable-item:hover {
+            background: var(--stage-hover-bg, rgba(99, 102, 241, 0.05));
+            color: var(--stage-color, #8b5cf6);
+            transform: translateX(4px);
+        }
+
+        body.dark-mode .iw-clickable-item:hover {
+            background: var(--stage-hover-dark-bg, rgba(99, 102, 241, 0.15));
+        }
+
         .rm-premium-subtitle {
             font-size: 0.75rem;
             color: var(--text-muted, #64748b);
@@ -1898,27 +2102,148 @@
         .iw-resp-list {
             list-style: none;
             padding: 0;
-            margin: 0;
+            margin: 0.5rem 0 0;
             display: flex;
             flex-direction: column;
-            gap: 0.35rem;
+            gap: 0.65rem;
         }
 
         .iw-resp-list li {
-            font-size: 0.78rem;
+            position: relative;
+            font-size: 0.88rem;
             color: var(--text-secondary, #475569);
-            line-height: 1.4;
-            display: flex;
-            gap: 0.45rem;
-            align-items: flex-start;
+            line-height: 1.5;
+            font-weight: 600;
+            opacity: 0;
+            transform: translateY(8px);
+            animation: iwItemFadeIn 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
         }
 
-        .iw-resp-list li::before {
-            content: '→';
-            flex-shrink: 0;
-            font-size: 0.7rem;
-            margin-top: 1px;
-            opacity: 0.5;
+        .iw-resp-list.iw-bullet-list li {
+            padding-left: 2rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .iw-resp-list.iw-bullet-list li::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0.45rem;
+            width: 10px;
+            height: 10px;
+            background: var(--bullet-color, #8b5cf6);
+            border-radius: 3px; /* Slightly rounded square for tech feel */
+            box-shadow: 0 0 6px var(--bullet-color, rgba(139, 92, 246, 0.25));
+            transition: all 0.3s ease;
+        }
+
+        .iw-resp-list.iw-bullet-list li:hover::before {
+            transform: scale(1.3) rotate(45deg);
+        }
+
+        /* --- Timeline Connection Line for Real Workflow --- */
+        .iw-resp-list.iw-timeline-list {
+            position: relative;
+            margin-top: 1.5rem;
+        }
+
+        .iw-resp-list.iw-timeline-list li {
+            padding-left: 0;
+            margin-bottom: 2.5rem;
+            display: grid;
+            grid-template-columns: 44px 1fr;
+            gap: 1.2rem;
+            align-items: flex-start;
+            position: relative;
+            z-index: 1;
+        }
+
+        .iw-resp-list.iw-timeline-list li::before {
+            display: none; /* Hide default dots */
+        }
+
+        .iw-resp-list.iw-timeline-list li:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            left: 21px; /* Perfectly centered with the 44px icon circle */
+            top: 3rem; 
+            bottom: -1.5rem;
+            width: 2px;
+            background: var(--bullet-color, #8b5cf6);
+            opacity: 0.2;
+            z-index: 0;
+        }
+
+        .iw-phase-icon-box {
+            position: relative;
+            z-index: 2;
+        }
+
+        .iw-phase-icon {
+            width: 36px;
+            height: 36px;
+            background: var(--card-bg, #fff);
+            border: 2px solid var(--bullet-color, #8b5cf6);
+            color: var(--bullet-color, #8b5cf6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-size: 0.9rem;
+            box-shadow: 0 0 8px var(--bullet-color, rgba(139, 92, 246, 0.15));
+            transition: all 0.3s ease;
+        }
+
+        .iw-phase-body {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            padding-top: 2px;
+        }
+
+        .iw-phase-badge {
+            align-self: flex-start;
+            font-size: 0.6rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            padding: 2px 8px;
+            border-radius: 5px;
+            background: var(--bullet-color, #8b5cf6);
+            color: #fff;
+            box-shadow: 0 2px 6px var(--bullet-color, rgba(139, 92, 246, 0.18));
+        }
+
+        .iw-phase-content {
+            font-size: 0.92rem;
+            line-height: 1.6;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .iw-resp-list.iw-timeline-list li:hover .iw-phase-icon {
+            transform: scale(1.15) rotate(5deg);
+            background: var(--bullet-color, #8b5cf6);
+            color: #fff;
+        }
+
+        body.dark-mode .iw-phase-icon {
+            background: #1a1f2e;
+        }
+
+        body.dark-mode .iw-resp-list.iw-timeline-list li:not(:last-child)::after {
+            opacity: 0.25;
+        }
+
+        @keyframes iwItemFadeIn {
+            from {
+                opacity: 0;
+                transform: translateX(-15px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
         }
 
         body.dark-mode .iw-resp-list li {
@@ -2242,6 +2567,75 @@
 
         body.dark-mode .iq-question {
             color: #cbd5e1;
+        }
+
+        /* Inline Explanation Themes (Aptitude-Style) */
+        .topic-clickable {
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .topic-clickable:hover {
+            background: rgba(139, 92, 246, 0.03) !important;
+        }
+
+        .rm-inline-explanation {
+            display: none;
+            flex: 1 1 100%;
+            margin-top: 12px;
+            padding: 1.5rem;
+            background: rgba(0, 0, 0, 0.02);
+            border-radius: 16px;
+            border: 1px dashed rgba(139, 92, 246, 0.2);
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            width: 100%;
+            position: relative;
+            animation: slideDownIn 0.3s ease-out;
+        }
+
+        @keyframes slideDownIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        body.dark-mode .rm-inline-explanation {
+            background: rgba(255, 255, 255, 0.02);
+            border-color: rgba(139, 92, 246, 0.1);
+        }
+
+        .rm-explanation-close {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            cursor: pointer;
+            color: #94a3b8;
+            padding: 5px;
+            transition: color 0.2s;
+        }
+
+        .rm-explanation-close:hover {
+            color: #ef4444;
+        }
+
+        .rm-inline-video-link {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 12px;
+            background: rgba(139, 92, 246, 0.05);
+            border-radius: 8px;
+            color: #8b5cf6 !important;
+            text-decoration: none !important;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: background 0.2s;
+            margin-top: 8px;
+            width: fit-content;
+        }
+
+        .rm-inline-video-link:hover {
+            background: rgba(139, 92, 246, 0.1);
         }
 
         .iq-answer {
@@ -2700,6 +3094,90 @@
             .guidance-actions { flex-direction: column; width: 100%; }
             .guidance-btn { width: 100%; justify-content: center; }
         }
+
+        /* Career Progression UI Overhaul */
+        .iw-role-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.25fr;
+            gap: 2rem;
+            margin-top: 1.5rem;
+        }
+
+        .iw-role-col-title {
+            font-size: 0.85rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .iw-skill-chip-wrap {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+
+        .iw-skill-chip {
+            padding: 8px 16px;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid transparent;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            background: color-mix(in srgb, var(--accent-color) 6%, white);
+        }
+
+        .iw-skill-chip:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            background: white !important;
+            border-color: color-mix(in srgb, var(--accent-color) 20%, transparent);
+        }
+
+        .iw-arrow-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .iw-arrow-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 10px;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            color: var(--text-secondary);
+        }
+
+        .iw-arrow-list li i {
+            margin-top: 5px;
+            font-size: 0.85rem;
+            opacity: 0.8;
+            color: var(--accent-color);
+        }
+
+        @media (max-width: 900px) {
+            .iw-role-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+            .iw-role-badges {
+                position: relative !important;
+                top: 0 !important;
+                margin-top: 0.5rem;
+                margin-bottom: 1.5rem;
+                justify-content: flex-start !important;
+                flex-wrap: wrap;
+            }
+            .iw-stage { gap: 0.8rem; }
+            .iw-stage-dot { width: 55px; }
+            .iw-dot-label { font-size: 0.55rem; }
+        }
     </style>
 
     <section class="iw-section">
@@ -2710,7 +3188,7 @@
                 you'll own.</p>
             <div
                 style="margin-top: 12px; font-size: 0.75rem; color: #8b5cf6; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; background: rgba(139, 92, 246, 0.1); padding: 5px 12px; border-radius: 20px; border: 1px solid rgba(139, 92, 246, 0.2);">
-                <i class="fa-solid fa-microchip"></i> Completely API Based Results
+                <i class="fa-solid fa-microchip"></i> Completely AI Based Results
             </div>
         </div>
 
@@ -2721,213 +3199,416 @@
 
     <script>
         (function () {
-            const skill = "{{ skill_query }}".toLowerCase().trim();
-            const cacheKey = `iw_cache_${skill}`;
+            const skill = "{{ skill_query }}".trim();
+            const cacheKey = `iw_cache_v9_${skill.toLowerCase().replace(/\s+/g, '_')}`;
             const track = document.getElementById('iw-track');
             if (!track) return;
 
-            // --- 1. Smart Cache Check (Instant Restore) ---
+            /* ─────────── UI CONFIG FOR SECTIONS ─────────── */
+            const sectionConfigs = {
+                industry_context: { name: 'Industry Context', icon: 'fa-building', color: '#8b5cf6' },
+                workflow: { name: 'Real Workflow', icon: 'fa-diagram-project', color: '#6366f1' },
+                intern: { name: 'Intern', icon: 'fa-seedling', color: '#8b5cf6' },
+                junior: { name: 'Junior Developer', icon: 'fa-code', color: '#10b981' },
+                mid: { name: 'Mid-Level Developer', icon: 'fa-laptop-code', color: '#f59e0b' },
+                senior: { name: 'Senior Developer', icon: 'fa-user-tie', color: '#0ea5e9' },
+                lead: { name: 'Lead / Architect', icon: 'fa-chess-king', color: '#eab308' },
+                tasks: { name: 'Real Tasks', icon: 'fa-list-check', color: '#f43f5e' },
+                tools: { name: 'Tools Used', icon: 'fa-toolbox', color: '#8b5cf6' },
+                challenges: { name: 'Common Challenges', icon: 'fa-triangle-exclamation', color: '#ef4444' },
+                deliverables: { name: 'Deliverables', icon: 'fa-box-open', color: '#6366f1' },
+                reality_check: { name: 'Reality Check', icon: 'fa-eye', color: '#f59e0b' }
+            };
+
+            const getColorMeta = (color) => ({
+                border: `color-mix(in srgb, ${color} 30%, transparent)`,
+                bg: `color-mix(in srgb, ${color} 8%, transparent)`,
+                expBg: `color-mix(in srgb, ${color} 8%, transparent)`,
+                expColor: color,
+                expBorder: `color-mix(in srgb, ${color} 20%, transparent)`
+            });
+
+            // --- 1. Smart Cache Check ---
             const cachedStr = sessionStorage.getItem(cacheKey);
             if (cachedStr) {
                 try {
                     const cached = JSON.parse(cachedStr);
-                    const age = Date.now() - cached.timestamp;
-                    if (age < 15000) { // 15 second refresh window
-                        track.innerHTML = cached.html;
-                        return; // EXIT: Restored instantly
-                    }
+                    track.innerHTML = cached.html;
+                    return;
                 } catch (e) { sessionStorage.removeItem(cacheKey); }
             }
 
-            /* ─────────── STAGE DEFINITIONS ─────────── */
-            const stagesMeta = [
-                {
-                    name: 'Intern',
-                    exp: '0 – 6 months',
-                    color: '#8b5cf6', border: 'rgba(139,92,246,0.3)', bg: 'rgba(139,92,246,0.08)',
-                    dotColor: '#8b5cf6',
-                    icon: 'fa-seedling',
-                    ctc: 'Stipend / Unpaid',
-                    labelColor: '#8b5cf6',
-                    expBg: 'rgba(139,92,246,0.08)', expColor: '#8b5cf6', expBorder: 'rgba(139,92,246,0.2)',
-                },
-                {
-                    name: 'Junior Developer',
-                    exp: '0 – 2 yrs',
-                    color: '#6366f1', border: 'rgba(99,102,241,0.3)', bg: 'rgba(99,102,241,0.08)',
-                    dotColor: '#6366f1',
-                    icon: 'fa-code',
-                    ctc: '₹3.5L – ₹7L / yr',
-                    labelColor: '#6366f1',
-                    expBg: 'rgba(99,102,241,0.08)', expColor: '#6366f1', expBorder: 'rgba(99,102,241,0.2)',
-                },
-                {
-                    name: 'Mid-Level Developer',
-                    exp: '2 – 5 yrs',
-                    color: '#3b82f6', border: 'rgba(59,130,246,0.3)', bg: 'rgba(59,130,246,0.08)',
-                    dotColor: '#3b82f6',
-                    icon: 'fa-laptop-code',
-                    ctc: '₹8L – ₹18L / yr',
-                    labelColor: '#3b82f6',
-                    expBg: 'rgba(59,130,246,0.08)', expColor: '#3b82f6', expBorder: 'rgba(59,130,246,0.2)',
-                },
-                {
-                    name: 'Senior Developer',
-                    exp: '5 – 10 yrs',
-                    color: '#10b981', border: 'rgba(16,185,129,0.3)', bg: 'rgba(16,185,129,0.08)',
-                    dotColor: '#10b981',
-                    icon: 'fa-star',
-                    ctc: '₹18L – ₹40L / yr',
-                    labelColor: '#10b981',
-                    expBg: 'rgba(16,185,129,0.08)', expColor: '#10b981', expBorder: 'rgba(16,185,129,0.2)',
-                },
-                {
-                    name: 'Lead / Architect',
-                    exp: '10+ yrs',
-                    color: '#f59e0b', border: 'rgba(245,158,11,0.3)', bg: 'rgba(245,158,11,0.08)',
-                    dotColor: '#f59e0b',
-                    icon: 'fa-crown',
-                    ctc: '₹40L+ / yr',
-                    labelColor: '#f59e0b',
-                    expBg: 'rgba(245,158,11,0.08)', expColor: '#f59e0b', expBorder: 'rgba(245,158,11,0.2)',
-                },
-            ];
+            // --- 2. Loading State ---
+            track.innerHTML = `
+                <div style="grid-column: 1/-1; text-align: center; padding: 4rem 2rem;">
+                    <div class="wa-inline-spinner" style="width: 40px; height: 40px; border-width: 4px; border-top-color: #8b5cf6; margin-bottom: 1.5rem;"></div>
+                    <h3 style="font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; color: var(--text-primary);">Analyzing Industry Workflows...</h3>
+                    <p style="color: var(--text-secondary); margin-top: 0.5rem;">Generating role expectations and real-world checklists for ${skill}</p>
+                </div>`;
 
-            /* ─────────── SKILL-SPECIFIC STAGE DATA ─────────── */
-            const skillProfiles = {
-                python: {
-                    intern: { skills: ['🐍 Python basics', '🧱 OOP', '🌿 Git', '🔌 REST APIs', '📊 SQL basics', '🎸 Flask/Django intro', '📓 Jupyter'], resp: ['Fix bugs in existing codebase', 'Write unit tests', 'Document functions', 'Assist in data cleaning tasks', 'Attend code reviews'] },
-                    junior: { skills: ['🎸 Django/Flask', '🔗 SQLAlchemy', '🐘 PostgreSQL', '🐳 Docker basics', '🔌 REST API design', '🃏 Pytest', '🐧 Linux CLI'], resp: ['Build feature modules', 'Write & run automated tests', 'Participate in sprint planning', 'Debug production issues', 'Collaborate via Git PRs'] },
-                    mid: { skills: ['🥬 Celery', '⚡ Redis', '🏗️ Microservices', '☁️ AWS/GCP', '🔄 CI/CD pipelines', '📡 GraphQL', '⚙️ Performance tuning'], resp: ['Design API architecture', 'Mentor interns & juniors', 'Own feature delivery end-to-end', 'Review PRs & enforce code quality', 'Integrate third-party services'] },
-                    senior: { skills: ['🏛️ System design', '🌐 Distributed systems', '🚇 Kafka', '🛳️ Kubernetes', '🔒 Security best practices', '💰 Cost optimization'], resp: ['Architect backend systems', 'Define tech standards', 'Lead cross-team initiatives', 'Drive hiring & interviews', 'Resolve production incidents'] },
-                    lead: { skills: ['☁️ Cloud architecture', '🤖 MLOps', '💵 FinOps', '🤝 Stakeholder management', '🗺️ Strategic roadmapping', '⚖️ Vendor evaluation'], resp: ['Set engineering direction', 'Align tech with business goals', 'Budget & team scaling', 'Executive reporting', 'Evaluate emerging technologies'] },
-                },
-                javascript: {
-                    intern: { skills: ['🌐 HTML/CSS', '📜 JS ES6+', '🌿 Git', '💻 Chrome DevTools', '⚛️ React basics', '📦 npm', '🔌 REST fetch'], resp: ['Build UI components', 'Fix UI bugs', 'Write markup from designs', 'Attend standups', 'Review wireframes'] },
-                    junior: { skills: ['⚛️ React/Vue', '📘 TypeScript', '📦 Webpack/Vite', '🔌 REST & GraphQL', '🃏 Jest', '🎨 SCSS', '♿ Accessibility'], resp: ['Develop feature UIs', 'Connect APIs to frontend', 'Fix cross-browser issues', 'Write component tests', 'Improve UI performance'] },
-                    mid: { skills: ['⚛️ Next.js', '📊 State management', '🔌 WebSockets', '🚀 SSR/SSG', '🔄 CI/CD', '⚡ Web performance', '📱 PWA'], resp: ['Own frontend architecture decisions', 'Lead UI redesigns', 'Conduct performance audits', 'Mentor juniors', 'Drive DX improvements'] },
-                    senior: { skills: ['🏗️ Micro-frontends', '🔗 Module federation', '🎨 Design systems', '📦 Monorepos', '♿ Accessibility audits', '📈 Analytics integration'], resp: ['Define frontend standards', 'Scale component libraries', 'Interview candidates', 'Collaborate with product & design', 'Drive technical debt reduction'] },
-                    lead: { skills: ['🚀 Platform strategy', '🤝 Multi-team coordination', '💵 FinOps', '🤝 Stakeholder alignment', '🎯 OKR planning'], resp: ['Own frontend platform vision', 'Manage engineering squads', 'Represent tech in board updates', 'Drive cross-product consistency', 'Build frontend culture'] },
-                },
-                java: {
-                    intern: { skills: ['☕ Core Java', '🧱 OOP', '🏗️ Maven', '🍃 Spring MVC basics', '🐬 MySQL', '🌿 Git', '🃏 JUnit'], resp: ['Write utility classes', 'Fix reported bugs', 'Write basic unit tests', 'Study codebase conventions', 'Participate in reviews'] },
-                    junior: { skills: ['🍃 Spring Boot', '❄️ Hibernate', '🔌 REST APIs', '🐳 Docker', '🔗 JPA', '🐘 PostgreSQL', '📖 Swagger'], resp: ['Build REST endpoints', 'Write integration tests', 'Maintain API documentation', 'Implement business logic', 'Support deployments'] },
-                    mid: { skills: ['🏗️ Microservices', '🚇 Kafka', '⚡ Redis', '🛳️ Kubernetes', '☁️ AWS', '🔄 CQRS/Event sourcing', '🔑 OAuth2'], resp: ['Architect service boundaries', 'Drive API versioning', 'Design for high availability', 'Review and merge PRs', 'Own sprint velocity'] },
-                    senior: { skills: ['⚙️ JVM tuning', '🌐 Distributed systems', '🏛️ System design', '🛡️ Security (OWASP)', '🛠️ SRE practices'], resp: ['Lead backend guild', 'Define coding standards', 'Own architecture decisions', 'Liaise with DevOps teams', 'Drive incident post-mortems'] },
-                    lead: { skills: ['🏛️ Enterprise architecture', '⚖️ Vendor selection', '💵 Cost governance', '📈 Team growth strategy', '⚠️ Risk management'], resp: ['Set technical vision', 'Manage engineering budget', 'Align with CTO roadmap', 'Scale engineering org', 'Recruit principal engineers'] },
-                },
-                react: {
-                    intern: { skills: ['🌐 HTML/CSS', '📜 JSX', '⚛️ Props & State', '🌿 Git', '📦 npm', '💻 Chrome DevTools'], resp: ['Build presentational components', 'Fix styling bugs', 'Implement layouts from Figma', 'Read component documentation', 'Attend sprint demos'] },
-                    junior: { skills: ['⚛️ Hooks', '🛣️ React Router', '📦 Context API', '🔌 Axios', '🃏 Jest/RTL', '🎨 CSS-in-JS', '📱 Responsive design'], resp: ['Develop reusable components', 'Integrate REST APIs', 'Write component tests', 'Collaborate with UX designers', 'Fix accessibility issues'] },
-                    mid: { skills: ['🟣 Redux/Zustand', '⚛️ Next.js', '📦 Code splitting', '⚡ Web performance', '🎨 Storybook', '📡 GraphQL/Apollo'], resp: ['Design component architecture', 'Lead feature development', 'Conduct code reviews', 'Drive performance optimizations', 'Define frontend conventions'] },
-                    senior: { skills: ['🏗️ Micro-frontends', '🔗 Module federation', '🎨 Design systems', '📦 Monorepo tooling', '♿ A11y audits', '📈 Analytics'], resp: ['Scale component library', 'Mentor frontend team', 'Drive technical decisions', 'Represent frontend in architecture meetings', 'Optimize CI/CD pipelines'] },
-                    lead: { skills: ['🚀 Frontend platform strategy', '🤝 Multi-team alignment', '💵 FinOps', '🎯 Roadmap planning', '🤝 Stakeholder management'], resp: ['Own frontend ecosystem', 'Grow engineering squads', 'Set quality benchmarks', 'Align with product leadership', 'Drive frontend culture'] },
-                },
-                datascience: {
-                    intern: { skills: ['🐍 Python', '🐼 Pandas', '🔢 NumPy', '📈 Matplotlib', '🤖 Basic ML (sklearn)', '📊 SQL', '📓 Jupyter'], resp: ['Data cleaning & EDA', 'Create visualizations', 'Assist model validation', 'Document datasets', 'Run baseline experiments'] },
-                    junior: { skills: ['🤖 Scikit-learn', '🛠️ Feature engineering', '📊 SQL', '📈 Statistical analysis', '🌿 Git', '🎯 Model evaluation metrics', '📊 Power BI/Tableau'], resp: ['Build classification/regression models', 'Work on A/B testing', 'Prepare data pipelines', 'Present insights to stakeholders', 'Maintain model versions'] },
-                    mid: { skills: ['🔥 TensorFlow/PyTorch', '🤖 MLflow', '🌪️ Airflow', '⚡ Spark', '☁️ Cloud ML', '📈 Time series', '🗣️ NLP basics'], resp: ['Design end-to-end ML pipelines', 'Deploy models to production', 'Own model monitoring', 'Lead data initiatives', 'Collaborate with business teams'] },
-                    senior: { skills: ['🧠 LLMs', '🤖 MLOps', '🗄️ Feature stores', '📈 Causal inference', '🧠 Deep learning', '🌐 Distributed training'], resp: ['Define ML strategy', 'Drive research prototypes to production', 'Mentor DS team', 'Architect data platform', 'Present to C-suite'] },
-                    lead: { skills: ['🤖 AI strategy', '🛡️ Data governance', '👥 Team leadership', '⚖️ Vendor evaluation', '📊 BI ecosystem design'], resp: ['Set AI/data vision', 'Align ML roadmap with business', 'Manage data science org', 'Ensure model ethics & compliance', 'Drive revenue through data'] },
-                },
-                default: {
-                    intern: { skills: ['🧩 Core fundamentals', '🌿 Git version control', '💡 Problem solving', '📝 Documentation', '💬 Team communication', '🧪 Unit testing basics'], resp: ['Fix existing bugs', 'Build small features', 'Write unit tests', 'Attend code reviews', 'Learn codebase conventions'] },
-                    junior: { skills: ['🏗️ Framework proficiency', '🔌 REST APIs', '📊 Database basics', '🐳 Docker basics', '🔄 CI/CD basics', '🏃 Agile workflow'], resp: ['Build feature modules', 'Write automated tests', 'Collaborate via PRs', 'Fix production bugs', 'Deliver sprint tasks'] },
-                    mid: { skills: ['🏛️ System design', '☁️ Cloud platforms', '🏗️ Microservices', '⚙️ Performance tuning', '🔒 Security fundamentals', '👥 Mentoring'], resp: ['Own feature delivery', 'Design technical solutions', 'Conduct code reviews', 'Mentor junior developers', 'Drive sprint planning'] },
-                    senior: { skills: ['🌐 Distributed systems', '🧩 Architecture patterns', '🛠️ SRE practices', '👥 Cross-team leadership', '🎯 Technical strategy'], resp: ['Architect systems', 'Set coding standards', 'Lead technical interviews', 'Drive incident management', 'Collaborate with product leadership'] },
-                    lead: { skills: ['🚀 Engineering strategy', '🤝 Stakeholder management', '💵 Budget & resource planning', '👥 Org design', '🗺️ Technology roadmapping'], resp: ['Set technical direction', 'Grow and scale the team', 'Align tech with business goals', 'Drive hiring strategy', 'Executive-level reporting'] },
-                },
-            };
+            function makeCard(key, content, isList = false) {
+                const config = sectionConfigs[key] || { name: key.toUpperCase(), icon: 'fa-circle-info', color: '#64748b' };
+                const meta = getColorMeta(config.color);
+                
+                const timelineConfigs = {
+                    'workflow': { label: 'Phase', icons: ['fa-magnifying-glass', 'fa-gears', 'fa-vial', 'fa-rocket', 'fa-check-double'] },
+                    'industry_context': { label: '', icons: ['fa-building-columns', 'fa-users-gear', 'fa-chart-pie', 'fa-landmark', 'fa-briefcase'] },
+                    'deliverables': { label: '', icons: ['fa-file-signature', 'fa-box-open', 'fa-circle-check', 'fa-award', 'fa-clipboard-list'] }
+                };
 
-            function getProfile(skill) {
-                const clean = skill.replace(/[\s-]/g, '').toLowerCase();
-                for (const key of Object.keys(skillProfiles)) {
-                    if (clean.includes(key) || clean === key) return skillProfiles[key];
+                const timeline = timelineConfigs[key];
+                let bodyContent = '';
+                if (Array.isArray(content)) {
+                    // Allow markdown bolding and ensure bullet cleaning for list items
+                    const formatItem = text => text.replace(/\*\*(.*?)\*\*/g, '<strong style="color: var(--text-primary); font-weight: 800;">$1</strong>');
+                    // Clean list based on user preference (removing bullets/icons for tools/challenges)
+                    // Enable bullets for all sections that don't use the specialized timeline layout
+                    const timelineClass = timeline ? 'iw-timeline-list' : '';
+                    const bulletClass = timeline ? '' : 'iw-bullet-list';
+                    
+                    bodyContent = `<ul class="iw-resp-list ${bulletClass} ${timelineClass}" style="--bullet-color: ${config.color};">
+                        ${content.map((item, idx) => {
+                            const cleanItem = item.replace(/^[•\-\d\.]+\s*/, '');
+                            const animatedStyle = `animation-delay: ${idx * 0.18}s`;
+                            
+                            // Only 'tools' section items are clickable as per user request
+                            if (key === 'tools') {
+                                // Use data-topic attribute to avoid complex quote escaping issues in onclick
+                                const safeDataTopic = cleanItem.replace(/"/g, "&quot;");
+                                return `
+                                <li style="${animatedStyle}; list-style:none;" class="iw-clickable-item" onclick="toggleIwSkillExplanation(this, this.getAttribute('data-topic'), '${config.color}')" data-topic="${safeDataTopic}">
+                                    <div style="display:flex; align-items:flex-start; gap:10px;">
+                                        <span>${formatItem(cleanItem)}</span>
+                                    </div>
+                                    <div class="iw-inline-explanation"></div>
+                                </li>`;
+                            }
+
+                            if (timeline) {
+                                const icon = timeline.icons[idx % timeline.icons.length];
+                                return `
+                                <li style="${animatedStyle} list-style: none;">
+                                    <div class="iw-phase-icon-box">
+                                        <div class="iw-phase-icon"><i class="fa-solid ${icon}"></i></div>
+                                    </div>
+                                    <div class="iw-phase-body">
+                                        ${timeline.label ? `<span class="iw-phase-badge">${timeline.label} ${idx + 1}</span>` : ''}
+                                        <div class="iw-phase-content">${formatItem(cleanItem)}</div>
+                                    </div>
+                                </li>`;
+                            }
+                            
+                            return `<li style="${animatedStyle}">${formatItem(cleanItem)}</li>`;
+                        }).join('')}
+                    </ul>`;
+                } else if (typeof content === 'string') {
+                    if (content.trim().startsWith('<div')) {
+                        bodyContent = content; // Allows inserting pre-formatted rich HTML block
+                    } else {
+                        // Force list rendering for major descriptive sections
+                        const listForcedKeys = ['industry_context', 'workflow', 'deliverables', 'reality_check'];
+                        const isMainSection = listForcedKeys.includes(key);
+                        
+                        // Smart line splitting: try newlines first, then sentence-based if it's a main section
+                        let lines = content.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+                        if (lines.length === 1 && isMainSection && content.includes('.')) {
+                            lines = content.split(/(?<=[.!?])\s+/).map(l => l.trim()).filter(l => l.length > 0);
+                        }
+
+                        const isBulletList = isMainSection || (lines.length > 1 && lines.every(line => /^[•\-\d\.]/.test(line)));
+                        
+                        const formatText = text => text.replace(/\*\*(.*?)\*\*/g, '<strong style="color: var(--text-primary); font-weight: 800;">$1</strong>');
+                        
+                        if (isBulletList) {
+                            const timelineClass = timeline ? 'iw-timeline-list' : '';
+                            
+                            bodyContent = `<ul class="iw-resp-list iw-bullet-list ${timelineClass}" style="--bullet-color: ${config.color};">
+                                ${lines.map((line, idx) => {
+                                    const cleanLine = line.replace(/^[•\-\d\.]+\s*/, ''); // Clean leading bullets/numbers
+                                    const animatedStyle = `animation-delay: ${idx * 0.18}s`;
+                                    
+                                    if (timeline) {
+                                        const icon = timeline.icons[idx % timeline.icons.length];
+                                        return `
+                                        <li style="${animatedStyle} list-style: none;">
+                                            <div class="iw-phase-icon-box">
+                                                <div class="iw-phase-icon"><i class="fa-solid ${icon}"></i></div>
+                                            </div>
+                                            <div class="iw-phase-body">
+                                                ${timeline.label ? `<span class="iw-phase-badge">${timeline.label} ${idx + 1}</span>` : ''}
+                                                <div class="iw-phase-content">${formatText(cleanLine)}</div>
+                                            </div>
+                                        </li>`;
+                                    }
+                                    
+                                    return `<li style="${animatedStyle}">${formatText(cleanLine)}</li>`;
+                                }).join('')}
+                            </ul>`;
+                        } else {
+                            bodyContent = `<p style="font-size: 0.95rem; line-height: 1.6; color: var(--text-primary); font-weight: 600;">${formatText(content)}</p>`;
+                        }
+                    }
                 }
-                return skillProfiles.default;
+
+                const isToolsCard = (key === 'tools');
+                return `
+                <div class="iw-stage">
+                    <div class="iw-stage-dot">
+                        <div class="iw-dot-circle" style="border-color:${meta.border}; color:${config.color}; box-shadow: 0 0 0 4px ${meta.bg};">
+                            <i class="fa-solid ${config.icon}"></i>
+                        </div>
+                        <span class="iw-dot-label" style="color:${config.color}; text-align: center; width: 80px; font-size: 0.7rem;">${config.name}</span>
+                    </div>
+                    <div class="iw-stage-body" style="
+                        --stage-color: ${config.color};
+                        --stage-border: ${meta.border};
+                        --stage-hover-bg: ${meta.bg};
+                        --stage-hover-dark-bg: color-mix(in srgb, ${config.color} 12%, transparent);
+                        --stage-shadow: ${meta.bg};
+                    ">
+                        <div class="iw-stage-top">
+                            <span class="iw-stage-name">${config.name}</span>
+                        </div>
+                        <div class="iw-stage-cols" style="display: block;">
+                            <div style="margin-top: 0.5rem;">
+                                ${bodyContent}
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
             }
 
-            window.toggleIwDesc = async function (elem, skillName, color) {
-                const container = elem.closest('.iw-stage-cols');
-                let descBox = container.querySelector('.iw-desc-box');
+            function formatRole(role, color = '#64748b') {
+                const meta = getColorMeta(color);
+                return `
+                <div class="iw-role-container" style="--accent-color: ${color}; position: relative;">
+                    <!-- Badge Section -->
+                    <div class="iw-role-badges" style="position: absolute; top: -50px; right: 0; display: flex; gap: 10px; align-items: center; justify-content: flex-end;">
+                        <span style="background: color-mix(in srgb, ${color} 10%, #f3f0ff); color: ${color}; padding: 6px 16px; border-radius: 20px; font-weight: 700; font-size: 0.75rem; text-transform: uppercase;">
+                            ${role.duration}
+                        </span>
+                        <span style="background: color-mix(in srgb, #10b981 10%, #ecfdf5); color: #059669; padding: 6px 16px; border-radius: 20px; font-weight: 700; font-size: 0.75rem; text-transform: uppercase;">
+                            ${role.salary}
+                        </span>
+                    </div>
 
-                // If clicking the same pill, toggle it off
-                if (descBox.style.display === 'block' && descBox.dataset.currentSkill === skillName) {
+                    <div class="iw-role-grid">
+                        <!-- Left Column: Skills -->
+                        <div>
+                            <div class="iw-role-col-title" style="color: ${color};">
+                                <i class="fa-solid fa-wrench"></i> EXPECTED SKILLS
+                            </div>
+                            <div class="iw-skill-chip-wrap">
+                                ${(role.expected_skills || []).map(s => {
+                                    const cleanText = s.replace(/[\u{1F300}-\u{1F64F}\u{1F680}-\u{1F6FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F900}-\u{1F9FF}\u{1F3FB}-\u{1F3FF}\u{1F1E6}-\u{1F1FF}]/gu, '').trim();
+                                    return `
+                                    <div style="position: relative;">
+                                        <div class="iw-skill-chip" 
+                                             onclick="toggleIwSkillExplanation(this, '${cleanText.replace(/'/g, "\\'")}', '${color}')"
+                                             style="border-color: color-mix(in srgb, ${color} 15%, transparent);">
+                                            ${s}
+                                        </div>
+                                        <div class="iw-inline-explanation"></div>
+                                    </div>`;
+                                }).join('')}
+                            </div>
+                        </div>
+
+                        <!-- Right Column: Responsibilities -->
+                        <div>
+                            <div class="iw-role-col-title" style="color: ${color};">
+                                <i class="fa-solid fa-list-ul"></i> ROLES & RESPONSIBILITIES
+                            </div>
+                            <ul class="iw-arrow-list">
+                                ${(role.responsibilities || []).map((r, idx) => `
+                                    <li style="animation-delay: ${idx * 0.1}s">
+                                        <i class="fa-solid fa-arrow-right"></i>
+                                        <span>${r}</span>
+                                    </li>
+                                `).join('')}
+                            </ul>
+                        </div>
+                    </div>
+                </div>`;
+            }
+
+            // Global logic for skill explanations in Industrial Workflow
+            window.toggleIwSkillExplanation = async function(pill, topic, color) {
+                // Prioritize local child box (Tools section) first, then fallback to sibling (Role cards)
+                const descBox = pill.querySelector('.iw-inline-explanation') || 
+                                pill.parentElement.querySelector('.iw-inline-explanation');
+                
+                if (!descBox) return;
+
+                await handleIwExpansion(pill, descBox, topic, color);
+            };
+
+            // --- Frontend Resilience Layer ---
+            const iwSessionCache = {};
+            async function fetchWithResilience(url, retries = 3) {
+                if (iwSessionCache[url]) return iwSessionCache[url];
+                for (let i = 0; i < retries; i++) {
+                    try {
+                        const r = await fetch(url);
+                        if (!r.ok) throw new Error(`Status ${r.status}`);
+                        const d = await r.json();
+                        iwSessionCache[url] = d;
+                        return d;
+                    } catch (err) {
+                        if (i === retries - 1) throw err;
+                        await new Promise(res => setTimeout(res, 1000));
+                    }
+                }
+            }
+
+            async function handleIwExpansion(pill, descBox, topic, color) {
+                if (descBox.style.display === 'block') {
                     descBox.style.display = 'none';
                     return;
                 }
 
-                const closeIcon = `<i class="fa-solid fa-xmark iw-desc-close" onclick="this.parentElement.style.display='none'"></i>`;
-                descBox.innerHTML = `${closeIcon}<strong>${skillName}:</strong> <span style="font-style: italic; opacity: 0.8;"><i class="fa-solid fa-circle-notch fa-spin"></i> Generating with Groq AI...</span>`;
-                descBox.style.borderLeftColor = color;
+                // Close other drawers in the same card or list
+                const card = pill.closest('.iw-stage-body');
+                const list = pill.closest('ul');
+                if (card) {
+                    card.querySelectorAll('.iw-inline-explanation').forEach(box => {
+                        if (box !== descBox) box.style.display = 'none';
+                    });
+                } else if (list) {
+                    list.querySelectorAll('.iw-inline-explanation').forEach(box => {
+                        if (box !== descBox) box.style.display = 'none';
+                    });
+                }
+
                 descBox.style.display = 'block';
-                descBox.dataset.currentSkill = skillName;
+                descBox.style.borderLeft = `4px solid ${color}`;
+                descBox.innerHTML = `
+                    <div class="iw-loading-state">
+                        <div style="width: 40px; height: 40px; border: 3px solid color-mix(in srgb, ${color} 20%, transparent); border-top: 3px solid ${color}; border-radius: 50%; animation: waSpinInline 0.8s linear infinite;"></div>
+                        <div style="text-align:center;">
+                            <div style="font-size: 0.85rem; font-weight: 800; color: ${color}; letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 4px;">Consulting AI Mentor</div>
+                            <div style="font-size: 0.75rem; color: var(--text-secondary); font-weight: 500;">Synthesizing Industrial Intelligence...</div>
+                        </div>
+                    </div>`;
 
                 try {
-                    const response = await fetch(`/api/explain_skill?skill=${encodeURIComponent(skillName)}`);
-                    const data = await response.json();
-                    if (data.explanation) {
-                        descBox.innerHTML = `${closeIcon}<strong>${skillName}:</strong> (Powered by Groq ✨) <br> ${data.explanation}`;
-                    } else {
-                        descBox.innerHTML = `${closeIcon}<strong>${skillName}:</strong> Could not fetch explanation. Please try again.`;
-                    }
-                } catch (err) {
-                    descBox.innerHTML = `${closeIcon}<strong>${skillName}:</strong> Error fetching explanation.`;
-                }
-            };
+                    const d = await fetchWithResilience(`/api/topic-explanation?topic=${encodeURIComponent(topic)}&roadmap=${encodeURIComponent(skill)}`);
+                    
+                    if (d.error || !d.explanation) throw new Error(d.error || "No data");
 
-            function makeStage(meta, data) {
-                return `
-            <div class="iw-stage">
-                <div class="iw-stage-dot">
-                    <div class="iw-dot-circle" style="border-color:${meta.border}; color:${meta.dotColor}; box-shadow: 0 0 0 4px ${meta.bg};">
-                        <i class="fa-solid ${meta.icon}"></i>
-                    </div>
-                    <span class="iw-dot-label" style="color:${meta.labelColor};">${meta.name.split(' ')[0]}</span>
-                </div>
-                <div class="iw-stage-body" style="
-                    --stage-color: ${meta.dotColor};
-                    --stage-border: ${meta.border};
-                    --stage-hover-bg: ${meta.bg};
-                    --stage-hover-dark-bg: color-mix(in srgb, ${meta.dotColor} 12%, transparent);
-                    --stage-shadow: ${meta.bg};
-                ">
-                    <div class="iw-stage-top">
-                        <span class="iw-stage-name">${meta.name}</span>
-                        <div style="display:flex;gap:0.4rem;flex-wrap:wrap;align-items:center;">
-                            <span class="iw-stage-exp" style="background:${meta.expBg};color:${meta.expColor};border:1px solid ${meta.expBorder};">${meta.exp}</span>
-                            <span class="iw-stage-ctc">${meta.ctc}</span>
-                        </div>
-                    </div>
-                    <div class="iw-stage-cols">
-                        <div>
-                            <div class="iw-col-label" style="color:${meta.dotColor};"><i class="fa-solid fa-wrench"></i> Expected Skills</div>
-                            <div class="iw-pill-wrap">
-                                ${data.skills.map(s => `<span class="iw-pill" onclick="toggleIwDesc(this, '${s.replace(/'/g, "\\'")}', '${meta.dotColor}')" style="border-color:${meta.expBorder};">${s}</span>`).join('')}
+                    descBox.innerHTML = `
+                        <i class="fa-solid fa-xmark iw-desc-close" onclick="this.parentElement.style.display='none'"></i>
+                        <div style="font-weight: 800; color: var(--text-primary); margin-bottom: 8px; font-size: 0.9rem; display: flex; align-items: center; gap: 8px;">
+                            <div style="width:24px; height:24px; background:color-mix(in srgb, ${color} 15%, transparent); border-radius:6px; display:flex; align-items:center; justify-content:center;">
+                                <i class="fa-solid fa-lightbulb" style="color: ${color}; font-size:0.8rem;"></i>
                             </div>
-                            <div class="iw-desc-box"></div>
+                            ${d.title}
                         </div>
-                        <div>
-                            <div class="iw-col-label" style="color:${meta.dotColor};"><i class="fa-solid fa-list-check"></i> Roles & Responsibilities</div>
-                            <ul class="iw-resp-list">
-                                ${data.resp.map(r => `<li>${r}</li>`).join('')}
-                            </ul>
+                        <div style="line-height: 1.6; color: var(--text-secondary); margin-bottom: 12px; font-size: 0.9rem;">${d.explanation}</div>
+                        <div style="margin-top: 15px; border-top: 1px solid rgba(0,0,0,0.06); padding-top: 15px;">
+                            <a href="https://www.youtube.com/results?search_query=${encodeURIComponent(topic + ' tutorial')}" 
+                               target="_blank" 
+                               style="background: #ef4444; color: white; text-decoration: none; padding: 10px 18px; border-radius: 12px; font-size: 0.85rem; font-weight: 800; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2); transition: all 0.3s ease;"
+                               onmouseover="this.style.transform='translateY(-2px)'; this.style.box-shadow='0 6px 15px rgba(239, 68, 68, 0.3)';"
+                               onmouseout="this.style.transform='translateY(0)'; this.style.box-shadow='0 4px 12px rgba(239, 68, 68, 0.2)';"
+                            >
+                                <i class="fa-brands fa-youtube" style="font-size: 1rem;"></i> 
+                                <span>Watch Video Tutorial</span>
+                            </a>
                         </div>
-                    </div>
-                </div>
-            </div>`;
+                    `;
+                } catch (err) {
+                    console.error("[Workflow AI Debug] Error:", err);
+                    descBox.innerHTML = `<p style="color:#ef4444; font-size:0.8rem; font-weight:700; background:rgba(239, 68, 68, 0.05); padding:10px; border-radius:8px;"><i class="fa-solid fa-circle-exclamation" style="margin-right:6px;"></i> Decryption Failed. Signal Lost.</p>`;
+                }
             }
 
-            const profile = getProfile(skill);
-            const stageKeys = ['intern', 'junior', 'mid', 'senior', 'lead'];
-            const renderedHtml = stagesMeta.map((meta, i) => makeStage(meta, profile[stageKeys[i]])).join('');
-            track.innerHTML = renderedHtml;
+            async function fetchWorkflow() {
+                const track = document.getElementById('iw-track');
+                if (track) {
+                    track.innerHTML = `
+                        <div class="iw-loading-state" style="grid-column: 1/-1; text-align: center; padding: 4rem 2rem; background: rgba(139, 92, 246, 0.03); border-radius: 24px; border: 1px solid rgba(139, 92, 246, 0.1); position: relative; overflow: hidden;">
+                            <div style="width: 64px; height: 64px; border: 4px solid rgba(139, 92, 246, 0.1); border-top: 4px solid #8b5cf6; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; animation: waSpinInline 0.8s linear infinite;"></div>
+                            <div style="text-align:center;">
+                                <h3 style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 1.4rem; font-weight: 800; color: var(--text-primary); margin-bottom: 0.8rem; letter-spacing: -0.02em; text-transform: none;">Consulting AI Industry Mentor</h3>
+                                <p style="color: var(--text-secondary); max-width: 420px; margin: 0 auto; line-height: 1.6; font-size: 0.95rem; font-weight: 500;">Synthesizing real-world workflow data and industrial standards for <b>${skill}</b>...</p>
+                            </div>
+                        </div>`;
+                }
+                try {
+                    const data = await fetchWithResilience(`/api/industrial-workflow?skill=${encodeURIComponent(skill)}`);
+                    
+                    if (data.status === 'updating') {
+                        track.innerHTML = `
+                            <div style="grid-column: 1/-1; text-align: center; padding: 4rem 2rem; background: rgba(139, 92, 246, 0.03); border-radius: 24px; border: 1px solid rgba(139, 92, 246, 0.15); position: relative; overflow: hidden; animation: waPanelSlideIn 0.6s cubic-bezier(0.19, 1, 0.22, 1);">
+                                <div style="position: absolute; top: 0; left: 0; width: 100%; height: 3px; background: linear-gradient(90deg, transparent, #8b5cf6, transparent); width: 200%; animation: iwStatusScan 3s linear infinite;"></div>
+                                <div style="width: 64px; height: 64px; background: rgba(139, 92, 246, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; color: #8b5cf6; font-size: 1.8rem; animation: iwPulseGlow 2s infinite;">
+                                    <i class="fa-solid fa-arrows-rotate"></i>
+                                </div>
+                                <h3 style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 1.4rem; font-weight: 800; color: var(--text-primary); margin-bottom: 0.5rem; letter-spacing: -0.02em;">Signal Under Verification</h3>
+                                <p style="color: var(--text-secondary); max-width: 420px; margin: 0 auto 1.5rem; line-height: 1.6; font-size: 0.95rem;">${data.message}</p>
+                                <div style="display: inline-flex; align-items: center; gap: 8px; font-size: 0.72rem; font-weight: 800; color: #8b5cf6; text-transform: uppercase; letter-spacing: 1px; background: rgba(139, 92, 246, 0.1); padding: 8px 20px; border-radius: 30px; border: 1px solid rgba(139, 92, 246, 0.2);">
+                                    <span style="width: 8px; height: 8px; background: #8b5cf6; border-radius: 50%; display: inline-block; animation: pulse 1.5s infinite;"></span>
+                                    AI MENTOR STATUS: PROCESSING
+                                </div>
+                            </div>
+                            <style>
+                                @keyframes iwStatusScan { 0% { transform: translateX(-100%); } 100% { transform: translateX(50%); } }
+                                @keyframes iwPulseGlow { 0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.4); } 70% { transform: scale(1.05); box-shadow: 0 0 0 15px rgba(139, 92, 246, 0); } 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(139, 92, 246, 0); } }
+                            </style>
+                        `;
+                        return;
+                    }
 
-            // Save to cache for next refresh
-            sessionStorage.setItem(cacheKey, JSON.stringify({
-                html: renderedHtml,
-                timestamp: Date.now()
-            }));
+                    if (data.error) throw new Error(data.error);
+
+                    let html = '';
+                    if (data.industry_context) html += makeCard('industry_context', data.industry_context);
+                    if (data.workflow) html+= makeCard('workflow', data.workflow);
+                    
+                    // Unified Role Rendering with Error Safety
+                    if (data.career_progression && Array.isArray(data.career_progression)) {
+                        const roles = data.career_progression;
+                        if (roles[0]) html += makeCard('intern', formatRole(roles[0], '#0ea5e9'));
+                        if (roles[1]) html += makeCard('junior', formatRole(roles[1], '#10b981'));
+                        if (roles[2]) html += makeCard('mid', formatRole(roles[2], '#f59e0b'));
+                        if (roles[3]) html += makeCard('senior', formatRole(roles[3], '#8b5cf6'));
+                        if (roles[4]) html += makeCard('lead', formatRole(roles[4], '#eab308'));
+                    } else if (data.roles) {
+                        if (data.roles.intern) html += makeCard('intern', data.roles.intern);
+                        if (data.roles.junior) html += makeCard('junior', data.roles.junior);
+                        if (data.roles.mid) html += makeCard('mid', data.roles.mid);
+                    }
+
+                    if (data.tasks) html += makeCard('tasks', data.tasks, true);
+                    if (data.tools) html += makeCard('tools', data.tools, true);
+                    if (data.challenges) html += makeCard('challenges', data.challenges, true);
+                    if (data.deliverables) html += makeCard('deliverables', data.deliverables);
+                    if (data.reality_check) html += makeCard('reality_check', data.reality_check);
+
+                    if (!html) throw new Error("Empty Workflow Data");
+
+                    track.innerHTML = html;
+                    sessionStorage.setItem(cacheKey, JSON.stringify({ html, timestamp: Date.now() }));
+
+                } catch (err) {
+                    console.error("Workflow Error:", err);
+                    // Ensure the header remains visible even if content fails
+                    track.innerHTML = `
+                        <div style="grid-column: 1/-1; text-align: center; padding: 4rem 2rem; background: rgba(239, 68, 68, 0.03); border-radius: 24px; border: 1px solid rgba(239, 68, 68, 0.15); animation: waPanelSlideIn 0.6s cubic-bezier(0.19, 1, 0.22, 1);">
+                            <div style="width: 64px; height: 64px; background: rgba(239, 68, 68, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; color: #ef4444; font-size: 1.8rem;">
+                                <i class="fa-solid fa-triangle-exclamation"></i>
+                            </div>
+                            <h3 style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 1.4rem; font-weight: 800; color: var(--text-primary); margin-bottom: 0.5rem; letter-spacing: -0.02em;">Signal Lost</h3>
+                            <p style="color: var(--text-secondary); max-width: 400px; margin: 0 auto 1.8rem; line-height: 1.6;">The industry neural network for <b>${skill}</b> is currently unreachable. Our mentors are investigating the disconnect.</p>
+                            <button onclick="location.reload()" class="rm-btn-start" style="padding: 0.8rem 2rem; font-size: 0.92rem; border-radius: 14px;">
+                                <i class="fa-solid fa-bolt" style="margin-right: 8px;"></i> Re-establish Connection
+                            </button>
+                        </div>`;
+                }
+            }
+
+            fetchWorkflow();
         })();
     </script>
 
@@ -3088,19 +3769,6 @@
     </section>
     <hr class="rm-divider" id="iq-divider" style="display: none; margin: 3rem 0;">
 
-    <!-- ===== LEARNING RESOURCES SECTION ===== -->
-    <section class="lr-section" id="resources-section" style="display: none;">
-        <div class="lr-section-glow-1"></div>
-        <div class="lr-section-glow-2"></div>
-
-        <div class="lr-header">
-            <h2 class="lr-title">Learning Resources</h2>
-        </div>
-        <div class="lr-list" id="lr-list">
-            <!-- Resources injected by JS -->
-        </div>
-    </section>
-    <hr class="rm-divider" id="lr-divider" style="display: none; margin: 3rem 0;">
 
     <!-- ===== CAREER MOVE SECTION ===== -->
     <section class="job-section" id="job-section" style="display: none;">
@@ -3206,28 +3874,10 @@
                 default: { fresher: '₹4.0L+', experienced: '₹10.0L+', specialist: '₹20L+' }
             };
 
-            /* ---- INDUSTRY TOOLS ---- */
-            const industryToolsMap = {
-                java: ['IntelliJ IDEA', 'Eclipse', 'Maven', 'Gradle', 'Spring Boot', 'JUnit', 'Postman', 'Git', 'Jenkins', 'Docker', 'SonarQube', 'JIRA'],
-                python: ['PyCharm', 'VS Code', 'pip', 'Virtualenv', 'Jupyter', 'Flask', 'Django', 'FastAPI', 'pytest', 'Docker', 'Git', 'Postman'],
-                fullstack: ['VS Code', 'Postman', 'Docker', 'GitHub', 'JIRA', 'Figma', 'MongoDB Compass', 'pgAdmin', 'Webpack', 'Vite', 'Vercel', 'Heroku'],
-                frontend: ['VS Code', 'Chrome DevTools', 'Figma', 'GitHub', 'Webpack', 'Vite', 'Storybook', 'Lighthouse', 'npm', 'Postman'],
-                backend: ['Postman', 'Docker', 'Redis', 'PostgreSQL', 'MongoDB', 'Git', 'JIRA', 'AWS CLI', 'Nginx', 'Kafka'],
-                datascience: ['Jupyter', 'Anaconda', 'VS Code', 'Tableau', 'Power BI', 'Excel', 'Git', 'Google Colab', 'DBeaver', 'Pandas Profiling'],
-                ai: ['Jupyter', 'PyTorch', 'TensorFlow', 'Hugging Face', 'CUDA', 'Google Colab', 'Weights & Biases', 'MLflow', 'Docker', 'Git'],
-                devops: ['Docker', 'Kubernetes', 'Jenkins', 'GitHub Actions', 'Terraform', 'Ansible', 'Prometheus', 'Grafana', 'AWS', 'Azure DevOps'],
-                cybersecurity: ['Kali Linux', 'Wireshark', 'Metasploit', 'Burp Suite', 'Nmap', 'Splunk', 'Snort', 'Nessus', 'OWASP ZAP', 'Hashcat'],
-                webdevelopment: ['VS Code', 'Chrome DevTools', 'Figma', 'GitHub', 'npm', 'Vite', 'Postman', 'Netlify', 'Firebase', 'ESLint'],
-                database: ['MySQL Workbench', 'pgAdmin', 'MongoDB Compass', 'DBeaver', 'Redis CLI', 'Adminer', 'DataGrip', 'SQLite Browser'],
-                mobile: ['Android Studio', 'Xcode', 'VS Code', 'Flutter', 'React Native', 'Firebase', 'Postman', 'Git', 'Figma', 'TestFlight'],
-                cloudcomputing: ['AWS Console', 'Azure Portal', 'GCP Console', 'Terraform', 'Ansible', 'Docker', 'Kubernetes', 'Helm', 'Pulumi', 'CloudFormation'],
-                blockchain: ['Remix IDE', 'Truffle', 'Hardhat', 'MetaMask', 'Ganache', 'IPFS', 'OpenZeppelin', 'Ethers.js', 'Web3.js', 'Solidity'],
-                reactjs: ['VS Code', 'Chrome DevTools', 'npm', 'Vite', 'Redux DevTools', 'Storybook', 'GitHub', 'Postman', 'Tailwind CSS', 'ESLint'],
-                default: ['VS Code', 'Git', 'GitHub', 'Docker', 'Postman', 'Linux Terminal', 'JIRA', 'Slack', 'Notion', 'Chrome DevTools']
-            };
+            /* ---- INDUSTRY TOOLS (DELETED - NOW DYNAMIC) ---- */
 
             /* ---- ORDERED CARD RENDERER ---- */
-            function renderRoadmapCards() {
+            async function renderRoadmapCards() {
                 const skill = "{{ skill_query }}".toLowerCase();
 
                 const emojiMap = {
@@ -3315,16 +3965,7 @@
                     default: ['SQL (SELECT, JOIN)', 'MySQL / PostgreSQL setup', 'NoSQL basics', 'CRUD operations', 'Database indexing']
                 };
 
-                const frameworksContent = {
-                    datascience: ['Pandas & NumPy', 'Scikit-learn', 'Matplotlib / Seaborn', 'Streamlit', 'TensorFlow / PyTorch'],
-                    ai: ['PyTorch', 'TensorFlow / Keras', 'Hugging Face Transformers', 'LangChain', 'FastAPI'],
-                    cybersecurity: ['Metasploit framework', 'Scapy', 'OWASP testing guide', 'The Volatility framework', 'Autopsy (forensics)'],
-                    devops: ['Terraform (IaC)', 'Ansible (config)', 'Helm (Kubernetes)', 'ArgoCD (GitOps)', 'Prometheus / Grafana'],
-                    android: ['Jetpack Compose', 'Dagger/Hilt (DI)', 'Retrofit (networking)', 'Coroutines', 'Navigation Component'],
-                    ios: ['SwiftUI', 'Combine (reactive)', 'CocoaPods / SPM', 'Alamofire', 'RxSwift basics'],
-                    java: ['Spring Boot', 'Spring MVC', 'Spring Security', 'Hibernate / JPA', 'Maven / Gradle'],
-                    default: ['Popular stack framework', 'Testing framework', 'Build tool (Maven/npm)', 'ORM', 'CI/CD framework']
-                };
+                /* ---- FRAMEWORKS (DELETED - NOW DYNAMIC) ---- */
 
                 const includeWeb = ['web', 'api', 'java', 'python', 'backend', 'full', 'data', 'cloud', 'devops', 'cyber', 'android', 'ios', 'ml', 'machine'];
                 const includeDB = ['database', 'sql', 'java', 'python', 'backend', 'full', 'data', 'cloud', 'devops', 'cyber', 'android', 'ios', 'ml', 'machine'];
@@ -3334,26 +3975,26 @@
                     return includesList.some(kw => skill.includes(kw));
                 }
 
-                if (!hasSection('web') && !hasSection('api') && isExplicitlyRelevant(includeWeb)) {
-                    sections.push({ title: 'Web & API', content: getContent(webApiContent) });
-                }
-                if (!hasSection('database') && !hasSection('sql') && isExplicitlyRelevant(includeDB)) {
-                    sections.push({ title: 'Database', content: getContent(databaseContent) });
-                }
-                if (!hasSection('framework') && !hasSection('stack') && isExplicitlyRelevant(includeFramework)) {
-                    sections.push({ title: 'Frameworks', content: getContent(frameworksContent) });
+                // 2. Fetch Dynamic Tools and Frameworks from API
+                let dynamicData = { tools: [], frameworks: [] };
+                try {
+                    // Using fetchWithResilience to handle potential API issues or 404s
+                    const res = await fetch(`/api/dynamic-tools-frameworks?skill=${encodeURIComponent(skill)}`);
+                    if (res.ok) {
+                        const contentType = res.headers.get("content-type");
+                        if (contentType && contentType.indexOf("application/json") !== -1) {
+                            dynamicData = await res.json();
+                        }
+                    }
+                } catch (e) {
+                    console.error("Failed to fetch dynamic tools/frameworks:", e);
                 }
 
-                // Apply strict filtering to remove irrelevant sections from predefined or Gemini roadmaps
-                sections = sections.filter(s => {
-                    const t = s.title.toLowerCase();
-                    if ((t.includes('web') || t.includes('api')) && !isExplicitlyRelevant(includeWeb)) return false;
-                    if ((t.includes('database') || t.includes('sql')) && !isExplicitlyRelevant(includeDB)) return false;
-                    if ((t.includes('framework') || t.includes('stack')) && !isExplicitlyRelevant(includeFramework)) return false;
-                    return true;
-                });
-                if (!hasSection('industry tools')) {
-                    sections.push({ title: 'Industry Tools', content: getContent(industryToolsMap) });
+                if (!hasSection('industry tools') && dynamicData.tools && dynamicData.tools.length > 0) {
+                    sections.push({ title: 'Industry Tools', content: dynamicData.tools });
+                }
+                if (!hasSection('framework') && !hasSection('stack') && dynamicData.frameworks && dynamicData.frameworks.length > 0) {
+                    sections.push({ title: 'Frameworks', content: dynamicData.frameworks });
                 }
 
                 // Add Salary Insights dynamically
@@ -3466,14 +4107,20 @@
                     else if (t.includes('cloud') || t.includes('devops')) { icon = 'cloud'; label = 'Infra'; }
 
                     // Disable interactive logic for informative cards
-                    const isSpecial = t.includes('salary') || t.includes('career') || t.includes('industry tool') || t.includes('project');
+                    // Allow interaction for main learning cards (Foundation, Core, Tools, Projects, etc.)
+                    const isSpecial = t.includes('salary') || t.includes('career');
 
                     let items = s.content;
                     if (typeof items === 'string') items = items.split('<br>');
 
                     let listHtml = `<div class="rm-step-list" data-section="${s.title}">
                 ${items.map(item => {
-                        const clean = item.replace(/^[•🔹\-*]\s*/g, '').replace(/[•🔹]/g, '').trim();
+                        const clean = item.replace(/[\uFFFD\uFE0F\u200D\u200B\uFEFF\u00A0]/g, '') 
+                                          .replace(/^[•🔹\-*]\s+/g, '') 
+                                          .replace(/[•🔹]/g, '')
+                                          .trim()
+                                          .replace(/[^a-zA-Z0-9\s\(\)\-\_\:\+\.\&\/\?\!\u0900-\u097F\uD800-\uDBFF\uDC00-\uDFFF]+$/, '') // Remove one or more trailing weird chars
+                                          .trim();
                         if (!clean) return '';
                         return `<div class="rm-step-item ${isSpecial ? '' : 'topic-clickable'}">
                         <div class="rm-step-checkbox">${getTopicEmoji(clean)}</div>
@@ -3587,9 +4234,11 @@
                     }
                 };
 
-                // Apply saved progress
+                // Apply saved progress (Ticking UI only)
                 document.querySelectorAll('.rm-step-item').forEach(el => {
-                    const topicName = el.querySelector('.rm-step-topic').innerText.trim();
+                    const topicTitle = el.querySelector('.rm-step-topic');
+                    if (!topicTitle) return;
+                    const topicName = topicTitle.innerText.trim();
                     const card = el.closest('.rm-premium-card');
                     const titleEl = card.querySelector('.rm-premium-title');
                     const badgeEl = titleEl.querySelector('.rm-card-badge');
@@ -3606,47 +4255,83 @@
                             cb.style.color = '#10b981';
                         }
                     }
+                });
 
-                    el.addEventListener('click', async function (e) {
-                        if (e.target.closest('.rm-btn-done-zone') || e.target.closest('.rm-inline-explanation')) return;
+                // Unified Event Delegation for Clickable Topics (Handles Dynamically Added Cards)
+                document.getElementById('rm-main-grid').addEventListener('click', async function (e) {
+                    const el = e.target.closest('.rm-step-item');
+                    if (!el || !el.classList.contains('topic-clickable')) return;
 
-                        const explanationDiv = el.querySelector('.rm-inline-explanation');
-                        if (explanationDiv.style.display === 'block') {
-                            explanationDiv.style.display = 'none';
-                            el.classList.remove('expanded');
-                            return;
-                        }
+                    // Prevent click if clicking the done zone or existing explanation
+                    if (e.target.closest('.rm-btn-done-zone') || e.target.closest('.rm-inline-explanation') || e.target.closest('.rm-explanation-close')) return;
 
-                        el.classList.add('expanded');
+                    const explanationDiv = el.querySelector('.rm-inline-explanation');
+                    if (!explanationDiv) return;
 
-                        if (topicName.includes(':')) return;
+                    if (explanationDiv.style.display === 'block') {
+                        explanationDiv.style.display = 'none';
+                        el.classList.remove('expanded');
+                        return;
+                    }
 
-                        explanationDiv.style.display = 'block';
-                        explanationDiv.innerHTML = '<div style="text-align:center; padding: 10px;"><i class="fa-solid fa-spinner fa-spin" style="color:#8b5cf6;"></i> Loading...</div>';
-
-                        try {
-                            const r = await fetch('/api/topic-explanation?topic=' + encodeURIComponent(topicName));
-                            const d = await r.json();
-                            explanationDiv.innerHTML = `
-                        <i class="fa-solid fa-xmark rm-explanation-close" onclick="closeExplanation(this, event)"></i>
-                        <div style="margin-bottom: 8px;"><strong>${d.title}</strong></div>
-                        <div style="line-height: 1.6; margin-bottom: 12px; color: inherit; padding-right: 25px;">${d.explanation}</div>
-                        ${d.resources && d.resources.length ? `
-                            <div style="display:flex; flex-direction:column; gap:6px;">
-                                ${d.resources.map(res => {
-                                let iconHTML = '<i class="fa-solid fa-link" style="margin-right:5px;"></i>';
-                                if ((res.type && res.type.toLowerCase() === 'video') || (res.link && res.link.includes('youtube'))) {
-                                    iconHTML = '<i class="fa-brands fa-youtube" style="margin-right:5px; color:#ef4444;"></i>';
-                                }
-                                return `<a href="${res.link}" target="_blank" style="color:#8b5cf6; text-decoration:none; font-size:0.85rem;">${iconHTML}${res.title}</a>`;
-                            }).join('')}
-                            </div>
-                        ` : ''}
-                    `;
-                        } catch (e) {
-                            explanationDiv.innerHTML = '<p style="color:#ef4444;">Failed to fetch specific insights.</p>';
+                    // Close other expanded items in the same container to keep it clean
+                    el.closest('.rm-step-list').querySelectorAll('.rm-step-item.expanded').forEach(other => {
+                        if (other !== el) {
+                            other.classList.remove('expanded');
+                            const otherDiv = other.querySelector('.rm-inline-explanation');
+                            if (otherDiv) otherDiv.style.display = 'none';
                         }
                     });
+
+                    el.classList.add('expanded');
+                    explanationDiv.style.display = 'block';
+                    explanationDiv.innerHTML = `
+                        <div class="iw-loading-state" style="padding: 1.5rem;">
+                            <div style="width: 32px; height: 32px; border: 3px solid rgba(139, 92, 246, 0.1); border-top: 3px solid #8b5cf6; border-radius: 50%; animation: waSpinInline 0.8s linear infinite;"></div>
+                            <div style="text-align:center;">
+                                <div style="font-size: 0.75rem; font-weight: 800; color: #8b5cf6; letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 2px;">AI Processing</div>
+                                <div style="font-size: 0.65rem; color: var(--text-secondary); font-weight: 600;">Decrypting Insights...</div>
+                            </div>
+                        </div>`;
+
+                    const topicName = el.querySelector('.rm-step-topic').innerText.trim().replace(/[\uFFFD]/g, '');
+                    
+                    // Smart Topic Extraction: If topicName is "Topic: Description", only use "Topic"
+                    let cleanTopic = topicName;
+                    if (topicName.includes(':')) {
+                        cleanTopic = topicName.split(':')[0].trim();
+                    }
+                    
+                    // Strip leading bullets if any
+                    cleanTopic = cleanTopic.replace(/^[•🔹\-*]\s+/g, '').trim();
+
+                    try {
+                        const r = await fetch(`/api/topic-explanation?topic=${encodeURIComponent(cleanTopic)}&roadmap=${encodeURIComponent(skill)}`);
+                        const d = await r.json();
+                        
+                        if (!d.explanation) throw new Error("No explanation data");
+
+                        explanationDiv.innerHTML = `
+                            <i class="fa-solid fa-xmark rm-explanation-close" onclick="closeExplanation(this, event)"></i>
+                            <div style="display:inline-block; background:rgba(139, 92, 246, 0.1); color:#8b5cf6; font-size:0.65rem; font-weight:800; text-transform:uppercase; padding:3px 10px; border-radius:12px; margin-bottom:10px; letter-spacing:0.5px;">Topic Insight</div>
+                            <div style="margin-bottom: 8px; font-size: 1.1rem; font-weight: 800; color:var(--text-primary); text-transform: none;">${d.title}</div>
+                            <div style="line-height: 1.6; margin-bottom: 16px; color: var(--text-secondary); padding-right: 30px;">${d.explanation}</div>
+                            
+                            <div style="margin-top: 15px; border-top: 1px solid rgba(139, 92, 246, 0.1); padding-top: 15px;">
+                                <a href="https://www.youtube.com/results?search_query=${encodeURIComponent(cleanTopic + ' tutorial')}" 
+                                   target="_blank" 
+                                   style="background: #ef4444; color: white; text-decoration: none; padding: 10px 18px; border-radius: 12px; font-size: 0.85rem; font-weight: 800; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2); transition: all 0.3s ease;"
+                                   onmouseover="this.style.transform='translateY(-2px)'; this.style.box-shadow='0 6px 15px rgba(239, 68, 68, 0.3)';"
+                                   onmouseout="this.style.transform='translateY(0)'; this.style.box-shadow='0 4px 12px rgba(239, 68, 68, 0.2)';"
+                                >
+                                    <i class="fa-brands fa-youtube" style="font-size: 1rem;"></i> 
+                                    <span>Watch Video Tutorial</span>
+                                </a>
+                            </div>
+                        `;
+                    } catch (e) {
+                        explanationDiv.innerHTML = '<p style="color:#ef4444; font-size:0.85rem;"><i class="fa-solid fa-circle-exclamation" style="margin-right:6px;"></i>Failed to fetch insights. Please check your connection.</p>';
+                    }
                 });
 
                 // Cloud Sync Logic
@@ -3781,32 +4466,22 @@
                 document.querySelectorAll('.rm-premium-card').forEach(card => observer.observe(card));
             }
 
-            async function showTopicModal(topic) {
-                if (topic.includes(':')) return; // Don't trigger for salary values
-                
-                // Body Lock & Lenis Sync
-                document.body.style.overflow = 'hidden';
-                if (window.lenis) window.lenis.stop();
-                
-                modal.classList.add('open');
-                modalBody.innerHTML = '<div style="text-align:center;padding:3rem 0;"><i class="fa-solid fa-spinner fa-spin" style="font-size:2rem;color:#8b5cf6;"></i><p style="margin-top:1rem;color:#94a3b8;">Decrypting Insights...</p></div>';
-                try {
-                    const r = await fetch('/api/topic-explanation?topic=' + encodeURIComponent(topic));
-                    const d = await r.json();
-                    modalBody.innerHTML = `
-                <div style="display:inline-block;background:rgba(139, 92, 246, 0.1);color:#a78bfa;font-size:0.68rem;font-weight:800;letter-spacing:2px;text-transform:uppercase;padding:5px 14px;border-radius:30px;margin-bottom:1.5rem;border:1px solid rgba(139, 92, 246, 0.2);">Obsidian Insight</div>
-                <h2 style="font-family:'Plus Jakarta Sans',sans-serif;font-size:2.2rem;font-weight:800;margin-bottom:1.2rem;letter-spacing:-0.03em;">${d.title}</h2>
-                <div style="line-height:1.8;font-size:1.05rem;margin-bottom:2.5rem;padding:1.5rem;background:rgba(0, 0, 0, 0.02);border-radius:20px;border:1px solid rgba(0, 0, 0, 0.05);">${d.explanation}</div>
-                ${d.resources && d.resources.length ? `
-                <h4 style="color:#a78bfa;font-size:0.75rem;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:1.2rem;">Technical Resources</h4>
-                <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:1.24rem;">
-                    ${d.resources.map(res => `<a href="${res.link}" target="_blank" class="rm-resource-link"><i class="fa-solid fa-arrow-up-right-from-square" style="color:#8b5cf6;"></i>${res.title}</a>`).join('')}
-                </div>` : ''}
-            `;
-                } catch (e) {
-                    modalBody.innerHTML = '<p style="color:#ef4444;">Failed to decrypt topic data.</p>';
+            /* ---- HELPER FUNCTIONS ---- */
+            window.closeExplanation = function(btn, event) {
+                if (event) event.stopPropagation();
+                const parent = btn.parentElement;
+                if (parent) {
+                    parent.style.display = 'none';
+                    const item = parent.closest('.rm-step-item') || parent.closest('.iw-stage-body') || parent.closest('.iw-clickable-item');
+                    if (item) item.classList.remove('expanded');
                 }
-            }
+            };
+
+            /* ---- MODAL LOGIC (RETAINED FOR OTHER USES) ---- */
+            window.showTopicModal = async function(topic) {
+                // Now just proxying to the new inline explanation via an alert or simple modal if needed
+                // But generally, topics now use the inline expander.
+            };
 
             /* ---- QUIZ ENGINE ---- */
             const closeAnyModal = () => {
@@ -4295,57 +4970,6 @@
                 window.location.href = "{{ url_for('interview_practice', skill=skill_query) }}";
             };
 
-            /* ---- LEARNING RESOURCES JS ---- */
-            async function renderLearningResources() {
-                const skill = "{{ skill_query }}";
-                const cacheKey = `lr_cache_${skill}`;
-                const section = document.getElementById('resources-section');
-                const list = document.getElementById('lr-list');
-                if (!section || !list) return;
-
-                // 1. Smart Cache Check (Instant Restore)
-                const cachedStr = sessionStorage.getItem(cacheKey);
-                if (cachedStr) {
-                    try {
-                        const cached = JSON.parse(cachedStr);
-                        if (Date.now() - cached.timestamp < 15000) {
-                            list.innerHTML = cached.html;
-                            section.style.display = 'block';
-                            const divider = document.getElementById('lr-divider');
-                            if (divider) divider.style.display = 'block';
-                            return;
-                        }
-                    } catch (e) { sessionStorage.removeItem(cacheKey); }
-                }
-
-                // 2. Data from Secure Container
-                let resources = [];
-                try {
-                    const container = document.getElementById('resources-json');
-                    if (container) resources = JSON.parse(container.textContent);
-                } catch (e) { console.error("Resource data failed to load"); }
-
-                if (resources && resources.length > 0) {
-                    const html = resources.map(res => `
-                <a href="${res.link || res.url || '#'}" target="_blank" class="lr-item">
-                    <div class="lr-icon"><i class="fa-solid fa-link"></i></div>
-                    <div class="lr-content">
-                        <div class="lr-item-title">${res.title || 'Expert Resource'}</div>
-                        <div class="lr-item-desc">${res.description || res.desc || 'Handpicked learning material.'}</div>
-                    </div>
-                    <div class="lr-external"><i class="fa-solid fa-arrow-up-right-from-square"></i></div>
-                </a>
-            `).join('');
-
-                    list.innerHTML = html;
-                    section.style.display = 'block';
-                    const divider = document.getElementById('lr-divider');
-                    if (divider) divider.style.display = 'block';
-
-                    // Save to Cache
-                    sessionStorage.setItem(cacheKey, JSON.stringify({ html: html, timestamp: Date.now() }));
-                }
-            }
 
             /* ---- CAREER MOVE JS ---- */
             async function renderJobOpenings() {
@@ -4444,7 +5068,6 @@
 
             window.fetchTopInterviewQuestions = fetchTopInterviewQuestions;
             fetchTopInterviewQuestions();
-            renderLearningResources();
             renderJobOpenings();
         });
     </script>

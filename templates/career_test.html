@@ -5,93 +5,131 @@
 
 <div class="dashboard-container">
     <div class="hero-centered-layout">
+        
+        <!-- Intro Section -->
         <div class="dashboard-hero-card" id="introArea">
-            <h1 class="hero-title-new">Career Personality Test</h1>
-            <p class="hero-subtitle-new">Take our quick assessment to discover career paths that perfectly match your personality and skills.</p>
+            <h1 class="hero-title-new">AI Career Intel Analyst</h1>
+            <p class="hero-subtitle-new">Analyze your unique interests to predict elite tech career paths tailored just for you.</p>
             
-            <div class="test-card-bg" style="max-width: 600px; margin: 2rem auto; background: var(--card-bg); padding: 3rem 2rem; border-radius: 16px; border: 1px solid var(--border-color); text-align: center; box-shadow: var(--shadow-md);">
-                <i class="fa-solid fa-brain" style="font-size: 3.5rem; color: var(--primary-color); margin-bottom: 1.5rem;"></i>
-                <h3 style="color: var(--text-primary); margin-bottom: 1rem; font-size: 1.4rem;">Ready to find your ideal tech role?</h3>
-                <p style="color: var(--text-secondary); margin-bottom: 2rem;">Answer 5 quick behavioral questions. Our system will analyze your preferences and recommend the best technology roles for you.</p>
-                <div style="display: flex; justify-content: center; align-items: center; width: 100%;">
-                    <button class="btn-gradient" style="padding: 1rem 3rem; font-size: 1.1rem; border-radius: 30px; margin: 0 auto;" onclick="startQuiz(this)">Start Test <i class="fa-solid fa-arrow-right" style="margin-left: 8px;"></i></button>
+            <div class="glass-card" style="max-width: 650px; margin: 3rem auto; text-align: center;">
+                <div class="ai-loader" style="width: 80px; height: 80px; margin-bottom: 2rem;">
+                    <div class="pulse"></div>
+                    <i class="fa-solid fa-microchip brain-icon" style="font-size: 2rem;"></i>
+                </div>
+                <h3 style="margin-bottom: 1.5rem; font-size: 1.6rem;">Initialize Career Synthesis?</h3>
+                <p style="margin-bottom: 2.5rem; font-size: 1.1rem;">Describe what you love doing and our AI will calculate your optimal professional trajectory in the 2026 tech landscape.</p>
+                
+                <button class="btn-gradient" style="padding: 1.2rem 3.5rem; font-size: 1.1rem; border-radius: 50px; border: none; cursor: pointer;" onclick="startAnalysis()">
+                    Begin Synthesis <i class="fa-solid fa-bolt" style="margin-left: 10px;"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Questionnaire Section -->
+        <div id="setupArea" class="career-section">
+            <div class="glass-card">
+                <div style="margin-bottom: 2.5rem;">
+                    <h2 style="font-size: 1.6rem; margin-bottom: 0.5rem;">What's on your mind?</h2>
+                    <p style="color: var(--career-card-text-muted); font-size: 1rem; margin-bottom: 1.5rem;">Directly type your interests, passions, or things you enjoy (e.g., "I love building creative websites and solving security puzzles").</p>
+                    
+                    <div class="direct-input-container">
+                        <textarea id="customInterest" placeholder="Type your interests here... The more specific you are, the better the prediction!"></textarea>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 2.5rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                        <h3 style="font-size: 1.2rem;">Quick Suggestions</h3>
+                        <span id="interestCount" style="background: var(--primary-color); color: white; padding: 0.3rem 1rem; border-radius: 20px; font-size: 0.75rem; font-weight: 800;">0 TAGS SELECTED</span>
+                    </div>
+                    
+                    <div id="interestGrid" style="display: flex; flex-wrap: wrap; gap: 10px;">
+                        <div class="interest-chip" onclick="toggleInterest(this, 'AI / Machine Learning')">AI / ML</div>
+                        <div class="interest-chip" onclick="toggleInterest(this, 'Cybersecurity')">Cybersecurity</div>
+                        <div class="interest-chip" onclick="toggleInterest(this, 'Cloud Architecture')">Cloud</div>
+                        <div class="interest-chip" onclick="toggleInterest(this, 'UI/UX Design')">Design</div>
+                        <div class="interest-chip" onclick="toggleInterest(this, 'Blockchain')">Blockchain</div>
+                        <div class="interest-chip" onclick="toggleInterest(this, 'Data Analysis')">Data Science</div>
+                        <div class="interest-chip" onclick="toggleInterest(this, 'Mobile Apps')">Mobile Dev</div>
+                        <div class="interest-chip" onclick="toggleInterest(this, 'Game Development')">Game Dev</div>
+                        <div class="interest-chip" onclick="toggleInterest(this, 'Robotics')">Robotics</div>
+                        <div class="interest-chip" onclick="toggleInterest(this, 'Fintech')">Fintech</div>
+                        <div class="interest-chip" onclick="toggleInterest(this, 'DevOps')">DevOps</div>
+                        <div class="interest-chip" onclick="toggleInterest(this, 'Web Development')">Web Dev</div>
+                    </div>
+                </div>
+
+                <div style="text-align: center;">
+                    <button id="analyzeBtn" class="btn-gradient" style="padding: 1.1rem 4rem; border-radius: 50px; font-weight: 700; font-size: 1.1rem;" onclick="runAIAnalysis()">
+                        Predict My Career Path <i class="fa-solid fa-wand-magic-sparkles" style="margin-left: 10px;"></i>
+                    </button>
                 </div>
             </div>
         </div>
 
-        <div id="quizArea" style="max-width: 600px; margin: 2rem auto; display: none;">
-            <div class="test-card-bg" style="background: var(--card-bg); padding: 3rem 2rem; border-radius: 16px; border: 1px solid var(--border-color); box-shadow: var(--shadow-md);">
-                
-                <div style="margin-bottom: 2rem;">
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; color: var(--text-secondary); font-size: 0.9rem;">
-                        <span id="questionProgress">Question 1 of 5</span>
-                    </div>
-                    <div style="width: 100%; background: var(--border-color); height: 8px; border-radius: 4px;">
-                        <div id="progressBar" style="width: 20%; background: var(--primary-color); height: 100%; border-radius: 4px; transition: width 0.3s ease;"></div>
-                    </div>
-                </div>
-
-                <!-- Q1 -->
-                <div class="question-container active" id="q1">
-                    <h3 style="color: var(--text-primary); margin-bottom: 1.5rem; font-size: 1.3rem;">1. Do you enjoy coding?</h3>
-                    <button class="quiz-option" onclick="selectOption(1, 'coding', 2, this)">Yes</button>
-                    <button class="quiz-option" onclick="selectOption(1, 'coding', 1, this)">Somewhat</button>
-                    <button class="quiz-option" onclick="selectOption(1, 'none', 0, this)">No</button>
-                </div>
-
-                <!-- Q2 -->
-                <div class="question-container" id="q2">
-                    <h3 style="color: var(--text-primary); margin-bottom: 1.5rem; font-size: 1.3rem;">2. Do you like working with data?</h3>
-                    <button class="quiz-option" onclick="selectOption(2, 'data', 2, this)">Yes</button>
-                    <button class="quiz-option" onclick="selectOption(2, 'data', 1, this)">Somewhat</button>
-                    <button class="quiz-option" onclick="selectOption(2, 'none', 0, this)">No</button>
-                </div>
-
-                <!-- Q3 -->
-                <div class="question-container" id="q3">
-                    <h3 style="color: var(--text-primary); margin-bottom: 1.5rem; font-size: 1.3rem;">3. Do you like designing UI?</h3>
-                    <button class="quiz-option" onclick="selectOption(3, 'design', 2, this)">Yes</button>
-                    <button class="quiz-option" onclick="selectOption(3, 'none', 0, this)">No</button>
-                </div>
-
-                <!-- Q4 -->
-                <div class="question-container" id="q4">
-                    <h3 style="color: var(--text-primary); margin-bottom: 1.5rem; font-size: 1.3rem;">4. Do you enjoy solving security problems?</h3>
-                    <button class="quiz-option" onclick="selectOption(4, 'security', 2, this)">Yes</button>
-                    <button class="quiz-option" onclick="selectOption(4, 'none', 0, this)">No</button>
-                </div>
-
-                <!-- Q5 -->
-                <div class="question-container" id="q5">
-                    <h3 style="color: var(--text-primary); margin-bottom: 1.5rem; font-size: 1.3rem;">5. Do you prefer logic over creativity?</h3>
-                    <button class="quiz-option" onclick="selectOption(5, 'coding', 2, this)">Logic</button>
-                    <button class="quiz-option" onclick="selectOption(5, 'design', 2, this)">Creativity</button>
-                </div>
-
-                <div style="text-align: right; margin-top: 1.5rem;">
-                    <button id="nextBtn" class="btn-primary" style="padding: 0.8rem 2rem; border-radius: 12px; display: none;" onclick="nextQuestion()">Next Question <i class="fa-solid fa-arrow-right"></i></button>
-                </div>
+        <!-- Loading Section -->
+        <div id="loadingArea" class="career-section loading-section">
+            <div class="ai-loader">
+                <div class="pulse"></div>
+                <div class="pulse"></div>
+                <i class="fa-solid fa-brain brain-icon"></i>
             </div>
+            <h2 id="loadingText" style="margin-top: 2rem;">Processing neural connections...</h2>
+            <p style="color: var(--career-card-text-muted); margin-top: 1rem;">Our AI is scanning thousands of career profiles to find your perfect match.</p>
         </div>
 
-        <div id="resultArea" style="max-width: 600px; margin: 2rem auto; display: none; animation: fadeIn 0.8s ease-in-out;">
-            <div class="test-gradient-bg" style="background: linear-gradient(135deg, rgba(108, 99, 255, 0.1) 0%, rgba(74, 144, 226, 0.1) 100%); padding: 3rem 2rem; border-radius: 16px; border: 1px solid rgba(108, 99, 255, 0.3); text-align: center; box-shadow: 0 10px 30px rgba(108,99,255,0.15);">
-                <i id="resultIcon" class="fa-solid fa-trophy" style="font-size: 4rem; color: var(--primary-color); margin-bottom: 1rem;"></i>
-                <h4 style="color: var(--text-secondary); text-transform: uppercase; font-size: 0.9rem; letter-spacing: 2px; margin-bottom: 0.5rem;">Your Ideal Career Match</h4>
-                <p id="atsErrorMessage" style="color: #ef4444; margin-bottom: 1rem; font-weight: 500; display: none; text-align: center;"><i class="fa-solid fa-circle-exclamation"></i> Please upload a resume before testing.</p>
-                <div id="atsSuccessMessage" style="background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 2rem; margin-bottom: 2rem; display: none; text-align: center;">
-                <h2 id="resultTitle" style="color: var(--text-primary); margin-bottom: 1rem; font-size: 2.2rem; font-weight: 700;">Software Developer</h2>
-                
-                <p id="resultDesc" style="color: var(--text-secondary); margin-bottom: 2rem; font-size: 1.1rem; line-height: 1.6;">You love logical problem solving and building systems from scratch.</p>
-                
-                <div class="test-card-bg" style="text-align: left; background: var(--card-bg); padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border-color);">
-                    <h5 style="margin-bottom: 1rem; color: var(--text-primary); font-size: 1.1rem;">Recommended Skills:</h5>
-                    <div id="resultSkills" style="display: flex; flex-wrap: wrap; gap: 0.8rem;">
-                        <span style="background: rgba(108, 99, 255, 0.1); color: var(--primary-color); padding: 0.4rem 1rem; border-radius: 20px; font-weight: 600;">Python</span>
+        <!-- Result Section -->
+        <div id="resultArea" class="career-section">
+            <div class="glass-card">
+                <div class="result-header">
+                    <span class="role-badge" id="roleBadge">Recommended Match</span>
+                    <h2 id="resultTitle" style="font-size: 3rem; margin-bottom: 1rem; line-height: 1.1;">-</h2>
+                    <p id="resultMatchReason" style="color: var(--career-card-text-muted); font-size: 1.25rem; max-width: 650px; margin: 0 auto; line-height: 1.6;">-</p>
+                </div>
+
+                <div class="stat-grid">
+                    <div class="stat-item">
+                        <span class="stat-value" id="resSalary">-</span>
+                        <span class="stat-label">Avg Salary (IN)</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value" id="resDemand">-</span>
+                        <span class="stat-label">Market Demand</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-value" id="resDifficulty">-</span>
+                        <span class="stat-label">Entry Barrier</span>
                     </div>
                 </div>
 
-                <button class="btn-gradient" style="margin-top: 2.5rem; padding: 0.8rem 2.5rem; border-radius: 30px;" onclick="location.reload()">Take Test Again</button>
+                <div class="results-details-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2.5rem; margin-top: 3rem;">
+
+                    <div>
+                        <h4 style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 12px; font-size: 1.2rem;">
+                            <i class="fa-solid fa-fire-flame-curved" style="color: #ff595e;"></i> Core Skillset
+                        </h4>
+                        <div id="resSkills" style="display: flex; flex-wrap: wrap; gap: 10px;"></div>
+                    </div>
+                    <div>
+                        <h4 style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 12px; font-size: 1.2rem;">
+                            <i class="fa-solid fa-building-circle-check" style="color: #4a90e2;"></i> Top Hiring Firms
+                        </h4>
+                        <div id="resCompanies" style="display: flex; flex-wrap: wrap; gap: 10px;"></div>
+                    </div>
+                </div>
+
+                <!-- Day in the Life (Extra Feature) -->
+                <div class="day-life-journal">
+                    <div class="day-life-title">
+                        <i class="fa-solid fa-compass-drafting" style="color: #6c63ff;"></i> A Day in the Life
+                    </div>
+                    <p id="resDayLife" style="line-height: 1.8; font-style: italic; font-size: 1.1rem; opacity: 0.9;">-</p>
+                </div>
+
+                <div style="text-align: center; margin-top: 4rem; display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
+                    <button class="btn-gradient" style="padding: 1.2rem 3rem; border-radius: 50px; font-size: 1rem;" onclick="location.reload()">New Prediction</button>
+                    <button class="btn-primary" style="padding: 1.2rem 3rem; border-radius: 50px; font-size: 1rem; background: rgba(0,0,0,0.05); color: var(--career-card-text); border: 1px solid var(--glass-border);" onclick="window.print()">Export Profile</button>
+                </div>
             </div>
         </div>
 
@@ -99,127 +137,93 @@
 </div>
 
 <script>
-let currentQuestion = 1;
-let scores = {
-    coding: 0,
-    data: 0,
-    design: 0,
-    security: 0
-};
-let selectedValue = null;
+let selectedInterests = [];
+const loadingMessages = [
+    "Analyzing psychological interests...",
+    "Scanning industry demand databases...",
+    "Calculating salary trajectories...",
+    "Synthesizing perfect career matches...",
+    "Generating professional persona..."
+];
 
-function startQuiz(btn) {
-    const originalText = btn.innerHTML;
-    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin" style="margin-right: 8px;"></i> Loading...';
-    btn.disabled = true;
-    
-    setTimeout(() => {
-        document.getElementById('introArea').style.display = 'none';
-        document.getElementById('quizArea').style.display = 'block';
-    }, 600);
+function startAnalysis() {
+    document.getElementById('introArea').style.display = 'none';
+    document.getElementById('setupArea').style.display = 'block';
+    document.getElementById('customInterest').focus();
 }
 
-function selectOption(qNum, category, points, btnElement) {
-    // Clear previous selection visually
-    const options = document.getElementById('q' + qNum).getElementsByClassName('quiz-option');
-    for (let opt of options) {
-        opt.classList.remove('selected');
-    }
-    
-    // Highlight choice
-    btnElement.classList.add('selected');
-    
-    // Store current state
-    selectedValue = { category, points };
-    
-    // Show Next button securely
-    const nextBtn = document.getElementById('nextBtn');
-    nextBtn.style.display = 'inline-block';
-    if(qNum === 5) {
-        nextBtn.innerHTML = 'See Results <i class="fa-solid fa-check"></i>';
-    }
-}
-
-function nextQuestion() {
-    if(!selectedValue) return;
-    
-    // Process exact score value
-    if(selectedValue.category !== 'none') {
-        scores[selectedValue.category] += selectedValue.points;
-    }
-    
-    selectedValue = null;
-    
-    // Hide current question completely
-    document.getElementById('q' + currentQuestion).classList.remove('active');
-    document.getElementById('nextBtn').style.display = 'none';
-    
-    if (currentQuestion < 5) {
-        // Build next question payload
-        currentQuestion++;
-        document.getElementById('q' + currentQuestion).classList.add('active');
-        document.getElementById('questionProgress').innerText = `Question ${currentQuestion} of 5`;
-        document.getElementById('progressBar').style.width = (currentQuestion * 20) + '%';
+function toggleInterest(element, interest) {
+    if (selectedInterests.includes(interest)) {
+        selectedInterests = selectedInterests.filter(i => i !== interest);
+        element.classList.remove('selected');
     } else {
-        // Finished evaluation branch
-        showResults();
+        selectedInterests.push(interest);
+        element.classList.add('selected');
+    }
+    document.getElementById('interestCount').innerText = `${selectedInterests.length} TAGS SELECTED`;
+}
+
+async function runAIAnalysis() {
+    const custom = document.getElementById('customInterest').value.trim();
+    if (!custom && selectedInterests.length < 1) {
+        alert("Please share some interests first!");
+        return;
+    }
+
+    const finalInterests = [...selectedInterests];
+    if (custom) finalInterests.push(custom);
+
+    document.getElementById('setupArea').style.display = 'none';
+    document.getElementById('loadingArea').style.display = 'block';
+
+    let msgIndex = 0;
+    const msgInterval = setInterval(() => {
+        msgIndex = (msgIndex + 1) % loadingMessages.length;
+        document.getElementById('loadingText').innerText = loadingMessages[msgIndex];
+    }, 1500);
+
+    try {
+        const response = await fetch('/api/predict-career', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ interests: finalInterests })
+        });
+        const data = await response.json();
+        
+        clearInterval(msgInterval);
+        if (data.error) throw new Error(data.error);
+        displayResults(data);
+    } catch (err) {
+        clearInterval(msgInterval);
+        alert("Connectivity Issues: " + err.message);
+        location.reload();
     }
 }
 
-function showResults() {
-    document.getElementById('quizArea').style.display = 'none';
-    
-    // Logic: Calculate exactly which bucket has highest scores
-    let highestCategory = 'coding';
-    let max = -1;
-    for(let cat in scores) {
-        if(scores[cat] > max) {
-            max = scores[cat];
-            highestCategory = cat;
-        }
-    }
-    
-    /* Result Mapping Schema */
-    const mappings = {
-        'coding': {
-            title: 'Software Developer',
-            desc: 'You have a strong affinity for logic, building systems, and solving complex algorithmic puzzles. You enjoy bringing ideas to life through code!',
-            skills: ['Python', 'Java', 'JavaScript', 'Algorithms', 'Databases'],
-            icon: 'fa-laptop-code'
-        },
-        'data': {
-            title: 'Data Scientist',
-            desc: 'You are naturally analytical and logically curious. You brilliantly enjoy discovering patterns in numbers and predicting trends using statistics.',
-            skills: ['Python', 'SQL', 'Machine Learning', 'Data Visualization', 'Math'],
-            icon: 'fa-chart-line'
-        },
-        'design': {
-            title: 'UI/UX Designer',
-            desc: 'You possess a highly creative mindset, aesthetic touch, and deeply care about user experiences. Designing beautiful and intuitive interfaces is your true calling.',
-            skills: ['Figma', 'Wireframing', 'User Research', 'Prototyping', 'CSS'],
-            icon: 'fa-pen-nib'
-        },
-        'security': {
-            title: 'Cyber Security Analyst',
-            desc: 'You are a natural problem solver who loves digging out vulnerabilities. Protecting systems and outsmarting hackers excites you logically.',
-            skills: ['Ethical Hacking', 'Networking', 'Cryptography', 'Linux', 'Risk Analysis'],
-            icon: 'fa-shield-halved'
-        }
-    };
-    
-    const result = mappings[highestCategory];
-    
-    document.getElementById('resultTitle').innerText = result.title;
-    document.getElementById('resultDesc').innerText = result.desc;
-    document.getElementById('resultIcon').className = `fa-solid ${result.icon}`;
-    
-    const skillsContainer = document.getElementById('resultSkills');
-    skillsContainer.innerHTML = '';
-    result.skills.forEach(skill => {
-        skillsContainer.innerHTML += `<a href="/roadmap?skill=${encodeURIComponent(skill)}" style="text-decoration: none; cursor: pointer;"><span style="background: rgba(108, 99, 255, 0.1); color: var(--primary-color); padding: 0.4rem 1rem; border-radius: 20px; font-weight: 600; font-size: 0.9rem; cursor: pointer;">${skill}</span></a>`;
-    });
-    
+function displayResults(data) {
+    document.getElementById('loadingArea').style.display = 'none';
     document.getElementById('resultArea').style.display = 'block';
+    
+    document.getElementById('resultTitle').innerText = (data.emoji || '🚀') + ' ' + data.role;
+    document.getElementById('resultMatchReason').innerText = data.match_reason;
+    document.getElementById('resSalary').innerText = data.salary;
+    document.getElementById('resDemand').innerText = data.market_demand;
+    document.getElementById('resDifficulty').innerText = data.difficulty + '/10';
+    document.getElementById('resDayLife').innerText = data.day_in_the_life;
+
+    const skillsCont = document.getElementById('resSkills');
+    skillsCont.innerHTML = '';
+    data.skills.forEach(skill => {
+        skillsCont.innerHTML += `<a href="/roadmap?skill=${encodeURIComponent(skill)}" style="text-decoration: none;">
+            <span class="interest-chip selected" style="font-size: 0.85rem; padding: 0.6rem 1.2rem;">${skill}</span>
+        </a>`;
+    });
+
+    const compCont = document.getElementById('resCompanies');
+    compCont.innerHTML = '';
+    data.companies.forEach(comp => {
+        compCont.innerHTML += `<span class="interest-chip" style="font-size: 0.85rem; padding: 0.6rem 1.2rem; cursor: default;">${comp}</span>`;
+    });
 }
 </script>
 {% endblock %}

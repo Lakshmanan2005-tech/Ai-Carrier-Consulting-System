@@ -137,9 +137,58 @@
                     </button>
                 </form>
                 <div id="aiSuggestionBox" class="ai-suggestions" style="display: none;"></div>
+
+                <!-- Google-Style Loading Bar (Pinned to Card Bottom) -->
+                <div id="simpleLoaderBar" class="simple-search-loader">
+                    <div class="loader-shimmer"></div>
+                    <div class="loader-shimmer secondary"></div>
+                </div>
             </div>
         </div>
     </div>
+
+    <style>
+        .simple-search-loader {
+            display: none;
+            position: absolute;
+            bottom: -8px;
+            left: 5%;
+            right: 5%;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            overflow: hidden;
+            z-index: 10001;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .loader-shimmer {
+            width: 40%;
+            height: 100%;
+            background: linear-gradient(to right, #4285f4, #ea4335, #fbbc05, #34a853);
+            position: absolute;
+            top: 0; left: -100%;
+            animation: googleSlideMain 2s infinite cubic-bezier(0.65, 0.815, 0.735, 0.395);
+            border-radius: 10px;
+        }
+
+        .loader-shimmer.secondary {
+            animation: googleSlideSec 2s infinite cubic-bezier(0.165, 0.84, 0.44, 1);
+            animation-delay: 1.15s;
+        }
+
+        @keyframes googleSlideMain {
+            0% { left: -100%; width: 30%; }
+            60% { left: 100%; width: 100%; }
+            100% { left: 100%; width: 100%; }
+        }
+
+        @keyframes googleSlideSec {
+            0% { left: -150%; width: 10%; }
+            60% { left: 100%; width: 10%; }
+            100% { left: 100%; width: 10%; }
+        }
+    </style>
     <!-- Fresher Guide Section -->
     <div class="section-container reveal-on-scroll freshers-section-mobile"
         style="margin-top: 0.5rem; background: var(--fg-bg, #f5f7ff); border: 1px solid var(--border-color); border-radius: 48px; padding: 4.5rem 2rem; overflow: hidden; position: relative;">
@@ -1693,9 +1742,13 @@
                     el.addEventListener("click", function () {
                         const text = list[this.getAttribute("data-index")];
                         input.value = text;
-                        suggestionBox.innerHTML = "";
                         suggestionBox.style.display = "none";
-                        if (generateBtn) generateBtn.click();
+                        if (typeof window.triggerRoadmapLoader === 'function') {
+                            window.triggerRoadmapLoader();
+                            setTimeout(() => { if (generateBtn) generateBtn.click(); }, 600);
+                        } else {
+                            if (generateBtn) generateBtn.click();
+                        }
                     });
                 });
             }
@@ -1827,7 +1880,34 @@
             revealObserver.observe(section);
         });
 
+        // Premium Roadmap Generator Loader Logic
+        window.triggerRoadmapLoader = function() {
+            const bar = document.getElementById('simpleLoaderBar');
+            if (bar) bar.style.display = 'block';
+        };
 
+        if (roadmapForm) {
+            roadmapForm.addEventListener('submit', function(e) {
+                if (this.getAttribute('data-submitting') === 'true') return;
+                e.preventDefault();
+                window.triggerRoadmapLoader();
+                this.setAttribute('data-submitting', 'true');
+                setTimeout(() => { this.submit(); }, 800);
+            });
+        }
+
+        // Apply loader to all roadmap links (Trending, History, etc.)
+        document.addEventListener('click', function(e) {
+            const link = e.target.closest('a');
+            if (link && link.href && (link.href.includes('/roadmap?') || link.href.includes('skill='))) {
+                // Ignore if it's an internal modal trigger or similar
+                if (link.hasAttribute('data-no-loader')) return;
+                
+                e.preventDefault();
+                window.triggerRoadmapLoader();
+                setTimeout(() => { window.location.href = link.href; }, 800);
+            }
+        });
 
     });
 </script>

@@ -3151,6 +3151,7 @@ h3::first-letter {
         min-height: auto !important;
         padding-top: 1rem !important;
         padding-bottom: 2rem !important;
+        flex-direction: column !important;
     }
 
     .dashboard-hero-card {

@@ -61,9 +61,206 @@ GROQ_API_KEY = os.getenv('GROQ_API_KEY')
 GROQ_API_KEY_2 = os.getenv('GROQ_API_KEY_2.0')
 GROQ_CHAT_API_KEY = os.getenv('GROQ_CHAT_API_KEY')
 
+class GroqExplainer:
+    def __init__(self):
+        self.keys = [
+            os.getenv('GROQ_WORK_FLOW'),
+            os.getenv('GROQ_ROAD_MAP'),
+            os.getenv('GROQ_CHAT_API_KEY'),
+            os.getenv('GROQ_API_KEY'),
+            os.getenv('GROQ_API_KEY_2.0')
+        ]
+        self.keys = [k for k in self.keys if k]
+        self.current_index = 0
+
+    def get_token(self):
+        if not self.keys: return None
+        token = self.keys[self.current_index]
+        self.current_index = (self.current_index + 1) % len(self.keys)
+        return token
+
+    def call_ai(self, prompt, model="llama-3.3-70b-versatile", json_mode=True):
+        if not self.keys: return None
+        
+        for _ in range(len(self.keys)):
+            api_key = self.get_token()
+            url = "https://api.groq.com/openai/v1/chat/completions"
+            headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
+            payload = {
+                "model": model,
+                "messages": [{"role": "user", "content": prompt}],
+                "temperature": 0.3,
+                "response_format": {"type": "json_object"} if json_mode else None
+            }
+            try:
+                resp = requests.post(url, headers=headers, json=payload, timeout=25)
+                if resp.status_code == 429:
+                    print(f"Key {api_key[:10]}... rate limited, switching...")
+                    continue
+                resp.raise_for_status()
+                content = resp.json()['choices'][0]['message']['content']
+                return json.loads(content) if json_mode else content
+            except Exception as e:
+                print(f"Groq rotation error with key {api_key[:10]}...: {e}")
+                continue
+        return None
+
+def sanitize_ai_response(data):
+    """Deep cleans AI response data from corrupted characters like \uFFFD."""
+    if isinstance(data, dict):
+        return {k: sanitize_ai_response(v) for k, v in data.items()}
+    elif isinstance(data, list):
+        return [sanitize_ai_response(v) for v in data]
+    elif isinstance(data, str):
+        # Remove replacement character \uFFFD and other invisible garbage
+        # Try to force encode/decode to strip malformed bytes
+        try:
+            cleaned = data.encode('ascii', 'ignore').decode('ascii') # Very aggressive
+            if not cleaned or len(cleaned) < len(data) * 0.5: # If too much was lost, fall back to milder
+                 cleaned = data.encode('utf-8', 'ignore').decode('utf-8')
+            return cleaned.replace('\ufffd', '').replace('\uFFFD', '').strip()
+        except:
+            return data.replace('\ufffd', '').replace('\uFFFD', '').strip()
+    return data
+
+groq_explainer = GroqExplainer()
+
+INDUSTRIAL_WORKFLOW_CACHE = {}
+
+def get_industrial_workflow(skill):
+    """Generates detailed IT company expectations and role-based workflows for a given skill."""
+    if skill.lower() in INDUSTRIAL_WORKFLOW_CACHE:
+        return INDUSTRIAL_WORKFLOW_CACHE[skill.lower()]
+
+    prompt = f"""
+    Analyze the industrial workflow and company expectations for the skill: {skill} (Targeting 2025-2026 tech landscape).
+    Return EXACTLY a JSON object with these keys:
+    
+    1. "industry_context": (string) 2-3 lines with relevant emojis about how this skill is used in modern MNCs/Startups.
+    2. "workflow": (array) 5 clear phases of a real-world project workflow using this skill. Each phase MUST be a string with a <b>short, bold title</b> followed by a 2-3 line short and sweet explanation specifically designed to be easily understandable by students, using relevant emojis.
+    3. "career_progression": (array of 5 objects: Intern, Junior, Mid-Level, Senior, Lead/Architect)
+       - role: Name
+       - duration: time spent (e.g. 0-6 months)
+       - salary: Estimated Indian market salary in EXACTLY this format: "₹3.5L - ₹7L / yr" (use ₹ and Lakhs/yr)
+       - expected_skills: array of 3-4 specific skill items with relevant emojis
+       - responsibilities: array of 3-4 core duties with relevant emojis
+    4. "tasks": (array) 5 specific real-world tasks with emojis.
+    5. "tools": (array) 5 specific industry-standard tools with emojis.
+    6. "challenges": (array) 5 common technical bottlenecks with emojis.
+    7. "deliverables": (array) 5 specific artifacts or outputs with emojis. Each item MUST be a string with a <b>short, bold title</b> followed by a 2-3 line short and sweet explanation designed for students.
+    8. "reality_check": (array) 3 honest truths with emojis about the job. Each item MUST be a <b>bold title</b> followed by a 2-3 line short and sweet explanation for students.
+
+    STRICT RULES:
+    - EVERY string item (context, tasks, tools, etc.) MUST include at least one relevant emoji.
+    - Use HTML <b> tags for bolding inside strings.
+    - No markdown formatting.
+    - Indian market context for salary (LPA).
+    - Return ONLY the JSON object.
+    """
+
+    try:
+        data = groq_explainer.call_ai(prompt)
+        if data and isinstance(data, dict) and "career_progression" in data:
+            INDUSTRIAL_WORKFLOW_CACHE[skill.lower()] = data
+            return data
+    except Exception as e:
+        print(f"Industrial Workflow AI Error: {e}")
+
+    # --- Robust Fallback (MNC Benchmarks) ---
+    print(f"Using Fallback for {skill}...")
+    try:
+        # Standard format: ₹3.5L – ₹7L / yr
+        salaries = ["₹4L - ₹8L / yr", "₹8L - ₹15L / yr", "₹15L - ₹28L / yr", "₹28L - ₹45L / yr", "₹45L - ₹90L+ / yr"]
+        durations = ["0-6 Months (Internship)", "1-2 Years (Associate)", "3-5 Years (Core)", "6-10 Years (Senior)", "Lead / 10+ Years"]
+        
+        fallback_data = {
+            "industry_context": f"Professional expertise in <b>{skill}</b> is the backbone of modern enterprise solutions 🏗️, powering scalable architectures and digital transformation in the 2026 tech world 🚀.",
+            "workflow": [
+                "<b>Mission Discovery</b> 🔍: Just like a detective gathering clues, we talk to clients to understand the 'What' and 'Why' before writing a single line of code 🗺️.",
+                "<b>Architectural Blueprint</b> 📐: This is the design phase where we map out how different parts connect, ensuring the system is fast, secure, and ready for growth 🏗️.",
+                "<b>Rapid Construction</b> 💻: The exciting part! We build features piece-by-piece using agile methods, testing everything to keep the quality high ⚡.",
+                "<b>Cloud Deployment</b> 🌍: We push our work to global servers so users can access it instantly, while monitoring it like a mission control center 🚀.",
+                "<b>Continuous Evolution</b> ⚡: Technology never stops, so we keep improving the system based on user feedback to keep it top-of-the-line 📈."
+            ],
+            "career_progression": [],
+            "tasks": ["Collaborating with stakeholders 🤝", "Writing clean, scalable code ✍️", "Implementing unit & integration tests 🧪", "Participating in architectural reviews 🏛️", "Optimizing production performance 🚀"],
+            "tools": ["Jira / Linear 📊", "GitHub / GitLab 🐙", "Docker / Kubernetes 🐳", "Slack / Teams 💬", "VS Code / IDEs 💻"],
+            "challenges": ["Solving complex scalability issues 🧩", "Managing technical debt 🏚️", "Coordinating global timezones ⏰", "Maintaining high code coverage 📈", "Rapid tech evolution 🔄"],
+            "deliverables": [
+                "<b>Production-ready Code bases</b> 📦: The final, polished software that users actually interact with, built to professional industrial standards ✨.",
+                "<b>Detailed Documentation</b> 📄: A helpful guide that explains our work so other developers can easily understand and contribute to it 📚.",
+                "<b>System Design Maps</b> 🗺️: Visual blueprints showing how the data flows and how the architecture supports the business goals 🏗️.",
+                "<b>Automated Pipelines</b> ⛓️: Smart automated systems that test and deploy our code safely, reducing human error to zero ⚡.",
+                "<b>Actionable Feature Specs</b> 📝: Clear plans that describe exactly what new features will do and how they make users' lives better 🎯."
+            ],
+            "reality_check": [
+                "<b>Meetings are frequent</b> 🗓️: You'll spend about 25% of your time in collaboration meetings, making teamwork as important as coding skills 🗣️.",
+                "<b>Soft Skills are key</b> 📢: Being a coder is great, but explaining your ideas to non-tech people is what makes you an industry leader 🦸‍♂️.",
+                "<b>Code Reading vs Writing</b> 📖: You will actually spend 70% of your time reading and understanding existing code before writing your own 🔍."
+            ]
+        }
+
+        # Dynamically populate progression
+        from roadmap_data import DEFAULT_WORKFLOW
+        for i, role_base in enumerate(DEFAULT_WORKFLOW[:5]):
+            fallback_data["career_progression"].append({
+                "role": role_base["role"],
+                "duration": durations[i],
+                "salary": salaries[i],
+                "expected_skills": role_base["skills"][:4],
+                "responsibilities": [role_base["goal"]] + ["Mentoring others 👨‍🏫" if "Senior" in role_base["role"] else "Feature delivery 🚀"]
+            })
+            
+        return fallback_data
+    except Exception as fall_e:
+        print(f"Critical Fallback Failure: {fall_e}")
+    
+    return None
+
+@app.route('/api/industrial-workflow')
+def api_industrial_workflow():
+    skill = request.args.get('skill', '')
+    if not skill:
+        return jsonify({"error": "No skill provided"}), 400
+    
+    data = get_industrial_workflow(skill)
+    if not data:
+        return jsonify({"error": "Failed to generate workflow intelligence"}), 500
+    return jsonify(data)
+
+
+@app.route('/api/dynamic-tools-frameworks')
+def api_dynamic_tools_frameworks():
+    skill = request.args.get('skill', '')
+    if not skill:
+        return jsonify({"error": "No skill provided"}), 400
+        
+    prompt = f"""
+    Identify exactly 5 Industry-Standard Tools and 5 modern Frameworks for the skill: {skill} (Targeting 2026 industry).
+    Include 1 relevant emoji for EACH item.
+    Return ONLY a JSON object:
+    {{
+        "tools": ["Tool 1 🛠️", "Tool 2 📊", ...],
+        "frameworks": ["FW 1 ⚛️", "FW 2 ⚙️", ...]
+    }}
+    """
+    try:
+        data = groq_explainer.call_ai(prompt)
+        if data and ("tools" in data or "frameworks" in data):
+            return jsonify(sanitize_ai_response(data))
+    except Exception as e:
+        print(f"Dynamic Tools Error: {e}")
+        
+    # Standard Fallback (Cleaned Emojis)
+    return jsonify({
+        "tools": ["Git 🐙", "Jira 📊", "Postman 📮", "VS Code 💻", "Docker 🐳"],
+        "frameworks": ["Industry Standard Frameworks ⚙️", "Modern API Architectures 🔗", "Agile Methodologies 📋"]
+    })
+
+
 def get_groq_market_demand():
     """Fetches real-time IT market demand data using Groq Llama-3."""
-    if not GROQ_CHAT_API_KEY:
+    if not GROQ_CHAT_API_KEY and not GROQ_API_KEY:
         # High-quality Mock Data if API key is missing
         return {
             "skills": [
@@ -76,14 +273,8 @@ def get_groq_market_demand():
             ]
         }
     
-    url = "https://api.groq.com/openai/v1/chat/completions"
-    headers = {
-        "Authorization": f"Bearer {GROQ_CHAT_API_KEY}",
-        "Content-Type": "application/json"
-    }
-    
     prompt = """
-    Analyze the current (2024-2025) global IT job market. 
+    Analyze the current (2025-2026) global IT job market. 
     Return exactly 6 of the most in-demand skills and their current market demand percentage (0-100).
     Provide an estimated year-over-year growth percentage for each.
     
@@ -96,35 +287,15 @@ def get_groq_market_demand():
     }
     Use vibrant, modern colors (Indigo, Emerald, Sky Blue, Rose, Amber, Violet).
     """
-
-    payload = {
-        "model": "llama-3.3-70b-versatile",
-        "messages": [{"role": "user", "content": prompt}],
-        "temperature": 0.1,
-        "response_format": {"type": "json_object"}
-    }
     
-    try:
-        response = requests.post(url, headers=headers, json=payload, timeout=15)
-        return response.json()['choices'][0]['message']['content']
-    except Exception as e:
-        print(f"Groq API Error: {e}")
-        return None
+    data = groq_explainer.call_ai(prompt, model="llama-3.3-70b-versatile")
+    return data
 
 @app.route('/api/market-demand')
 def api_market_demand():
     data = get_groq_market_demand()
     if data is None:
         return jsonify({"skills": []}), 500
-    if isinstance(data, str):
-        # AI returns a JSON string, try to parse it safely
-        try:
-            parsed = json.loads(data)
-            return jsonify(parsed)
-        except Exception as e:
-            print(f"Failed to parse Market Demand JSON: {e}")
-            return jsonify({"skills": []}), 500
-    # Mock data case (it returns a dict)
     return jsonify(data)
 
 
@@ -479,7 +650,7 @@ def api_topic_explanation():
             # Verify basic structure
             test_json = json.loads(content)
             if test_json.get('explanation'):
-                return content
+                return jsonify(sanitize_ai_response(test_json))
         except Exception as e:
             print(f"Topic Explanation Attempt ({model_name}) failed: {e}")
             continue
@@ -764,6 +935,63 @@ def career_test():
         return redirect(url_for('login'))
     return render_template('career_test.html')
 
+@app.route('/api/predict-career', methods=['POST'])
+def predict_career():
+    data = request.json
+    interests = data.get('interests', [])
+    
+    if not interests:
+        return jsonify({"error": "No interests provided"}), 400
+        
+    try:
+        model = genai.GenerativeModel("gemini-2.5-flash")
+        prompt = f"""You are a specialized career counselor. 
+Based on these interests: {', '.join(interests)}, predict the most suitable technology career path.
+
+Return ONLY a JSON object with this exact format:
+{{
+  "role": "Specific Career Title",
+  "emoji": "🚀",
+  "match_reason": "Brief explanation why this fits the interests",
+  "salary": "Range in Indian Rupees (e.g. ₹8L - ₹25L+)",
+  "market_demand": "Demand level (e.g. High, Very High)",
+  "difficulty": 7,
+  "day_in_the_life": "A creative 2-sentence description of a daily routine",
+  "skills": ["Skill 1", "Skill 2", "Skill 3", "Skill 4"],
+  "companies": ["Company 1", "Company 2", "Company 3"]
+}}
+IMPORTANT: Return ONLY valid JSON, all financial values MUST be in Indian Rupees (INR)."""
+
+        response = model.generate_content(prompt)
+        text = response.text.replace('```json', '').replace('```', '').strip()
+        result = json.loads(text)
+        return jsonify(sanitize_ai_response(result))
+    except Exception as e:
+        print(f"Gemini Career Prediction Error, falling back to Groq: {str(e)}")
+        try:
+            # Re-generate prompt as string for Groq
+            result = groq_explainer.call_ai(prompt)
+            if result:
+                return jsonify(sanitize_ai_response(result))
+        except Exception as ge:
+            print(f"Groq Fallback Error: {str(ge)}")
+        
+        return jsonify({"error": "AI synthesis failed on all providers. Please try again."}), 500
+
+
+@app.route('/api/ats_status')
+def ats_status():
+    if not os.getenv('GEMINI_API_KEY'):
+        return jsonify({"status": "offline", "error": "API Key missing"}), 200
+    try:
+        model = genai.GenerativeModel("gemini-2.5-flash")
+        # Lightweight check - just list models or a tiny prompt
+        # We'll just assume online if key exists and model can be initialized, 
+        # or do a very small generation.
+        return jsonify({"status": "online"})
+    except Exception as e:
+        return jsonify({"status": "offline", "error": str(e)}), 200
+
 @app.route('/api/ats_analyze', methods=['POST'])
 def ats_analyze():
         
@@ -817,10 +1045,16 @@ IMPORTANT: Return ONLY valid JSON, no markdown formatting."""
 
         response = model.generate_content(prompt)
         result = json.loads(response.text.replace('```json', '').replace('```', '').strip())
-        return jsonify(result)
+        return jsonify(sanitize_ai_response(result))
     except Exception as e:
-        print("ATS API Error:", str(e))
-        return jsonify({"error": "Error during AI analysis."}), 500
+        print(f"Gemini ATS Error, falling back to Groq: {str(e)}")
+        try:
+            result = groq_explainer.call_ai(prompt)
+            if result:
+                return jsonify(sanitize_ai_response(result))
+        except Exception as ge:
+            print(f"Groq ATS Fallback Error: {str(ge)}")
+        return jsonify({"error": "Error during AI analysis on all providers."}), 500
 
 @app.route('/api/company-mode', methods=['POST'])
 def company_mode():
@@ -1294,42 +1528,52 @@ def resume_learning():
 def answer_redirect(question):
     clean_question = urllib.parse.unquote(question).strip()
     
+    # Helper to handle extraction from AI text
+    def process_ai_response(ai_text):
+        if not ai_text: return None
+        # Robust Regex URL Extraction and Validation
+        match = re.search(r'(https?://[^\s"\'<>]+)', ai_text)
+        valid_url = False
+        if match:
+            url = match.group(1)
+            if "youtube.com" not in url and "stackoverflow.com" not in url:
+                try:
+                    req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+                    with urllib.request.urlopen(req, timeout=2) as r:
+                        valid_url = (r.getcode() == 200)
+                except:
+                    pass
+                    
+                if valid_url:
+                    return redirect(url)
+                    
+        # If URL hallucinated or not found, generate YouTube search keywords
+        keywords = ai_text.replace('"', '').replace("'", '').strip()
+        # If response was a dead URL, strip it to extract native concepts
+        if "http" in keywords or not keywords:
+            fallback_clean = clean_question.lower()
+            for word in ["what is ", "explain ", "the difference between ", "how to ", "describe "]:
+                fallback_clean = fallback_clean.replace(word, "")
+            keywords = fallback_clean.strip()[:60]
+            
+        search_query = urllib.parse.quote(keywords)
+        return redirect(f"https://www.youtube.com/results?search_query={search_query}")
+
+    prompt = f"Find the most authoritative OFFICIAL DOCUMENTATION page (e.g., Oracle, MDN, Python.org) that answers the interview question: '{clean_question}'. DO NOT guess or hallucinate GeekforGeeks URLs. If official docs don't exist, return ONLY 2-3 concise search keywords (e.g. 'java abstract interface'). DO NOT provide YouTube or StackOverflow. Return ONLY the raw valid URL or the keywords."
+
     if GEMINI_API_KEY:
         try:
             model = genai.GenerativeModel("gemini-2.5-flash")
-            prompt = f"Find the most authoritative OFFICIAL DOCUMENTATION page (e.g., Oracle, MDN, Python.org) that answers the interview question: '{clean_question}'. DO NOT guess or hallucinate GeekforGeeks URLs. If official docs don't exist, return ONLY 2-3 concise search keywords (e.g. 'java abstract interface'). DO NOT provide YouTube or StackOverflow. Return ONLY the raw valid URL or the keywords."
             response = model.generate_content(prompt)
-            
-            # Robust Regex URL Extraction and Validation
-            match = re.search(r'(https?://[^\s"\'<>]+)', response.text)
-            valid_url = False
-            if match:
-                url = match.group(1)
-                if "youtube.com" not in url and "stackoverflow.com" not in url:
-                    try:
-                        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
-                        with urllib.request.urlopen(req, timeout=2) as r:
-                            valid_url = (r.getcode() == 200)
-                    except:
-                        pass
-                        
-                    if valid_url:
-                        return redirect(url)
-                        
-            # If URL hallucinated or not found, generate YouTube search keywords
-            keywords = response.text.replace('"', '').replace("'", '').strip()
-            # If response was a dead URL, strip it to extract native concepts
-            if "http" in keywords or not keywords:
-                fallback_clean = clean_question.lower()
-                for word in ["what is ", "explain ", "the difference between ", "how to ", "describe "]:
-                    fallback_clean = fallback_clean.replace(word, "")
-                keywords = fallback_clean.strip()[:60]
-                
-            search_query = urllib.parse.quote(keywords)
-            return redirect(f"https://www.youtube.com/results?search_query={search_query}")
-
+            return process_ai_response(response.text)
         except Exception as e:
-            print(f"Answer fetch error: {str(e)}")
+            print(f"Gemini Answer fetch error, falling back to Groq: {str(e)}")
+            try:
+                res_text = groq_explainer.call_ai(prompt, json_mode=False)
+                if res_text:
+                    return process_ai_response(res_text)
+            except Exception as ge:
+                print(f"Groq Answer fallback error: {str(ge)}")
             
     # Ultimate Fallback for Interview Questions: YouTube Search
     fallback_clean = clean_question.lower()
@@ -1623,7 +1867,7 @@ def get_salary_api():
         "model": "meta/llama3-70b-instruct",
         "messages": [{
             "role": "user",
-            "content": f"Provide average salary in India for {skill} developer in strictly JSON format with keys: fresher (object with yearly, monthly), mid (object with yearly, monthly), senior (object with yearly, monthly). Values MUST be numbers (e.g. 400000). Return ONLY JSON."
+            "content": f"Provide average salary in India for {skill} developer in strictly JSON format with keys: fresher (object with yearly, monthly), mid (object with yearly, monthly), senior (object with yearly, monthly). ALL values MUST be in Indian Rupees (INR) and formatted as numbers (e.g. 400000). Return ONLY JSON."
         }]
     }
     
@@ -2020,85 +2264,15 @@ INDUSTRIAL_WORKFLOW_DATA = {
 }
 
 DEFAULT_WORKFLOW = [
-     {"role": "Intern / Trainee", "skills": ["Basic Programming", "Version Control", "Debugging", "Communication"], "goal": "Learn the codebase and assist developers"},
-     {"role": "Junior Developer", "skills": ["Core Frameworks", "Database basics", "Testing", "API Integration"], "goal": "Deliver independent features on time"},
-     {"role": "Software Developer (Mid-Level)", "skills": ["System Design", "Performance Optimization", "CI/CD", "Security Basics"], "goal": "Architect complex components and mentor juniors"},
-     {"role": "Senior Developer", "skills": ["Cloud Architecture", "Scalability", "Advanced System Design", "Code Review"], "goal": "Lead technical development and ensure code quality"},
-     {"role": "Tech Lead", "skills": ["Technical Strategy", "Agile Leadership", "Cross-team coordination", "Mentoring"], "goal": "Drive project delivery and resolve technical blockers"},
-     {"role": "Solution Architect", "skills": ["Enterprise Architecture", "Risk Management", "Technology Evaluation", "System Integration"], "goal": "Design organization-wide scalable software solutions"},
-     {"role": "Engineering Manager", "skills": ["People Management", "Budgeting", "Project Planning", "Strategic Delivery"], "goal": "Ensure team health and manage product delivery"}
+     {"role": "Intern / Trainee", "skills": ["Basic Programming 💻", "Version Control (Git) 🐙", "Debugging 🐞", "Communication 📢"], "goal": "Learn the codebase and assist developers 📚"},
+     {"role": "Junior Developer", "skills": ["Core Frameworks ⚙️", "Database basics 🗄️", "Testing 🧪", "API Integration 🔗"], "goal": "Deliver independent features on time 🚀"},
+     {"role": "Software Developer (Mid-Level)", "skills": ["System Design 🏛️", "Performance Optimization ⚡", "CI/CD ⛓️", "Security Basics 🛡️"], "goal": "Architect complex components and mentor juniors 👨‍🏫"},
+     {"role": "Senior Developer", "skills": ["Cloud Architecture ☁️", "Scalability 📈", "Advanced System Design 🏗️", "Code Review 🔍"], "goal": "Lead technical development and ensure code quality ✨"},
+     {"role": "Tech Lead", "skills": ["Technical Strategy 🎯", "Agile Leadership 📋", "Cross-team coordination 🤝", "Mentoring 🎓"], "goal": "Drive project delivery and resolve technical blockers 🛠️"},
+     {"role": "Solution Architect", "skills": ["Enterprise Architecture 🏢", "Risk Management ⚠️", "Technology Evaluation ⚖️", "System Integration 🔄"], "goal": "Design organization-wide scalable software solutions 🌐"},
+     {"role": "Engineering Manager", "skills": ["People Management 👥", "Budgeting 💰", "Project Planning 📅", "Strategic Delivery 🚀"], "goal": "Ensure team health and manage product delivery 📈"}
 ]
 
-@app.route('/api/industrial-workflow', methods=['GET', 'POST'])
-@app.route('/api/industrial_workflow', methods=['GET', 'POST'])
-def get_industrial_workflow():
-    if request.method == 'POST':
-        data = request.json or {}
-        skill = data.get('skill', '').lower().strip()
-    else:
-        skill = request.args.get('skill', '').lower().strip()
-    
-    # 1. Hardcoded Fetch (Lightning Fast)
-    if skill in INDUSTRIAL_WORKFLOW_DATA:
-        return jsonify({"status": "success", "data": INDUSTRIAL_WORKFLOW_DATA[skill]})
-        
-    for key, workflow in INDUSTRIAL_WORKFLOW_DATA.items():
-        if key in skill:
-            return jsonify({"status": "success", "data": workflow})
-
-    groq_api_key = os.getenv('GROQ_CHAT_API_KEY') or os.getenv('GROQ_API_KEY_2.0') or os.getenv('GROQ_API_KEY')
-    if not groq_api_key:
-        return jsonify({"status": "success", "data": DEFAULT_WORKFLOW})
-
-    # 2. Dynamic Groq Fallback Generation
-    try:
-        url = "https://api.groq.com/openai/v1/chat/completions"
-        headers = {
-            "Authorization": f"Bearer {groq_api_key}",
-            "Content-Type": "application/json"
-        }
-        prompt = f"""
-        You are an elite Industry Expert AI system. Your task is to generate a REALISTIC and PRACTICAL "Industrial Workflow" roadmap for the skill: '{skill}'.
-
-        ⚠️ STRICT RULES:
-        1. NO textbook or generic answers.
-        2. NO definitions, theory, or academic explanations.
-        3. Explain ONLY how things work in REAL leading companies.
-        4. Content must feel like "Insider Industry Knowledge" (e.g., mention Sprint reviews, specific CI/CD triggers, real-world bug prioritization, etc.).
-        5. Keep it structured, detailed, and truthful.
-
-        Roles to include strictly in this order: Intern / Trainee, Junior Developer, Software Developer (Mid-Level), Senior Developer, Tech Lead, Solution Architect, Engineering Manager.
-        
-        For EACH role return exactly:
-        - "role": string
-        - "skills": list of strings (max 4 core technical skills actually used in production)
-        - "goal": one line string describing their practical business goal
-
-        Return ONLY a valid JSON object with a root key "workflow" containing the list. No markdown.
-        """
-        payload = {
-            "model": "llama-3.3-70b-versatile",
-            "messages": [{"role": "user", "content": prompt}],
-            "temperature": 0.2,
-            "max_tokens": 1500,
-            "response_format": {"type": "json_object"}
-        }
-        response = requests.post(url, headers=headers, json=payload, timeout=30)
-        response.raise_for_status()
-        res_data = response.json()
-        raw_json = res_data["choices"][0]["message"]["content"].strip()
-        workflow_data = json.loads(raw_json)
-        # Handle case where AI might wrap it in a root key
-        if isinstance(workflow_data, dict):
-            for k in workflow_data:
-                if isinstance(workflow_data[k], list):
-                    workflow_data = workflow_data[k]
-                    break
-        return jsonify({"status": "success", "workflow": workflow_data})
-    except Exception as e:
-        print(f"Workflow Generation Error with Groq: {str(e)}")
-        # 3. Always strictly guarantee a fallback array
-        return jsonify({"status": "success", "data": DEFAULT_WORKFLOW})
 
 def fetch_roadmap_json(skill):
     # Build prompt using string concatenation to avoid f-string brace issues
@@ -2594,9 +2768,9 @@ def download_complete_pdf():
             if not amount: return "N/A"
             try:
                 a = float(amount)
-                if a >= 100000: return f"Rs. {a/100000:.1f}".replace(".0","") + "L"
-                if a >= 1000: return f"Rs. {int(a/1000)}K"
-                return f"Rs. {int(a)}"
+                if a >= 100000: return f"₹{a/100000:.1f}".replace(".0","") + "L"
+                if a >= 1000: return f"₹{int(a/1000)}K"
+                return f"₹{int(a)}"
             except: return str(amount)
 
         salary_data = roadmap_json.get("salary_insights", {})
@@ -2668,72 +2842,72 @@ def download_complete_pdf():
             skill_configs = {
                 'java': {
                     'tools': ["IntelliJ IDEA", "Eclipse", "Spring Boot", "Maven / Gradle", "Postman", "Docker"],
-                    'fallback': "<b>Fresher:</b> Rs. 3-6 LPA (Rs. 25K-45K/mo)<br/><b>Mid:</b> Rs. 6-12 LPA (Rs. 50K-1L/mo)<br/><b>Senior:</b> Rs. 12-25+ LPA (Rs. 1L-2L+/mo)<br/><br/>",
+                    'fallback': "<b>Fresher:</b> ₹ 3-6 LPA (₹ 25K-45K/mo)<br/><b>Mid:</b> ₹ 6-12 LPA (₹ 50K-1L/mo)<br/><b>Senior:</b> ₹ 12-25+ LPA (₹ 1L-2L+/mo)<br/><br/>",
                     'tip': "Focus on Spring Boot + DSA"
                 },
                 'python': {
                     'tools': ["VS Code", "PyCharm", "Jupyter Notebook", "Django / Flask", "Pandas / NumPy"],
-                    'fallback': "<b>Fresher:</b> Rs. 3-7 LPA (Rs. 25K-55K/mo)<br/><b>Mid:</b> Rs. 7-15 LPA (Rs. 55K-1.2L/mo)<br/><b>Senior:</b> Rs. 15-30+ LPA (Rs. 1.2L-2.5L+/mo)<br/><br/>",
+                    'fallback': "<b>Fresher:</b> ₹ 3-7 LPA (₹ 25K-55K/mo)<br/><b>Mid:</b> ₹ 7-15 LPA (₹ 55K-1.2L/mo)<br/><b>Senior:</b> ₹ 15-30+ LPA (₹ 1.2L-2.5L+/mo)<br/><br/>",
                     'tip': "Focus on Django/FastAPI + DSA"
                 },
                 'cyber': {
                     'tools': ["Kali Linux", "Wireshark", "Metasploit", "Burp Suite", "Nmap"],
-                    'fallback': "<b>Fresher:</b> Rs. 4–8 LPA (Rs. 30K–60K/mo)<br/><b>Mid:</b> Rs. 8–18 LPA (Rs. 60K–1.5L/mo)<br/><b>Senior:</b> Rs. 20–40+ LPA (Rs. 1.5L–3L+/mo)<br/><br/>",
+                    'fallback': "<b>Fresher:</b> ₹ 4–8 LPA (₹ 30K–60K/mo)<br/><b>Mid:</b> ₹ 8–18 LPA (₹ 60K–1.5L/mo)<br/><b>Senior:</b> ₹ 20–40+ LPA (₹ 1.5L–3L+/mo)<br/><br/>",
                     'tip': "Focus on Certs (CEH, OSCP) + Networking"
                 },
                 'ai': {
                     'tools': ["Jupyter Notebook", "TensorFlow", "Scikit-learn", "Pandas", "Google Colab"],
-                    'fallback': "<b>Fresher:</b> Rs. 5–10 LPA (Rs. 40K–80K/mo)<br/><b>Mid:</b> Rs. 10–25 LPA (Rs. 80K–2L/mo)<br/><b>Senior:</b> Rs. 25–50+ LPA (Rs. 2L–4L+/mo)<br/><br/>",
+                    'fallback': "<b>Fresher:</b> ₹ 5–10 LPA (₹ 40K–80K/mo)<br/><b>Mid:</b> ₹ 10–25 LPA (₹ 80K–2L/mo)<br/><b>Senior:</b> ₹ 25–50+ LPA (₹ 2L–4L+/mo)<br/><br/>",
                     'tip': "Focus on PyTorch/Math + DSA"
                 },
                 'fullstack': {
                     'tools': ["VS Code", "GitHub", "Docker", "Postman", "Chrome DevTools"],
-                    'fallback': "<b>Fresher:</b> Rs. 4–8 LPA (Rs. 30K–60K/mo)<br/><b>Mid:</b> Rs. 8–18 LPA (Rs. 60K–1.5L/mo)<br/><b>Senior:</b> Rs. 18–35+ LPA (Rs. 1.5L–2.5L+/mo)<br/><br/>",
+                    'fallback': "<b>Fresher:</b> ₹ 4–8 LPA (₹ 30K–60K/mo)<br/><b>Mid:</b> ₹ 8–18 LPA (₹ 60K–1.5L/mo)<br/><b>Senior:</b> ₹ 18–35+ LPA (₹ 1.5L–2.5L+/mo)<br/><br/>",
                     'tip': "Focus on React/NodeJS + DSA"
                 },
                 'frontend': {
                     'tools': ["VS Code", "Webpack", "Figma", "Chrome DevTools", "Git / GitHub"],
-                    'fallback': "<b>Fresher:</b> Rs. 3–6 LPA (Rs. 25K–45K/mo)<br/><b>Mid:</b> Rs. 6–14 LPA (Rs. 50K–1.1L/mo)<br/><b>Senior:</b> Rs. 14–25+ LPA (Rs. 1.1L–2L+/mo)<br/><br/>",
+                    'fallback': "<b>Fresher:</b> ₹ 3–6 LPA (₹ 25K–45K/mo)<br/><b>Mid:</b> ₹ 6–14 LPA (₹ 50K–1.1L/mo)<br/><b>Senior:</b> ₹ 14–25+ LPA (₹ 1.1L–2L+/mo)<br/><br/>",
                     'tip': "Focus on React/NextJS + UI/UX"
                 },
                 'backend': {
                     'tools': ["VS Code", "Postman", "Docker", "Kubernetes", "Linux Shell"],
-                    'fallback': "<b>Fresher:</b> Rs. 4–7 LPA (Rs. 30K–55K/mo)<br/><b>Mid:</b> Rs. 7–16 LPA (Rs. 55K–1.3L/mo)<br/><b>Senior:</b> Rs. 16–30+ LPA (Rs. 1.3L–2.5L+/mo)<br/><br/>",
+                    'fallback': "<b>Fresher:</b> ₹ 4–7 LPA (₹ 30K–55K/mo)<br/><b>Mid:</b> ₹ 7–16 LPA (₹ 55K–1.3L/mo)<br/><b>Senior:</b> ₹ 16–30+ LPA (₹ 1.3L–2.5L+/mo)<br/><br/>",
                     'tip': "Focus on Microservices + DB Scaling"
                 },
                 'data': {
                     'tools': ["Jupyter Notebook", "Tableau / PowerBI", "SQL Server / MySQL", "Apache Spark", "Excel"],
-                    'fallback': "<b>Fresher:</b> Rs. 4–8 LPA (Rs. 30K–60K/mo)<br/><b>Mid:</b> Rs. 8–15 LPA (Rs. 60K–1.2L/mo)<br/><b>Senior:</b> Rs. 15–35+ LPA (Rs. 1.2L–2.5L+/mo)<br/><br/>",
+                    'fallback': "<b>Fresher:</b> ₹ 4–8 LPA (₹ 30K–60K/mo)<br/><b>Mid:</b> ₹ 8–15 LPA (₹ 60K–1.2L/mo)<br/><b>Senior:</b> ₹ 15–35+ LPA (₹ 1.2L–2.5L+/mo)<br/><br/>",
                     'tip': "Focus on SQL Mastery + Stats"
                 },
                 'devops': {
                     'tools': ["Docker", "Kubernetes", "Jenkins", "Terraform", "AWS / Azure Console"],
-                    'fallback': "<b>Fresher:</b> Rs. 5–9 LPA (Rs. 40K–70K/mo)<br/><b>Mid:</b> Rs. 9–18 LPA (Rs. 70K–1.5L/mo)<br/><b>Senior:</b> Rs. 18–35+ LPA (Rs. 1.5L–2.5L+/mo)<br/><br/>",
+                    'fallback': "<b>Fresher:</b> ₹ 5–9 LPA (₹ 40K–70K/mo)<br/><b>Mid:</b> ₹ 9–18 LPA (₹ 70K–1.5L/mo)<br/><b>Senior:</b> ₹ 18–35+ LPA (₹ 1.5L–2.5L+/mo)<br/><br/>",
                     'tip': "Focus on K8s + CI/CD Pipelines"
                 },
                 'mobile': {
                     'tools': ["Android Studio", "Xcode", "Firebase", "Postman", "Figma"],
-                    'fallback': "<b>Fresher:</b> Rs. 3–7 LPA (Rs. 25K–55K/mo)<br/><b>Mid:</b> Rs. 7–14 LPA (Rs. 55K–1.1L/mo)<br/><b>Senior:</b> Rs. 14–25+ LPA (Rs. 1.1L–2L+/mo)<br/><br/>",
+                    'fallback': "<b>Fresher:</b> ₹ 3–7 LPA (₹ 25K–55K/mo)<br/><b>Mid:</b> ₹ 7–14 LPA (₹ 55K–1.1L/mo)<br/><b>Senior:</b> ₹ 14–25+ LPA (₹ 1.1L–2L+/mo)<br/><br/>",
                     'tip': "Focus on Native iOS/Android or Flutter"
                 },
                 'game': {
                     'tools': ["Unity / Unreal Editor", "Visual Studio", "Blender", "GitHub", "Rider"],
-                    'fallback': "<b>Fresher:</b> Rs. 3–6 LPA (Rs. 25K–45K/mo)<br/><b>Mid:</b> Rs. 6–12 LPA (Rs. 50K–1L/mo)<br/><b>Senior:</b> Rs. 12–22+ LPA (Rs. 1L–1.8L+/mo)<br/><br/>",
+                    'fallback': "<b>Fresher:</b> ₹ 3–6 LPA (₹ 25K–45K/mo)<br/><b>Mid:</b> ₹ 6–12 LPA (₹ 50K–1L/mo)<br/><b>Senior:</b> ₹ 12–22+ LPA (₹ 1L–1.8L+/mo)<br/><br/>",
                     'tip': "Focus on Engine Mastery + C++/C#"
                 },
                 'blockchain': {
                     'tools': ["Remix IDE", "Hardhat / Truffle", "Ganache", "Metamask", "VS Code"],
-                    'fallback': "<b>Fresher:</b> Rs. 6–10 LPA (Rs. 50K–80K/mo)<br/><b>Mid:</b> Rs. 10–25 LPA (Rs. 80K–2L/mo)<br/><b>Senior:</b> Rs. 25–50+ LPA (Rs. 2L–4L+/mo)<br/><br/>",
+                    'fallback': "<b>Fresher:</b> ₹ 6–10 LPA (₹ 50K–80K/mo)<br/><b>Mid:</b> ₹ 10–25 LPA (₹ 80K–2L/mo)<br/><b>Senior:</b> ₹ 25–50+ LPA (₹ 2L–4L+/mo)<br/><br/>",
                     'tip': "Focus on Smart Contracts + Rust/Solidity"
                 },
                 'qa': {
                     'tools': ["Selenium", "Postman", "JMeter", "Jira", "Appium"],
-                    'fallback': "<b>Fresher:</b> Rs. 3-5 LPA (Rs. 25K-40K/mo)<br/><b>Mid:</b> Rs. 5-10 LPA (Rs. 40K-80K/mo)<br/><b>Senior:</b> Rs. 10-20+ LPA (Rs. 80K-1.6L+/mo)<br/><br/>",
+                    'fallback': "<b>Fresher:</b> ₹ 3-5 LPA (₹ 25K-40K/mo)<br/><b>Mid:</b> ₹ 5-10 LPA (₹ 40K-80K/mo)<br/><b>Senior:</b> ₹ 10-20+ LPA (₹ 80K-1.6L+/mo)<br/><br/>",
                     'tip': "Focus on Test Automation + Edge Cases"
                 },
                 'uiux': {
                     'tools': ["Figma", "Adobe XD", "Sketch", "InVision", "Miro"],
-                    'fallback': "<b>Fresher:</b> Rs. 3-6 LPA (Rs. 25K-45K/mo)<br/><b>Mid:</b> Rs. 6-12 LPA (Rs. 50K-1L/mo)<br/><b>Senior:</b> Rs. 12-20+ LPA (Rs. 1L-1.6L+/mo)<br/><br/>",
+                    'fallback': "<b>Fresher:</b> ₹ 3-6 LPA (₹ 25K-45K/mo)<br/><b>Mid:</b> ₹ 6-12 LPA (₹ 50K-1L/mo)<br/><b>Senior:</b> ₹ 12-20+ LPA (₹ 1L-1.6L+/mo)<br/><br/>",
                     'tip': "Focus on User Research + Prototyping"
                 }
             }
@@ -2741,7 +2915,7 @@ def download_complete_pdf():
             # Identify the relevant config group
             conf = skill_configs.get('default', {
                 'tools': ["VS Code", "Git / GitHub", "Docker", "Postman", "Google Chrome"],
-                'fallback': "<b>Fresher:</b> Rs. 3-6 LPA (Rs. 25K-45K/mo)<br/><b>Mid:</b> Rs. 6-12 LPA (Rs. 50K-1L/mo)<br/><b>Senior:</b> Rs. 12-25+ LPA (Rs. 1L-2L+/mo)<br/><br/>",
+                'fallback': "<b>Fresher:</b> ₹ 3-6 LPA (₹ 25K-45K/mo)<br/><b>Mid:</b> ₹ 6-12 LPA (₹ 50K-1L/mo)<br/><b>Senior:</b> ₹ 12-25+ LPA (₹ 1L-2L+/mo)<br/><br/>",
                 'tip': "Focus on Core Concepts + Deep Projects"
             })
             
