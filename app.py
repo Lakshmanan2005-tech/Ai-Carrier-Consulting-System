@@ -2512,6 +2512,19 @@ def download_complete_pdf():
         
         Story = []
         
+        # ── Helper: wrap_emojis ─────────────────────────
+        def wrap_emojis(text):
+            if not text: return ""
+            if not has_emoji_font:
+                # If no font, best to strip non-ASCII to avoid boxes
+                import re as _re
+                return _re.sub(r'[^\x00-\x7F]+', '', str(text))
+            
+            import re as _re
+            def emoji_repl(match):
+                return f'<font name="SegoeUIEmoji">{match.group(0)}</font>'
+            return _re.sub(r'[^\x00-\x7F]+', emoji_repl, str(text))
+
         # ── Helper: apply_linkify ───────────────────────
         def apply_linkify(text):
             if not text: return ""
@@ -2521,7 +2534,7 @@ def download_complete_pdf():
             safe_text = safe_text.replace('&lt;br&gt;', '<br/>').replace('&lt;br/&gt;', '<br/>')
             safe_text = re.sub(r'\[([^\]]+)\]\((https?://[^\s<>]+)\)', r'<a href=' + chr(34) + r'\2' + chr(34) + r' color=' + chr(34) + r'blue' + chr(34) + r'><u>\1</u></a>', safe_text)
             safe_text = re.sub(r'(?<!href=' + chr(34) + r')(?<!' + chr(34) + r'>)(https?://[^\s<>]+)', r'<a href=' + chr(34) + r'\1' + chr(34) + r' color=' + chr(34) + r'blue' + chr(34) + r'><u>\1</u></a>', safe_text)
-            return safe_text
+            return wrap_emojis(safe_text)
 
         # ── Helper: Clean section divider ─────────────────
         def add_divider():
@@ -2562,17 +2575,17 @@ def download_complete_pdf():
         
         def add_section(title_text, custom_emoji=''):
             add_divider()
-            import re as _re
             
-            # The original AI content might have its own emojis, let's keep them if present,
-            # otherwise strip them from the text itself and add our standard one.
-            clean_title = _re.sub(r'[^\x00-\x7F]+', '', title_text).strip()
+            # Keep emojis if font is available, otherwise strip
+            clean_title = wrap_emojis(title_text.strip())
             
-            if has_emoji_font:
+            if has_emoji_font and custom_emoji != 'NONE':
                 # Use real emoji from mapping or fallback custom_emoji
                 icon_char = '📌' # default
+                import re as _re
+                low_title = _re.sub(r'[^\x00-\x7F]+', '', title_text).lower()
                 for keyword, char in _section_emojis.items():
-                    if keyword in clean_title.lower():
+                    if keyword in low_title:
                         icon_char = char
                         break
                 if custom_emoji:
@@ -2581,11 +2594,11 @@ def download_complete_pdf():
                 icon_markup = f'<font name="SegoeUIEmoji" size="14">{icon_char}</font>  '
                 Story.append(Paragraph(icon_markup + f'<font color="#16213e">{clean_title}</font>', h2_style))
             else:
-                # Fallback to plain text if font fails
+                # Fallback to plain text if font fails or NONE requested
                 Story.append(Paragraph(f'<font color="#16213e">{clean_title}</font>', h2_style))
         
         # ── Helper: Render items as spaced bullets ────────
-        def add_bullets(items_list):
+        def add_bullets(items_list, show_link=True):
             bullet_items = []
             for item in items_list:
                 if isinstance(item, dict):
@@ -2597,7 +2610,7 @@ def download_complete_pdf():
                     parts = [f"<b>{apply_linkify(str(name))}</b>"]
                     if diff:
                         parts.append(f"  <font color='#666666'>({apply_linkify(str(diff))})</font>")
-                    if link:
+                    if link and show_link:
                         parts.append(f'  <a href="{link}" color="blue"><u>Link</u></a>')
                     
                     text = ''.join(parts)
@@ -2649,7 +2662,12 @@ def download_complete_pdf():
                 if not is_indepth and ('Career' in sec_title or 'Job' in sec_title):
                     continue
                 
-                add_section(sec_title, '📌')
+                # Remove automatic icon for specific levels to avoid double emojis
+                sec_icon = ''
+                if any(kw in lower_title for kw in ['beginner', 'intermediate', 'advanced', 'tools', 'project']):
+                    sec_icon = 'NONE'
+
+                add_section(sec_title, sec_icon)
                 
                 items = []
                 if isinstance(sec_content, list):
@@ -2661,7 +2679,13 @@ def download_complete_pdf():
                     else:
                         items = [sec_content]
 
-                add_bullets(items)
+                # Remove links for specific levels and tools
+                show_link = True
+                lower_title = sec_title.lower()
+                if any(kw in lower_title for kw in ['beginner', 'intermediate', 'advanced', 'tools', 'salary']):
+                    show_link = False
+                
+                add_bullets(items, show_link=show_link)
                 Story.append(Spacer(1, 6))
         else:
             # Fallback for re-fetch without sections key
@@ -2676,9 +2700,11 @@ def download_complete_pdf():
                 ("🚀 Real-world Projects", "projects")
             ]
             for ui_title, json_key in sections_map:
-                if json_key in roadmap_json and roadmap_json[json_key]:
-                    add_section(ui_title)
-                    add_bullets(roadmap_json[json_key])
+                    # Suppress automatic icon for these sections as they have their own in the title
+                    sec_icon = 'NONE' if json_key in ['beginner', 'intermediate', 'advanced', 'tools', 'projects'] else ''
+                    add_section(ui_title, sec_icon)
+                    show_link = json_key not in ['beginner', 'intermediate', 'advanced', 'tools', 'salary']
+                    add_bullets(roadmap_json[json_key], show_link=show_link)
                     Story.append(Spacer(1, 6))
                 
         # ── Industrial Workflow ───────────────────────────
@@ -2768,14 +2794,14 @@ def download_complete_pdf():
             if not amount: return "N/A"
             try:
                 a = float(amount)
-                if a >= 100000: return f"₹{a/100000:.1f}".replace(".0","") + "L"
-                if a >= 1000: return f"₹{int(a/1000)}K"
-                return f"₹{int(a)}"
+                if a >= 100000: return f"Rs. {a/100000:.1f}".replace(".0","") + "L"
+                if a >= 1000: return f"Rs. {int(a/1000)}K"
+                return f"Rs. {int(a)}"
             except: return str(amount)
 
         salary_data = roadmap_json.get("salary_insights", {})
         if salary_data and isinstance(salary_data, dict):
-            add_section("Salary Insights (India)", "💰")
+            add_section("Salary Insights (India)", "NONE")
             salary_items = []
             for level, label in [("fresher", "Fresher (0-2 yrs)"), ("mid", "Mid-Level (2-5 yrs)"), ("senior", "Senior (5+ yrs)")]:
                 level_data = salary_data.get(level, {})
