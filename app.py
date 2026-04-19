@@ -2440,8 +2440,8 @@ def download_complete_pdf():
         pdf_title = f"{skill.title()} Career Roadmap"
         doc = SimpleDocTemplate(
             buffer, pagesize=letter,
-            rightMargin=60, leftMargin=60,
-            topMargin=50, bottomMargin=40,
+            rightMargin=50, leftMargin=50,
+            topMargin=40, bottomMargin=35,
             title=pdf_title, author="AI Career Consulting System"
         )
         
@@ -2473,7 +2473,7 @@ def download_complete_pdf():
         )
         h2_style = ParagraphStyle(
             'PdfH2', parent=styles['Heading2'],
-            fontSize=16, leading=20,
+            fontSize=18, leading=22,
             spaceBefore=10, spaceAfter=8,
             textColor=dark_blue,
             leftIndent=0,
@@ -2481,21 +2481,21 @@ def download_complete_pdf():
         )
         h3_style = ParagraphStyle(
             'PdfH3', parent=styles['Heading3'],
-            fontSize=11, leading=14,
+            fontSize=12, leading=14,
             spaceBefore=6, spaceAfter=4,
             textColor=primary_teal,
             fontName='Helvetica-Bold'
         )
         body_style = ParagraphStyle(
             'PdfBody', parent=styles['Normal'],
-            fontSize=9.5, leading=14,
+            fontSize=11, leading=13.5,
             spaceAfter=4,
             textColor=grey_text,
             fontName='Helvetica'
         )
         bullet_style = ParagraphStyle(
             'PdfBullet', parent=styles['Normal'],
-            fontSize=9.5, leading=14,
+            fontSize=11, leading=13.5,
             spaceAfter=3,
             leftIndent=20,
             textColor=grey_text,
@@ -2641,8 +2641,6 @@ def download_complete_pdf():
                 current_block.append(Paragraph(icon_markup + f'<font color="{header_color}">{clean_title}</font>', h2_style))
             else:
                 current_block.append(Paragraph(f'<font color="{header_color}">{clean_title}</font>', h2_style))
-            
-            current_block.append(HRFlowable(width="100%", thickness=1.5, color=colors.HexColor(header_color), spaceAfter=10))
 
         def flush_block():
             if current_block:
@@ -2666,8 +2664,20 @@ def download_complete_pdf():
                     text = ": ".join(parts)
                     if desc:
                         text += f"<br/><font color='#555555'>{apply_linkify(str(desc))}</font>"
+                    
+                    # 100% Working Link Fallback
+                    if not link:
+                        topic_query = (str(name) + " " + (str(skill) or "")).replace(" ", "+")
+                        link = f"https://www.google.com/search?q={topic_query}+tutorial+official+documentation"
+                    
+                    text += f"<br/><a href='{link}' color='#f97316'><u>Access Resource</u></a>"
                 else:
-                    text = apply_linkify(str(item).lstrip('•').strip())
+                    item_text = str(item).lstrip('•').strip()
+                    text = apply_linkify(item_text)
+                    # Fallback Search Link for simple text items
+                    topic_query = (item_text + " " + (str(skill) or "")).replace(" ", "+")
+                    link = f"https://www.google.com/search?q={topic_query}+tutorial+official+documentation"
+                    text += f"<br/><a href='{link}' color='#f97316'><u>Access Resource</u></a>"
                 
                 if text.strip():
                     bullet_items.append(ListItem(Paragraph(text, bullet_style), bulletColor=primary_teal))
@@ -2758,7 +2768,8 @@ def download_complete_pdf():
                     # Suppress automatic icon for these sections as they have their own in the title
                     sec_icon = 'NONE' if json_key in ['beginner', 'intermediate', 'advanced', 'tools', 'projects'] else ''
                     add_section(ui_title, sec_icon)
-                    show_link = json_key not in ['beginner', 'intermediate', 'advanced', 'tools', 'salary']
+                    # Always show links per user request
+                    show_link = True 
                     add_bullets(items, show_link=show_link)
                     current_block.append(Spacer(1, 6))
                     flush_block()
@@ -2801,8 +2812,9 @@ def download_complete_pdf():
                     text += f"<br/><font color='#555555'><i>Why:</i> {apply_linkify(reason)}</font>"
                 if tip:
                     text += f"<br/><font color='#0a4d68'><i>Mentor Tip:</i> {apply_linkify(tip)}</font>"
-                if link:
-                    text += f"<br/><a href='{link}' color='blue'><u>Access Learning Resource</u></a>"
+                if not link:
+                    link = f"https://www.google.com/search?q={apply_linkify(topic)}+aptitude+questions+tricks"
+                text += f"<br/><a href='{link}' color='#f97316'><u>Master this Topic</u></a>"
                 
                 apt_items.append(ListItem(Paragraph(text, bullet_style), bulletColor=primary_teal))
             if apt_items:
@@ -2825,8 +2837,9 @@ def download_complete_pdf():
                     text += f"<br/><font color='#555555'><i>Importance:</i> {apply_linkify(imp)}</font>"
                 if prob:
                     text += f"<br/><font color='#7c3aed'><i>Must-Do Problem:</i> {apply_linkify(prob)}</font>"
-                if link:
-                    text += f"<br/><a href='{link}' color='blue'><u>Practice on LeetCode/GFG</u></a>"
+                if not link:
+                    link = f"https://www.google.com/search?q={apply_linkify(pattern)}+dsa+pattern+problems+gfg+leetcode"
+                text += f"<br/><a href='{link}' color='#f97316'><u>Practice Problems</u></a>"
                 
                 dsa_items.append(ListItem(Paragraph(text, bullet_style), bulletColor=primary_teal))
             if dsa_items:
@@ -2913,8 +2926,9 @@ def download_complete_pdf():
                     parts = [f"<b>{apply_linkify(str(name))}</b>"]
                     if desc:
                         parts.append(f" — {apply_linkify(str(desc))}")
-                    if url:
-                        parts.append(f' <a href="{url}" color="blue"><u>Visit</u></a>')
+                    if not url:
+                        url = f"https://www.google.com/search?q={apply_linkify(str(name))}+official+documentation+tutorial"
+                    parts.append(f' <a href="{url}" color="#f97316"><u>Access Now</u></a>')
                     text = ''.join(parts)
                 else:
                     text = apply_linkify(str(res))
@@ -3113,8 +3127,8 @@ def download_complete_pdf():
         else:
             # Build the Grid Layout (2 topics per page strictly)
             section_width = 6.5 * inch
-            section_height = 4.4 * inch # Total cell height
-            inner_height = 4.2 * inch   # Content height within cell
+            section_height = 4.6 * inch # Perfectly fits two rows on Letter page with new margins
+            inner_height = 4.5 * inch   
             
             final_grid_story = []
             
@@ -3141,8 +3155,8 @@ def download_complete_pdf():
                     ('VALIGN', (0,0), (-1,-1), 'TOP'),
                     ('LEFTPADDING', (0,0), (-1,-1), 0),
                     ('RIGHTPADDING', (0,0), (-1,-1), 0),
-                    ('TOPPADDING', (0,0), (-1,-1), 10),
-                    ('BOTTOMPADDING', (0,0), (-1,-1), 10),
+                    ('TOPPADDING', (0,0), (-1,-1), 5),    # Reduced from 10
+                    ('BOTTOMPADDING', (0,0), (-1,-1), 5), # Reduced from 10
                 ]))
                 
                 final_grid_story.append(page_table)
