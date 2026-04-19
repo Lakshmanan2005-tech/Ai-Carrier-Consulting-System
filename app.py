@@ -20,8 +20,9 @@ import docx
 import io
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, ListFlowable, ListItem, HRFlowable
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, ListFlowable, ListItem, HRFlowable, Image, PageBreak, CondPageBreak, Table, TableStyle, KeepInFrame
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib import colors
 from reportlab.lib.units import inch
 # Trigger reload...
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify, abort, send_file, make_response
@@ -2446,71 +2447,89 @@ def download_complete_pdf():
         
         styles = getSampleStyleSheet()
         
-        # ── Premium PDF Styles (Apple-style clean layout) ──
+        # ── Premium PDF Styles (Modern Branded Layout) ──
+        primary_teal = colors.HexColor('#0d9488')
+        secondary_teal = colors.HexColor('#f0fdfa')
+        accent_orange = colors.HexColor('#f97316')
+        dark_blue = colors.HexColor('#1a1a2e')
+        grey_text = colors.HexColor('#333333')
+        light_grey = colors.HexColor('#888888')
+
         title_style = ParagraphStyle(
             'PdfTitle', parent=styles['Heading1'],
-            fontSize=20, leading=26,
-            spaceBefore=0, spaceAfter=4,
+            fontSize=24, leading=28,
+            spaceBefore=0, spaceAfter=2,
             alignment=1,
-            textColor='#1a1a2e',
+            textColor=primary_teal,
             fontName='Helvetica-Bold'
         )
         subtitle_style = ParagraphStyle(
             'PdfSubtitle', parent=styles['Normal'],
             fontSize=10, leading=14,
             alignment=1,
-            spaceAfter=14,
-            textColor='#888888',
+            spaceAfter=30,
+            textColor=light_grey,
             fontName='Helvetica'
         )
         h2_style = ParagraphStyle(
             'PdfH2', parent=styles['Heading2'],
             fontSize=16, leading=20,
-            spaceBefore=14, spaceAfter=8,
-            textColor='#1a1a2e',
+            spaceBefore=10, spaceAfter=8,
+            textColor=dark_blue,
+            leftIndent=0,
             fontName='Helvetica-Bold'
         )
         h3_style = ParagraphStyle(
             'PdfH3', parent=styles['Heading3'],
-            fontSize=13, leading=17,
-            spaceBefore=10, spaceAfter=5,
-            textColor='#0f3460',
+            fontSize=11, leading=14,
+            spaceBefore=6, spaceAfter=4,
+            textColor=primary_teal,
             fontName='Helvetica-Bold'
         )
         body_style = ParagraphStyle(
             'PdfBody', parent=styles['Normal'],
-            fontSize=10.5, leading=15,
-            spaceAfter=5,
-            textColor='#333333',
+            fontSize=9.5, leading=14,
+            spaceAfter=4,
+            textColor=grey_text,
             fontName='Helvetica'
         )
         bullet_style = ParagraphStyle(
             'PdfBullet', parent=styles['Normal'],
-            fontSize=10.5, leading=15,
-            spaceAfter=4,
-            leftIndent=18,
-            textColor='#333333',
+            fontSize=9.5, leading=14,
+            spaceAfter=3,
+            leftIndent=20,
+            textColor=grey_text,
             fontName='Helvetica'
         )
         intro_style = ParagraphStyle(
             'PdfIntro', parent=styles['Normal'],
-            fontSize=10.5, leading=16,
-            spaceBefore=2, spaceAfter=10,
-            textColor='#444444',
-            fontName='Helvetica-Oblique'
+            fontSize=10, leading=15,
+            spaceBefore=4, spaceAfter=10,
+            textColor=colors.HexColor('#444444'),
+            fontName='Helvetica-Oblique',
+            leftIndent=10,
+            rightIndent=10
         )
         mentor_style = ParagraphStyle(
             'PdfMentor', parent=styles['Normal'],
-            fontSize=10.5, leading=15,
+            # Mentor style is used for logic highlights, keep it prominent
+            fontSize=9.5, leading=14,
             leftIndent=20, rightIndent=20,
             spaceBefore=10, spaceAfter=10,
-            textColor='#1a1a2e',
-            backColor='#f0f4f8',
+            textColor=dark_blue,
+            backColor=secondary_teal,
             borderPadding=10,
+            borderColor=primary_teal,
+            borderWidth=1,
+            borderRadius=6,
             fontName='Helvetica-Oblique'
         )
         
         Story = []
+        # Support for "2 sections per page" strictly: 
+        # Collect items into "topic blocks", then render every 2 blocks in a fixed-height table.
+        topic_blocks = [] # List of lists (each list is one topic's flowables)
+        current_block = []
         
         # ── Helper: wrap_emojis ─────────────────────────
         def wrap_emojis(text):
@@ -2532,14 +2551,16 @@ def download_complete_pdf():
             safe_text = safe_text.replace('&lt;b&gt;', '<b>').replace('&lt;/b&gt;', '</b>')
             safe_text = safe_text.replace('&lt;strong&gt;', '<b>').replace('&lt;/strong&gt;', '</b>')
             safe_text = safe_text.replace('&lt;br&gt;', '<br/>').replace('&lt;br/&gt;', '<br/>')
-            safe_text = re.sub(r'\[([^\]]+)\]\((https?://[^\s<>]+)\)', r'<a href=' + chr(34) + r'\2' + chr(34) + r' color=' + chr(34) + r'blue' + chr(34) + r'><u>\1</u></a>', safe_text)
-            safe_text = re.sub(r'(?<!href=' + chr(34) + r')(?<!' + chr(34) + r'>)(https?://[^\s<>]+)', r'<a href=' + chr(34) + r'\1' + chr(34) + r' color=' + chr(34) + r'blue' + chr(34) + r'><u>\1</u></a>', safe_text)
+            # Use Branded Orange for links
+            link_color = '#f97316'
+            safe_text = re.sub(r'\[([^\]]+)\]\((https?://[^\s<>]+)\)', r'<a href=' + chr(34) + r'\2' + chr(34) + r' color=' + chr(34) + link_color + chr(34) + r'><u>\1</u></a>', safe_text)
+            safe_text = re.sub(r'(?<!href=' + chr(34) + r')(?<!' + chr(34) + r'>)(https?://[^\s<>]+)', r'<a href=' + chr(34) + r'\1' + chr(34) + r' color=' + chr(34) + link_color + chr(34) + r'><u>\1</u></a>', safe_text)
             return wrap_emojis(safe_text)
 
         # ── Helper: Clean section divider ─────────────────
         def add_divider():
-            Story.append(Spacer(1, 10))
-            Story.append(HRFlowable(width='100%', thickness=0.3, color='#dddddd', spaceAfter=6, spaceBefore=2))
+            current_block.append(Spacer(1, 12))
+            current_block.append(HRFlowable(width='100%', thickness=1.5, color=primary_teal, spaceAfter=8, spaceBefore=4))
         
         # ── Helper: Section heading with divider + real emojis ──
         # Try to register Segoe UI Emoji for real emoji support (Windows/Local)
@@ -2574,28 +2595,59 @@ def download_complete_pdf():
         }
         
         def add_section(title_text, custom_emoji=''):
-            add_divider()
+            # Clearer, card-like spacing
+            current_block.append(Spacer(1, 10))
+            
+            # 1. Vibrant Color Mapping for Specific Titles
+            title_colors = {
+                'introduction': '#0d9488',     # Teal
+                'beginner': '#0d9488',         # Teal
+                'intermediate': '#0f766e',     # Dark Teal
+                'advanced': '#1e3a8a',         # Navy
+                'tool': '#9333ea',             # Purple
+                'project': '#0891b2',          # Cyan
+                'career': '#ea580c',           # Orange
+                'certification': '#ca8a04',    # Gold
+                'interview': '#dc2626',        # Red
+                'resource': '#2563eb',         # Blue
+                'aptitude': '#7c3aed',         # Deep Purple
+                'dsa': '#be123c',              # Rose
+                'workflow': '#4d7c0f',         # Lime
+                'advice': '#16a34a'            # Green
+            }
+            
+            header_color = '#1a1a2e' # Default Dark Blue
+            import re as _re
+            low_title_for_color = _re.sub(r'[^\x00-\x7F]+', '', title_text).lower()
+            for kw, color_hex in title_colors.items():
+                if kw in low_title_for_color:
+                    header_color = color_hex
+                    break
             
             # Keep emojis if font is available, otherwise strip
             clean_title = wrap_emojis(title_text.strip())
             
-            if has_emoji_font and custom_emoji != 'NONE':
-                # Use real emoji from mapping or fallback custom_emoji
-                icon_char = '📌' # default
-                import re as _re
-                low_title = _re.sub(r'[^\x00-\x7F]+', '', title_text).lower()
-                for keyword, char in _section_emojis.items():
-                    if keyword in low_title:
-                        icon_char = char
-                        break
-                if custom_emoji:
-                    icon_char = custom_emoji
+            # Use real emoji from mapping or fallback custom_emoji
+            icon_char = '📌' # default
+            for keyword, char in _section_emojis.items():
+                if keyword in low_title_for_color:
+                    icon_char = char
+                    break
+            if custom_emoji:
+                icon_char = custom_emoji
                     
-                icon_markup = f'<font name="SegoeUIEmoji" size="14">{icon_char}</font>  '
-                Story.append(Paragraph(icon_markup + f'<font color="#16213e">{clean_title}</font>', h2_style))
+            if has_emoji_font and icon_char != 'NONE':
+                icon_markup = f'<font name="SegoeUIEmoji" size="15" color="{header_color}">{icon_char}</font>  '
+                current_block.append(Paragraph(icon_markup + f'<font color="{header_color}">{clean_title}</font>', h2_style))
             else:
-                # Fallback to plain text if font fails or NONE requested
-                Story.append(Paragraph(f'<font color="#16213e">{clean_title}</font>', h2_style))
+                current_block.append(Paragraph(f'<font color="{header_color}">{clean_title}</font>', h2_style))
+            
+            current_block.append(HRFlowable(width="100%", thickness=1.5, color=colors.HexColor(header_color), spaceAfter=10))
+
+        def flush_block():
+            if current_block:
+                topic_blocks.append(list(current_block))
+                current_block.clear()
         
         # ── Helper: Render items as spaced bullets ────────
         def add_bullets(items_list, show_link=True):
@@ -2610,46 +2662,46 @@ def download_complete_pdf():
                     parts = [f"<b>{apply_linkify(str(name))}</b>"]
                     if diff:
                         parts.append(f"  <font color='#666666'>({apply_linkify(str(diff))})</font>")
-                    if link and show_link:
-                        parts.append(f'  <a href="{link}" color="blue"><u>Link</u></a>')
                     
-                    text = ''.join(parts)
+                    text = ": ".join(parts)
                     if desc:
                         text += f"<br/><font color='#555555'>{apply_linkify(str(desc))}</font>"
                 else:
                     text = apply_linkify(str(item).lstrip('•').strip())
                 
                 if text.strip():
-                    bullet_items.append(ListItem(Paragraph(text, bullet_style), bulletColor='#0f3460'))
+                    bullet_items.append(ListItem(Paragraph(text, bullet_style), bulletColor=primary_teal))
             
             if bullet_items:
-                Story.append(ListFlowable(
+                current_block.append(ListFlowable(
                     bullet_items,
                     bulletType='bullet',
                     bulletFontSize=5,
                     bulletOffsetY=-2,
                     start='\u2022'
                 ))
-                Story.append(Spacer(1, 6))
+                current_block.append(Spacer(1, 6))
         
         # ══════════════════════════════════════════════════
         # PDF CONTENT START
         # ══════════════════════════════════════════════════
         
-        title = roadmap_json.get("title", f"{skill.title()} Complete Career Guidance")
-        Story.append(Paragraph(title, title_style))
-        Story.append(Spacer(1, 2))
-        Story.append(HRFlowable(width='40%', thickness=1.5, color='#0f3460', spaceAfter=4, spaceBefore=0))
-        Story.append(Paragraph("AI-Powered Career Guidance Document", subtitle_style))
-        Story.append(Spacer(1, 8))
+        title = apply_linkify(roadmap_json.get("title", f"{skill.title()} Complete Career Guidance"))
+        current_block.append(Paragraph(title, title_style))
+        current_block.append(Spacer(1, 2))
+        current_block.append(HRFlowable(width='40%', thickness=1.5, color='#0f3460', spaceAfter=4, spaceBefore=0))
+        current_block.append(Paragraph("AI-Powered Career Guidance Document", subtitle_style))
+        current_block.append(Spacer(1, 8))
         
         # ── Introduction ─────────────────────────────
         intro = roadmap_json.get("introduction", "")
-        if intro:
+        if intro and str(intro).strip():
             add_section("Introduction")
-            safe_intro = str(intro).replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
-            Story.append(Paragraph(safe_intro, intro_style))
-            Story.append(Spacer(1, 8))
+            safe_intro = apply_linkify(intro)
+            current_block.append(Paragraph(safe_intro, intro_style))
+            current_block.append(Spacer(1, 8))
+        
+        flush_block() # Intro counts as one block if it exists
 
 
 
@@ -2657,6 +2709,7 @@ def download_complete_pdf():
         if 'sections' in roadmap_json and roadmap_json['sections']:
             for section in roadmap_json['sections']:
                 sec_title = section.get('title', 'Section').replace('🔥', '').replace('🚀', '').strip()
+                lower_title = sec_title.lower()
                 sec_content = section.get('content', '')
                 
                 if not is_indepth and ('Career' in sec_title or 'Job' in sec_title):
@@ -2681,12 +2734,12 @@ def download_complete_pdf():
 
                 # Remove links for specific levels and tools
                 show_link = True
-                lower_title = sec_title.lower()
                 if any(kw in lower_title for kw in ['beginner', 'intermediate', 'advanced', 'tools', 'salary']):
                     show_link = False
                 
                 add_bullets(items, show_link=show_link)
-                Story.append(Spacer(1, 6))
+                current_block.append(Spacer(1, 6))
+                flush_block()
         else:
             # Fallback for re-fetch without sections key
             sections_map = [
@@ -2700,32 +2753,37 @@ def download_complete_pdf():
                 ("🚀 Real-world Projects", "projects")
             ]
             for ui_title, json_key in sections_map:
+                items = roadmap_json.get(json_key)
+                if items and isinstance(items, list):
                     # Suppress automatic icon for these sections as they have their own in the title
                     sec_icon = 'NONE' if json_key in ['beginner', 'intermediate', 'advanced', 'tools', 'projects'] else ''
                     add_section(ui_title, sec_icon)
                     show_link = json_key not in ['beginner', 'intermediate', 'advanced', 'tools', 'salary']
-                    add_bullets(roadmap_json[json_key], show_link=show_link)
-                    Story.append(Spacer(1, 6))
+                    add_bullets(items, show_link=show_link)
+                    current_block.append(Spacer(1, 6))
+                    flush_block()
                 
         # ── Industrial Workflow ───────────────────────────
-        if "workflow" in roadmap_json:
+        if "workflow" in roadmap_json and roadmap_json.get("workflow"):
             add_section("Industrial Workflow", "🏭")
-            wf_data = roadmap_json["workflow"]
+            wf_data = roadmap_json.get("workflow", {})
             roles = ["intern", "junior", "developer", "senior", "lead", "architect", "manager"]
             display_roles = ["Intern / Trainee", "Junior Developer", "Software Developer (Mid-Level)", "Senior Developer", "Tech Lead", "Solution Architect", "Engineering Manager"]
             
             for k, display in zip(roles, display_roles):
                 if k in wf_data:
                     role_data = wf_data[k]
-                    Story.append(Paragraph(f"<b>{display}</b>", h3_style))
+                    current_block.append(Paragraph(f"<b>{display}</b>", h3_style))
                     goal = role_data.get("goal", "")
                     if goal:
-                        Story.append(Paragraph(f"Goal: {apply_linkify(goal)}", bullet_style))
+                        current_block.append(Paragraph(f"Goal: {apply_linkify(goal)}", bullet_style))
                     skills = role_data.get("skills", [])
                     if skills:
                         skill_str = ", ".join(str(s) for s in skills)
-                        Story.append(Paragraph(f"Skills: {apply_linkify(skill_str)}", bullet_style))
-                    Story.append(Spacer(1, 4))
+                        current_block.append(Paragraph(f"Skills: {apply_linkify(skill_str)}", bullet_style))
+                    current_block.append(Spacer(1, 4))
+            
+            flush_block()
 
         # ── Aptitude Preparation ──────────────────────────
         aptitude_data = roadmap_json.get("aptitude", [])
@@ -2746,10 +2804,10 @@ def download_complete_pdf():
                 if link:
                     text += f"<br/><a href='{link}' color='blue'><u>Access Learning Resource</u></a>"
                 
-                apt_items.append(ListItem(Paragraph(text, bullet_style), bulletColor='#0f3460'))
+                apt_items.append(ListItem(Paragraph(text, bullet_style), bulletColor=primary_teal))
             if apt_items:
-                Story.append(ListFlowable(apt_items, bulletType='bullet', bulletFontSize=6, bulletOffsetY=-2, start='•'))
-            Story.append(Spacer(1, 6))
+                current_block.append(ListFlowable(apt_items, bulletType='bullet', bulletFontSize=6, bulletOffsetY=-2, start='•'))
+            current_block.append(Spacer(1, 6))
 
         # ── DSA Mastery ──────────────────────────────────
         dsa_data = roadmap_json.get("dsa", [])
@@ -2770,24 +2828,27 @@ def download_complete_pdf():
                 if link:
                     text += f"<br/><a href='{link}' color='blue'><u>Practice on LeetCode/GFG</u></a>"
                 
-                dsa_items.append(ListItem(Paragraph(text, bullet_style), bulletColor='#0f3460'))
+                dsa_items.append(ListItem(Paragraph(text, bullet_style), bulletColor=primary_teal))
             if dsa_items:
-                Story.append(ListFlowable(dsa_items, bulletType='bullet', bulletFontSize=6, bulletOffsetY=-2, start='•'))
-            Story.append(Spacer(1, 6))
+                current_block.append(ListFlowable(dsa_items, bulletType='bullet', bulletFontSize=6, bulletOffsetY=-2, start='•'))
+            current_block.append(Spacer(1, 6))
+            flush_block()
 
         # ── Career Paths ─────────────────────────────────
         career_paths = roadmap_json.get("career_paths", [])
         if career_paths:
             add_section("Career Paths", "💼")
             add_bullets(career_paths)
-            Story.append(Spacer(1, 6))
+            current_block.append(Spacer(1, 6))
+            flush_block()
 
         # ── Certifications ───────────────────────────────
         certifications = roadmap_json.get("certifications", [])
         if certifications:
             add_section("Certifications", "🎓")
             add_bullets(certifications)
-            Story.append(Spacer(1, 6))
+            current_block.append(Spacer(1, 6))
+            flush_block()
 
         # ── Salary Insights ──────────────────────────────
         def format_salary_py(amount):
@@ -2810,11 +2871,12 @@ def download_complete_pdf():
                     monthly = level_data.get("monthly", 0)
                     salary_items.append(ListItem(
                         Paragraph(f"<b>{label}:</b>  {format_salary_py(yearly)}/yr  ({format_salary_py(monthly)}/mo)", bullet_style),
-                        bulletColor='#0f3460'
+                        bulletColor=primary_teal
                     ))
             if salary_items:
-                Story.append(ListFlowable(salary_items, bulletType='bullet', bulletFontSize=6, bulletOffsetY=-2, start='•'))
-            Story.append(Spacer(1, 6))
+                current_block.append(ListFlowable(salary_items, bulletType='bullet', bulletFontSize=6, bulletOffsetY=-2, start='•'))
+            current_block.append(Spacer(1, 6))
+            flush_block()
 
         # ── Mentor Wisdom ────────────────────────────────
         mentor_data = roadmap_json.get("mentor_wisdom", [])
@@ -2824,17 +2886,19 @@ def download_complete_pdf():
                 strat = item.get("strategy", "")
                 detail = item.get("detail", "")
                 if strat:
-                    Story.append(Paragraph(f"<b>{apply_linkify(strat)}</b>", h3_style))
+                    current_block.append(Paragraph(f"<b>{apply_linkify(strat)}</b>", h3_style))
                 if detail:
-                    Story.append(Paragraph(apply_linkify(detail), mentor_style))
-            Story.append(Spacer(1, 8))
+                    current_block.append(Paragraph(apply_linkify(detail), mentor_style))
+            current_block.append(Spacer(1, 8))
+            flush_block()
 
         # ── Interview Questions ──────────────────────────
         iq_data = roadmap_json.get("interview_questions", [])
         if iq_data:
             add_section("Interview Questions", "❓")
             add_bullets(iq_data)
-            Story.append(Spacer(1, 6))
+            current_block.append(Spacer(1, 6))
+            flush_block()
 
         # ── Best Resources ────────────────────────────────
         resources_data = roadmap_json.get("resources", [])
@@ -2855,10 +2919,11 @@ def download_complete_pdf():
                 else:
                     text = apply_linkify(str(res))
                 if text.strip():
-                    res_items.append(ListItem(Paragraph(text, bullet_style), bulletColor='#0f3460'))
+                    res_items.append(ListItem(Paragraph(text, bullet_style), bulletColor=primary_teal))
             if res_items:
-                Story.append(ListFlowable(res_items, bulletType='bullet', bulletFontSize=6, bulletOffsetY=-2, start='•'))
-            Story.append(Spacer(1, 6))
+                current_block.append(ListFlowable(res_items, bulletType='bullet', bulletFontSize=6, bulletOffsetY=-2, start='•'))
+            current_block.append(Spacer(1, 6))
+            flush_block()
 
         # --- Manual Extensions (Only if NOT in-depth) ---
         if not is_indepth:
@@ -2950,28 +3015,30 @@ def download_complete_pdf():
                     conf = skill_configs[key]
                     break
 
-            Story.append(Paragraph("Industry Tools", h2_style))
+            current_block.append(Paragraph("Industry Tools", h2_style))
             for t in conf['tools']:
-                Story.append(Paragraph(f"• {t}", body_style))
-            Story.append(Spacer(1, 0.1 * inch))
+                current_block.append(Paragraph(f"• {t}", body_style))
+            current_block.append(Spacer(1, 0.1 * inch))
+            flush_block()
 
             # --- Point 11: Career Opportunities ---
             if 'career' in roadmap_json and roadmap_json['career']:
-                Story.append(Paragraph("Career Opportunities", h2_style))
+                current_block.append(Paragraph("Career Opportunities", h2_style))
                 for item in roadmap_json['career']:
                     if isinstance(item, dict):
                         role = item.get('role') or item.get('topic') or item.get('title') or ''
                         desc = item.get('description') or item.get('desc') or ''
                         if role:
                             safe_role = apply_linkify(role)
-                            Story.append(Paragraph(f"<b>• {safe_role}</b>", body_style))
+                            current_block.append(Paragraph(f"<b>• {safe_role}</b>", body_style))
                         if desc:
                             safe_desc = apply_linkify(desc)
-                            Story.append(Paragraph(safe_desc, body_style))
+                            current_block.append(Paragraph(safe_desc, body_style))
                     else:
                         safe_item_c = apply_linkify(item)
-                        Story.append(Paragraph(f"• {safe_item_c}", body_style))
-                Story.append(Spacer(1, 0.1 * inch))
+                        current_block.append(Paragraph(f"• {safe_item_c}", body_style))
+                current_block.append(Spacer(1, 0.1 * inch))
+                flush_block()
 
         # ── Resources ────────────────────────────────────
         has_resources = False
@@ -2989,9 +3056,10 @@ def download_complete_pdf():
                 "Advanced Concepts: <a href='https://www.geeksforgeeks.org/' color='blue'><u>GeeksforGeeks</u></a> / <a href='https://developer.mozilla.org/' color='blue'><u>MDN</u></a>",
                 "Interview Prep: <a href='https://leetcode.com/' color='blue'><u>LeetCode</u></a> / <a href='https://www.hackerrank.com/' color='blue'><u>HackerRank</u></a>"
             ]
-            res_items = [ListItem(Paragraph(r, bullet_style), bulletColor='#0f3460') for r in resources_html]
-            Story.append(ListFlowable(res_items, bulletType='bullet', bulletFontSize=6, bulletOffsetY=-2, start='•'))
-            Story.append(Spacer(1, 6))
+            res_items = [ListItem(Paragraph(r, bullet_style), bulletColor=primary_teal) for r in resources_html]
+            current_block.append(ListFlowable(res_items, bulletType='bullet', bulletFontSize=6, bulletOffsetY=-2, start='•'))
+            current_block.append(Spacer(1, 6))
+            flush_block()
 
         # ── Final Advice ─────────────────────────────────
         add_section("Final Advice", "✅")
@@ -3002,11 +3070,92 @@ def download_complete_pdf():
             "Stay consistent for 3–6 months",
             "Don't just watch tutorials, implement everything"
         ]
-        advice_items = [ListItem(Paragraph(a, bullet_style), bulletColor='#0f3460') for a in advice_points]
-        Story.append(ListFlowable(advice_items, bulletType='bullet', bulletFontSize=6, bulletOffsetY=-2, start='•'))
-        Story.append(Spacer(1, 12))
+        advice_items = [ListItem(Paragraph(a, bullet_style), bulletColor=primary_teal) for a in advice_points]
+        current_block.append(ListFlowable(advice_items, bulletType='bullet', bulletFontSize=6, bulletOffsetY=-2, start='•'))
+        current_block.append(Spacer(1, 12))
+        flush_block()
 
-        doc.build(Story)
+        # --- Branded Page Template Helpers ---
+        logo_path = os.path.join(app.static_folder, 'logo_final.png')
+
+        def draw_branded_canvas(canvas, doc):
+            canvas.saveState()
+            
+            # 1. Header Accents
+            canvas.setStrokeColor(primary_teal)
+            canvas.setLineWidth(2)
+            canvas.line(0.75*inch, 10.4*inch, 7.75*inch, 10.4*inch)
+            
+            # 2. Footer
+            canvas.setFont('Helvetica', 8)
+            canvas.setFillColor(light_grey)
+            footer_text = f"AI Career Consulting System — Official Roadmap Report • Page {doc.page}"
+            canvas.drawCentredString(4.25*inch, 0.5*inch, footer_text)
+            
+            # 3. Logo Removal Logic
+            # Logo is removed per user request.
+
+            canvas.restoreState()
+
+        # Finalize all topic blocks
+        flush_block()
+
+        # Final Story Construction (Building the Grid)
+        if not topic_blocks:
+            # Empty guard: Handle the case where no AI content was generated
+            err_msg = [
+                Spacer(1, 2 * inch),
+                Paragraph("Professional Roadmap Generated", title_style),
+                Spacer(1, 0.5 * inch),
+                Paragraph("We encountered an issue retrieving detailed roadmap sections. Please try regenerating the roadmap.", subtitle_style)
+            ]
+            doc.build(err_msg, onFirstPage=draw_branded_canvas, onLaterPages=draw_branded_canvas)
+        else:
+            # Build the Grid Layout (2 topics per page strictly)
+            section_width = 6.5 * inch
+            section_height = 4.4 * inch # Total cell height
+            inner_height = 4.2 * inch   # Content height within cell
+            
+            final_grid_story = []
+            
+            for i in range(0, len(topic_blocks), 2):
+                page_cells = []
+                
+                # Row 1 Frame (Auto-Scaling)
+                row1_content = topic_blocks[i]
+                # KeepInFrame ensures content shrinks if it's too long, avoiding LayoutError
+                row1_frame = [KeepInFrame(section_width, inner_height, row1_content, mode='shrink')]
+                page_cells.append([row1_frame])
+                
+                # Row 2 Frame (if exists)
+                if i + 1 < len(topic_blocks):
+                    row2_content = topic_blocks[i+1]
+                    row2_frame = [KeepInFrame(section_width, inner_height, row2_content, mode='shrink')]
+                    page_cells.append([row2_frame])
+                else:
+                    page_cells.append([""]) # Placeholder for odd number of sections
+                
+                # Render this page's table
+                page_table = Table(page_cells, colWidths=[section_width], rowHeights=[section_height, section_height])
+                page_table.setStyle(TableStyle([
+                    ('VALIGN', (0,0), (-1,-1), 'TOP'),
+                    ('LEFTPADDING', (0,0), (-1,-1), 0),
+                    ('RIGHTPADDING', (0,0), (-1,-1), 0),
+                    ('TOPPADDING', (0,0), (-1,-1), 10),
+                    ('BOTTOMPADDING', (0,0), (-1,-1), 10),
+                ]))
+                
+                final_grid_story.append(page_table)
+                final_grid_story.append(PageBreak())
+
+            # Build the PDF
+            try:
+                doc.build(final_grid_story, onFirstPage=draw_branded_canvas, onLaterPages=draw_branded_canvas)
+            except Exception as build_err:
+                print(f"CRITICAL: Grid build failed: {build_err}")
+                # Secondary Failsafe: Fall back to standard flow if grid fails
+                all_flowables = [item for sublist in topic_blocks for item in sublist]
+                doc.build(all_flowables)
         buffer.seek(0)
         
         # Safe filename
