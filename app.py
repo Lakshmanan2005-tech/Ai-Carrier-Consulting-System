@@ -2513,12 +2513,12 @@ def download_complete_pdf():
         mentor_style = ParagraphStyle(
             'PdfMentor', parent=styles['Normal'],
             # Mentor style is used for logic highlights, keep it prominent
-            fontSize=9.5, leading=14,
-            leftIndent=20, rightIndent=20,
-            spaceBefore=10, spaceAfter=10,
+            fontSize=11, leading=13.5,
+            leftIndent=8, rightIndent=8,
+            spaceBefore=14, spaceAfter=14,
             textColor=dark_blue,
             backColor=secondary_teal,
-            borderPadding=10,
+            borderPadding=8,
             borderColor=primary_teal,
             borderWidth=1,
             borderRadius=6,
@@ -2644,6 +2644,9 @@ def download_complete_pdf():
 
         def flush_block():
             if current_block:
+                # Put a line at the exact end of the content for proper separation
+                current_block.append(Spacer(1, 12))
+                current_block.append(HRFlowable(width="100%", thickness=1, color=colors.HexColor('#dddddd'), spaceAfter=5))
                 topic_blocks.append(list(current_block))
                 current_block.clear()
         
@@ -2671,6 +2674,9 @@ def download_complete_pdf():
                         link = f"https://www.google.com/search?q={topic_query}+tutorial+official+documentation"
                     
                     text += f"<br/><a href='{link}' color='#f97316'><u>Access Resource</u></a>"
+                    yt_query = (str(name) + " " + (str(skill) or "")).replace(" ", "+")
+                    yt_link = f"https://www.youtube.com/results?search_query={yt_query}+tutorial"
+                    text += f" | <a href='{yt_link}' color='#dc2626'><u>Watch on YouTube</u></a>"
                 else:
                     item_text = str(item).lstrip('•').strip()
                     text = apply_linkify(item_text)
@@ -2678,6 +2684,8 @@ def download_complete_pdf():
                     topic_query = (item_text + " " + (str(skill) or "")).replace(" ", "+")
                     link = f"https://www.google.com/search?q={topic_query}+tutorial+official+documentation"
                     text += f"<br/><a href='{link}' color='#f97316'><u>Access Resource</u></a>"
+                    yt_link = f"https://www.youtube.com/results?search_query={topic_query}+tutorial"
+                    text += f" | <a href='{yt_link}' color='#dc2626'><u>Watch on YouTube</u></a>"
                 
                 if text.strip():
                     bullet_items.append(ListItem(Paragraph(text, bullet_style), bulletColor=primary_teal))
@@ -2816,6 +2824,10 @@ def download_complete_pdf():
                     link = f"https://www.google.com/search?q={apply_linkify(topic)}+aptitude+questions+tricks"
                 text += f"<br/><a href='{link}' color='#f97316'><u>Master this Topic</u></a>"
                 
+                yt_query = apply_linkify(topic).replace(" ", "+")
+                yt_link = f"https://www.youtube.com/results?search_query={yt_query}+aptitude+tricks"
+                text += f" | <a href='{yt_link}' color='#dc2626'><u>Watch on YouTube</u></a>"
+                
                 apt_items.append(ListItem(Paragraph(text, bullet_style), bulletColor=primary_teal))
             if apt_items:
                 current_block.append(ListFlowable(apt_items, bulletType='bullet', bulletFontSize=6, bulletOffsetY=-2, start='•'))
@@ -2840,6 +2852,10 @@ def download_complete_pdf():
                 if not link:
                     link = f"https://www.google.com/search?q={apply_linkify(pattern)}+dsa+pattern+problems+gfg+leetcode"
                 text += f"<br/><a href='{link}' color='#f97316'><u>Practice Problems</u></a>"
+                
+                yt_query = apply_linkify(pattern).replace(" ", "+")
+                yt_link = f"https://www.youtube.com/results?search_query={yt_query}+dsa+pattern+tutorial"
+                text += f" | <a href='{yt_link}' color='#dc2626'><u>Watch on YouTube</u></a>"
                 
                 dsa_items.append(ListItem(Paragraph(text, bullet_style), bulletColor=primary_teal))
             if dsa_items:
@@ -2902,7 +2918,8 @@ def download_complete_pdf():
                     current_block.append(Paragraph(f"<b>{apply_linkify(strat)}</b>", h3_style))
                 if detail:
                     current_block.append(Paragraph(apply_linkify(detail), mentor_style))
-            current_block.append(Spacer(1, 8))
+                current_block.append(Spacer(1, 8))
+            current_block.append(Spacer(1, 6))
             flush_block()
 
         # ── Interview Questions ──────────────────────────
@@ -3096,9 +3113,7 @@ def download_complete_pdf():
             canvas.saveState()
             
             # 1. Header Accents
-            canvas.setStrokeColor(primary_teal)
-            canvas.setLineWidth(2)
-            canvas.line(0.75*inch, 10.4*inch, 7.75*inch, 10.4*inch)
+            # Removed green/teal header line per user request.
             
             # 2. Footer
             canvas.setFont('Helvetica', 8)
@@ -3149,8 +3164,8 @@ def download_complete_pdf():
                 else:
                     page_cells.append([""]) # Placeholder for odd number of sections
                 
-                # Render this page's table
-                page_table = Table(page_cells, colWidths=[section_width], rowHeights=[section_height, section_height])
+                # Render this page's table (Removed fixed rowHeights to eliminate large gaps)
+                page_table = Table(page_cells, colWidths=[section_width])
                 page_table.setStyle(TableStyle([
                     ('VALIGN', (0,0), (-1,-1), 'TOP'),
                     ('LEFTPADDING', (0,0), (-1,-1), 0),
