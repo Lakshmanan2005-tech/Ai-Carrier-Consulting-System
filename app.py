@@ -1087,11 +1087,9 @@ Candidate Status: {experience_level.capitalize()}
 STRICT FORMATTING RULES (MANDATORY):
 1. NO MARKDOWN: Do NOT use symbols like -, *, **, ###, ##, #, or any bullet characters.
 2. NO BULLETS: Use clean plain text with proper spacing. Do not use lists.
-3. INTEGRATED RESOURCES: 
-   - Under EACH main section, provide a sub-section called "Resources:".
-   - Each resource MUST be an HTML anchor tag: <a href="URL" target="_blank">Name</a>
-   - Place each resource link on its own new line.
-   - Include 2-3 specific, high-quality links per major section.
+3. NO RESOURCES: 
+   - Do NOT provide a "Resources:" sub-section for ANY section.
+   - Do NOT include any external links or URLs.
 4. NO GLOBAL RESOURCES: Do NOT include a "Free Resources" section at the end.
 5. CLEAN HEADINGS: Use emojis as section prefixes (🎯, 📌, 💻, 🧠, 🛠, 📊, 🗺, 🚀, 🔥, 🏁).
 6. NO META-TEXT: Do not use labels like "[Optional Section]". Omit sections completely if they don't apply.
@@ -1105,15 +1103,16 @@ Aptitude Logic:
 - Omit it completely otherwise.
 
 SECTIONS TO INCLUDE:
-🎯 {company} Overview (+ Resources)
-📌 Role Expectations (+ Resources)
-🧠 Required Skills (+ Resources)
-💻 DSA & Coding Level (+ Resources)
-🛠 Tools & Technologies (+ Resources)
-🧠 Aptitude Round Preparation (For Freshers) (+ Resources)
+🎯 {company} Overview
+📌 Role Expectations
+🧠 Required Skills
+💻 DSA & Coding Level
+🛠 Tools & Technologies
+📚 Placement Preparation Materials
+🧠 Aptitude Round Preparation (For Freshers)
 (Provide a complete breakdown: Explain the 'Elimination Factor', list topics like Percentages, Puzzles, and Grammar, and suggest specific mock test frequencies. Mention that this is often the most critical gatekeeper.)
-📊 Interview Process (+ Resources)
-🗺 Preparation Roadmap (+ Resources)
+📊 Interview Process
+🗺 Preparation Roadmap
 🔥 Tips & Final Conclusion"""
 
         payload = {
