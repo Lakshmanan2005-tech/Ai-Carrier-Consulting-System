@@ -2669,22 +2669,24 @@ def download_complete_pdf():
                     
                     # 100% Working Link Fallback
                     if not link:
-                        topic_query = (str(name) + " " + (str(skill) or "")).replace(" ", "+")
+                        topic_query = (str(name) + " " + (str(skill) or "")).replace(" ", "+").replace("'", "%27")
                         link = f"https://www.google.com/search?q={topic_query}+tutorial+official+documentation"
+                    else:
+                        link = link.replace("'", "%27").replace("&", "&amp;")
                     
-                    text += f"<br/><a href='{link}' color='#f97316'><u>Access Resource</u></a>"
-                    yt_query = (str(name) + " " + (str(skill) or "")).replace(" ", "+")
+                    text += f'<br/><a href="{link}" color="#f97316"><u>Access Resource</u></a>'
+                    yt_query = (str(name) + " " + (str(skill) or "")).replace(" ", "+").replace("'", "%27")
                     yt_link = f"https://www.youtube.com/results?search_query={yt_query}+tutorial"
-                    text += f" | <a href='{yt_link}' color='#dc2626'><u>Watch on YouTube</u></a>"
+                    text += f' | <a href="{yt_link}" color="#dc2626"><u>Watch on YouTube</u></a>'
                 else:
                     item_text = str(item).lstrip('•').strip()
                     text = apply_linkify(item_text)
                     # Fallback Search Link for simple text items
-                    topic_query = (item_text + " " + (str(skill) or "")).replace(" ", "+")
+                    topic_query = (item_text + " " + (str(skill) or "")).replace(" ", "+").replace("'", "%27")
                     link = f"https://www.google.com/search?q={topic_query}+tutorial+official+documentation"
-                    text += f"<br/><a href='{link}' color='#f97316'><u>Access Resource</u></a>"
+                    text += f'<br/><a href="{link}" color="#f97316"><u>Access Resource</u></a>'
                     yt_link = f"https://www.youtube.com/results?search_query={topic_query}+tutorial"
-                    text += f" | <a href='{yt_link}' color='#dc2626'><u>Watch on YouTube</u></a>"
+                    text += f' | <a href="{yt_link}" color="#dc2626"><u>Watch on YouTube</u></a>'
                 
                 if text.strip():
                     bullet_items.append(ListItem(Paragraph(text, bullet_style), bulletColor=primary_teal))
@@ -2820,12 +2822,14 @@ def download_complete_pdf():
                 if tip:
                     text += f"<br/><font color='#0a4d68'><i>Mentor Tip:</i> {apply_linkify(tip)}</font>"
                 if not link:
-                    link = f"https://www.google.com/search?q={apply_linkify(topic)}+aptitude+questions+tricks"
-                text += f"<br/><a href='{link}' color='#f97316'><u>Master this Topic</u></a>"
+                    link = f"https://www.google.com/search?q={apply_linkify(topic).replace(' ', '+').replace('\'', '%27')}+aptitude+questions+tricks"
+                else:
+                    link = link.replace("'", "%27").replace("&", "&amp;")
+                text += f'<br/><a href="{link}" color="#f97316"><u>Master this Topic</u></a>'
                 
-                yt_query = apply_linkify(topic).replace(" ", "+")
+                yt_query = apply_linkify(topic).replace(" ", "+").replace("'", "%27")
                 yt_link = f"https://www.youtube.com/results?search_query={yt_query}+aptitude+tricks"
-                text += f" | <a href='{yt_link}' color='#dc2626'><u>Watch on YouTube</u></a>"
+                text += f' | <a href="{yt_link}" color="#dc2626"><u>Watch on YouTube</u></a>'
                 
                 apt_items.append(ListItem(Paragraph(text, bullet_style), bulletColor=primary_teal))
             if apt_items:
@@ -2849,12 +2853,14 @@ def download_complete_pdf():
                 if prob:
                     text += f"<br/><font color='#7c3aed'><i>Must-Do Problem:</i> {apply_linkify(prob)}</font>"
                 if not link:
-                    link = f"https://www.google.com/search?q={apply_linkify(pattern)}+dsa+pattern+problems+gfg+leetcode"
-                text += f"<br/><a href='{link}' color='#f97316'><u>Practice Problems</u></a>"
+                    link = f"https://www.google.com/search?q={apply_linkify(pattern).replace(' ', '+').replace('\'', '%27')}+dsa+pattern+problems+gfg+leetcode"
+                else:
+                    link = link.replace("'", "%27").replace("&", "&amp;")
+                text += f'<br/><a href="{link}" color="#f97316"><u>Practice Problems</u></a>'
                 
-                yt_query = apply_linkify(pattern).replace(" ", "+")
+                yt_query = apply_linkify(pattern).replace(" ", "+").replace("'", "%27")
                 yt_link = f"https://www.youtube.com/results?search_query={yt_query}+dsa+pattern+tutorial"
-                text += f" | <a href='{yt_link}' color='#dc2626'><u>Watch on YouTube</u></a>"
+                text += f' | <a href="{yt_link}" color="#dc2626"><u>Watch on YouTube</u></a>'
                 
                 dsa_items.append(ListItem(Paragraph(text, bullet_style), bulletColor=primary_teal))
             if dsa_items:
