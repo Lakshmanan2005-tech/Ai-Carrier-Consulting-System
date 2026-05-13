@@ -3199,8 +3199,8 @@
 
     <script>
         (function () {
-            const skill = "{{ skill_query }}".trim();
-            const cacheKey = `iw_cache_v9_${skill.toLowerCase().replace(/\s+/g, '_')}`;
+            const skill = (document.title.split('-')[0] || "{{ skill_query }}").trim();
+            const cacheKey = `iw_cache_v11_${skill.toLowerCase().replace(/\s+/g, '_')}`;
             const track = document.getElementById('iw-track');
             if (!track) return;
 
@@ -3278,6 +3278,7 @@
                                 return `
                                 <li style="${animatedStyle}; list-style:none;" class="iw-clickable-item" onclick="toggleIwSkillExplanation(this, this.getAttribute('data-topic'), '${config.color}')" data-topic="${safeDataTopic}">
                                     <div style="display:flex; align-items:flex-start; gap:10px;">
+                                        <i class="fa-solid fa-circle-info" style="margin-top:4px; font-size:0.8rem; color:${config.color}; opacity:0.7;"></i>
                                         <span>${formatItem(cleanItem)}</span>
                                     </div>
                                     <div class="iw-inline-explanation"></div>
@@ -3401,10 +3402,12 @@
                             <div class="iw-skill-chip-wrap">
                                 ${(role.expected_skills || []).map(s => {
                                     const cleanText = s.replace(/[\u{1F300}-\u{1F64F}\u{1F680}-\u{1F6FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F900}-\u{1F9FF}\u{1F3FB}-\u{1F3FF}\u{1F1E6}-\u{1F1FF}]/gu, '').trim();
+                                    const safeDataTopic = cleanText.replace(/"/g, "&quot;");
                                     return `
                                     <div style="position: relative;">
                                         <div class="iw-skill-chip" 
-                                             onclick="toggleIwSkillExplanation(this, '${cleanText.replace(/'/g, "\\'")}', '${color}')"
+                                             onclick="toggleIwSkillExplanation(this, this.getAttribute('data-topic'), '${color}')"
+                                             data-topic="${safeDataTopic}"
                                              style="border-color: color-mix(in srgb, ${color} 15%, transparent);">
                                             ${s}
                                         </div>
