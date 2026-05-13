@@ -615,48 +615,37 @@ def api_live_jobs():
 @app.route('/api/topic-explanation')
 def api_topic_explanation():
     topic = request.args.get('topic')
+    roadmap = request.args.get('roadmap', 'General Technology')
     if not topic:
         return jsonify({"error": "No topic provided"}), 400
         
-    # Robust retry logic for Topic Explanation
-    api_key = os.getenv('GROQ_CHAT_API_KEY') or os.getenv('GROQ_API_KEY')
-    if not api_key:
-        return jsonify({"error": "Groq API Key missing"}), 500
-        
-    url = "https://api.groq.com/openai/v1/chat/completions"
-    headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
+    prompt = f"""
+    Explain the technical topic '{topic}' specifically within the context of '{roadmap}'.
+    Target Audience: IT students and freshers looking to enter the industry.
     
-    prompt = f"""Explain '{topic}'. Return ONLY a JSON object:
-    {{
-        "title": "{topic}",
-        "explanation": "3-5 lines...",
-        "resources": [{{"type": "Docs/Video", "title": "...", "link": "..."}}],
-        "ai_tutor_article": "Detailed guide..."
-    }}"""
+    Return EXACTLY a JSON object with these keys:
+    1. "title": The name of the topic (e.g. "{topic}")
+    2. "explanation": A clear, 4-5 line high-level explanation with 1-2 relevant emojis. 
+       Explain WHAT it is and WHY it matters in a professional environment.
+    3. "resources": An array of 2 objects with keys "type" (Docs/Tutorial/Video), "title", and "link".
+    4. "ai_tutor_article": A more detailed 8-10 line guide or "pro-tip" for mastering this topic.
+    
+    Rules:
+    - Use student-friendly but professional language.
+    - Include relevant emojis.
+    - No markdown formatting.
+    - Return ONLY the JSON object.
+    """
 
-    for model_name in ["llama-3.3-70b-versatile", "llama-3.1-8b-instant"]:
-        try:
-            payload = {
-                "model": model_name,
-                "messages": [{"role": "user", "content": prompt}],
-                "temperature": 0.3,
-                "max_tokens": 1000,
-                "response_format": {"type": "json_object"}
-            }
-            response = requests.post(url, headers=headers, json=payload, timeout=15)
-            response.raise_for_status()
-            res_data = response.json()
-            content = res_data['choices'][0]['message']['content'].strip()
-            
-            # Verify basic structure
-            test_json = json.loads(content)
-            if test_json.get('explanation'):
-                return jsonify(sanitize_ai_response(test_json))
-        except Exception as e:
-            print(f"Topic Explanation Attempt ({model_name}) failed: {e}")
-            continue
+    try:
+        data = groq_explainer.call_ai(prompt)
+        if data and isinstance(data, dict) and "explanation" in data:
+            return jsonify(sanitize_ai_response(data))
+    except Exception as e:
+        print(f"Topic Explanation AI Error: {e}")
             
     return jsonify({"error": "Failed to fetch explanation"}), 500
+
 
 @app.route('/api/explain_skill')
 def api_explain_skill():

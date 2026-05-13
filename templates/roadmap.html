@@ -3199,7 +3199,7 @@
 
     <script>
         (function () {
-            const skill = (document.title.split('-')[0] || "{{ skill_query }}").trim();
+            const skill = "{{ skill_query }}".trim() || (document.title.split('-')[0] || "General").trim();
             const cacheKey = `iw_cache_v11_${skill.toLowerCase().replace(/\s+/g, '_')}`;
             const track = document.getElementById('iw-track');
             if (!track) return;
@@ -3499,16 +3499,39 @@
                     
                     if (d.error || !d.explanation) throw new Error(d.error || "No data");
 
+                    const resourcesHtml = (d.resources || []).map(r => `
+                        <a href="${r.link}" target="_blank" style="display:flex; align-items:center; gap:8px; color:${color}; text-decoration:none; font-size:0.8rem; font-weight:600; margin-bottom:6px;">
+                            <i class="fa-solid ${r.type === 'Video' ? 'fa-video' : 'fa-file-lines'}"></i>
+                            <span>${r.title}</span>
+                        </a>
+                    `).join('');
+
                     descBox.innerHTML = `
                         <i class="fa-solid fa-xmark iw-desc-close" onclick="this.parentElement.style.display='none'"></i>
-                        <div style="font-weight: 800; color: var(--text-primary); margin-bottom: 8px; font-size: 0.9rem; display: flex; align-items: center; gap: 8px;">
-                            <div style="width:24px; height:24px; background:color-mix(in srgb, ${color} 15%, transparent); border-radius:6px; display:flex; align-items:center; justify-content:center;">
-                                <i class="fa-solid fa-lightbulb" style="color: ${color}; font-size:0.8rem;"></i>
+                        <div style="font-weight: 800; color: var(--text-primary); margin-bottom: 8px; font-size: 0.95rem; display: flex; align-items: center; gap: 8px;">
+                            <div style="width:28px; height:28px; background:color-mix(in srgb, ${color} 15%, transparent); border-radius:8px; display:flex; align-items:center; justify-content:center;">
+                                <i class="fa-solid fa-lightbulb" style="color: ${color}; font-size:0.9rem;"></i>
                             </div>
                             ${d.title}
                         </div>
-                        <div style="line-height: 1.6; color: var(--text-secondary); margin-bottom: 12px; font-size: 0.9rem;">${d.explanation}</div>
-                        <div style="margin-top: 15px; border-top: 1px solid rgba(0,0,0,0.06); padding-top: 15px;">
+                        
+                        <div style="line-height: 1.6; color: var(--text-secondary); margin-bottom: 16px; font-size: 0.9rem;">${d.explanation}</div>
+                        
+                        ${d.ai_tutor_article ? `
+                        <div style="background: color-mix(in srgb, ${color} 5%, #f8fafc); border-radius: 12px; padding: 15px; margin-bottom: 15px; border: 1px solid color-mix(in srgb, ${color} 10%, transparent);">
+                            <div style="font-size: 0.7rem; font-weight: 800; color: ${color}; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px;">AI Pro-Tip</div>
+                            <div style="font-size: 0.85rem; color: var(--text-primary); line-height: 1.5;">${d.ai_tutor_article}</div>
+                        </div>
+                        ` : ''}
+
+                        ${resourcesHtml ? `
+                        <div style="margin-bottom: 15px;">
+                            <div style="font-size: 0.7rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">Learning Resources</div>
+                            ${resourcesHtml}
+                        </div>
+                        ` : ''}
+
+                        <div style="margin-top: 15px; border-top: 1px solid rgba(0,0,0,0.06); padding-top: 15px; display: flex; gap: 10px; flex-wrap: wrap;">
                             <a href="https://www.youtube.com/results?search_query=${encodeURIComponent(topic + ' tutorial')}" 
                                target="_blank" 
                                style="background: #ef4444; color: white; text-decoration: none; padding: 10px 18px; border-radius: 12px; font-size: 0.85rem; font-weight: 800; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2); transition: all 0.3s ease;"
@@ -3516,7 +3539,7 @@
                                onmouseout="this.style.transform='translateY(0)'; this.style.box-shadow='0 4px 12px rgba(239, 68, 68, 0.2)';"
                             >
                                 <i class="fa-brands fa-youtube" style="font-size: 1rem;"></i> 
-                                <span>Watch Video Tutorial</span>
+                                <span>Watch Masterclass</span>
                             </a>
                         </div>
                     `;
