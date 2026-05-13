@@ -621,19 +621,17 @@ def api_topic_explanation():
         
     prompt = f"""
     Explain the technical topic '{topic}' specifically within the context of '{roadmap}'.
-    Target Audience: IT students and freshers looking to enter the industry.
+    Target Audience: IT students and freshers.
     
     Return EXACTLY a JSON object with these keys:
-    1. "title": The name of the topic (e.g. "{topic}")
-    2. "explanation": A clear, 4-5 line high-level explanation with 1-2 relevant emojis. 
+    1. "title": "{topic}"
+    2. "explanation": A clear, 5-6 line high-level explanation with 1-2 relevant emojis. 
        Explain WHAT it is and WHY it matters in a professional environment.
-    3. "resources": An array of 2 objects with keys "type" (Docs/Tutorial/Video), "title", and "link".
-    4. "ai_tutor_article": A more detailed 8-10 line guide or "pro-tip" for mastering this topic.
     
     Rules:
-    - Use student-friendly but professional language.
+    - Use student-friendly language.
     - Include relevant emojis.
-    - No markdown formatting.
+    - No markdown.
     - Return ONLY the JSON object.
     """
 
