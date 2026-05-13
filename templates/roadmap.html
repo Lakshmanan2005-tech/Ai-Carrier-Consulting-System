@@ -3499,13 +3499,6 @@
                     
                     if (d.error || !d.explanation) throw new Error(d.error || "No data");
 
-                    const resourcesHtml = (d.resources || []).map(r => `
-                        <a href="${r.link}" target="_blank" style="display:flex; align-items:center; gap:8px; color:${color}; text-decoration:none; font-size:0.8rem; font-weight:600; margin-bottom:6px;">
-                            <i class="fa-solid ${r.type === 'Video' ? 'fa-video' : 'fa-file-lines'}"></i>
-                            <span>${r.title}</span>
-                        </a>
-                    `).join('');
-
                     descBox.innerHTML = `
                         <i class="fa-solid fa-xmark iw-desc-close" onclick="this.parentElement.style.display='none'"></i>
                         <div style="font-weight: 800; color: var(--text-primary); margin-bottom: 8px; font-size: 0.95rem; display: flex; align-items: center; gap: 8px;">
@@ -3517,20 +3510,6 @@
                         
                         <div style="line-height: 1.6; color: var(--text-secondary); margin-bottom: 16px; font-size: 0.9rem;">${d.explanation}</div>
                         
-                        ${d.ai_tutor_article ? `
-                        <div style="background: color-mix(in srgb, ${color} 5%, #f8fafc); border-radius: 12px; padding: 15px; margin-bottom: 15px; border: 1px solid color-mix(in srgb, ${color} 10%, transparent);">
-                            <div style="font-size: 0.7rem; font-weight: 800; color: ${color}; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px;">AI Pro-Tip</div>
-                            <div style="font-size: 0.85rem; color: var(--text-primary); line-height: 1.5;">${d.ai_tutor_article}</div>
-                        </div>
-                        ` : ''}
-
-                        ${resourcesHtml ? `
-                        <div style="margin-bottom: 15px;">
-                            <div style="font-size: 0.7rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">Learning Resources</div>
-                            ${resourcesHtml}
-                        </div>
-                        ` : ''}
-
                         <div style="margin-top: 15px; border-top: 1px solid rgba(0,0,0,0.06); padding-top: 15px; display: flex; gap: 10px; flex-wrap: wrap;">
                             <a href="https://www.youtube.com/results?search_query=${encodeURIComponent(topic + ' tutorial')}" 
                                target="_blank" 
